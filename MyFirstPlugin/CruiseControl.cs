@@ -13,16 +13,19 @@ using UnityEngine.UIElements;
 
 public class CruiseControl
 {
-    public float sp;
+    public float SetPoint { get; set; }
+    public float Acceleration { get; set; }
+    public float Speed { get; set; }
+    public float Throttle { get; set; }
     ManualLogSource logger;
     CruiseControlTarget target;
-    float kp = 1;
-    float kd = .25f;
+    float kp = .1f;
+    float kd = 0f;
     bool Enabled { get; set; }
     float lastThrottle;
     float currentTime;
     float dt;
-    float dtMax = .25f;
+    float dtMax = 1f;
     float lastSpeed = 0;
     float lastError = 0;
     // float acc
@@ -30,7 +33,7 @@ public class CruiseControl
     public CruiseControl(ManualLogSource logger)
     {
         target = new CruiseControlTarget();
-        sp = 0;
+        SetPoint = 0;
         this.logger = logger;
         lastThrottle = Time.realtimeSinceStartup;
     }
@@ -46,7 +49,7 @@ public class CruiseControl
             return;
         }
 
-        if (sp > 0)
+        if (SetPoint > 0)
         {
             Enabled = true;
         }
@@ -54,9 +57,9 @@ public class CruiseControl
         {
             return;
         }
-        if (sp <= 0)
+        if (SetPoint <= 0)
         {
-            sp = 0;
+            SetPoint = 0;
             target.SetThrottle(0f);
             Enabled = false;
             return;
@@ -74,12 +77,18 @@ public class CruiseControl
         }
         lastThrottle = Time.realtimeSinceStartup;
         float currentSpeed = target.GetSpeed();
-        float accel = currentSpeed - lastSpeed;
-        float throttle = target.GetThrottle();
-        float error = sp - currentSpeed;
+        Speed = currentSpeed;
+        double a = (currentSpeed / 3.6f - lastSpeed / 3.6f) * dtMax;
+        Acceleration = (float)Math.Round(a, 2);
+        Throttle = target.GetThrottle();
+        float error = SetPoint - currentSpeed;
         float result = kp * error + kd * (error - lastError);
-        logger.LogInfo($"sp={sp} currentSpeed={currentSpeed} throttle={throttle} error={error} result={result} reverser={reverser} accel={accel}");
+        // logger.LogInfo($"sp={SetPoint} currentSpeed={currentSpeed} throttle={throttle} error={error} result={result} reverser={reverser} accel={accel}");
         // result = Math.Min(result, .2f);
+        if (Speed < 5)
+        {
+            result = (float)Math.Min(.1, result);
+        }
         target.SetThrottle(result);
         lastSpeed = currentSpeed;
         lastError = error;

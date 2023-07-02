@@ -22,7 +22,7 @@ namespace MyFirstPlugin
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class MyPlugin : BaseUnityPlugin
     {
-        private CruiseControl cc;
+        private CruiseControl cruiseControl;
         static string cmd = "cc";
         // ExampleClass z;
 
@@ -36,12 +36,12 @@ namespace MyFirstPlugin
             Logger.LogInfo($"Plugin2 {PluginInfo.PLUGIN_GUID} is loaded!");
             // manager = GetComponent<InteriorControlsManager>();
             // SingletonBehaviour<HUDInterfacer>.Instance.HUDChanged += OnHUDChanged;
-            cc = new CruiseControl(Logger);
+            cruiseControl = new CruiseControl(Logger);
             RegisterCommands1();
-            Debug.Log($"Awake cc={cc}");
-            Debug.Log($"Awake cc={cc} {this.name}");
+            Debug.Log($"Awake cc={cruiseControl}");
+            Debug.Log($"Awake cc={cruiseControl} {this.name}");
             MyPlugin plugin = (MyPlugin)FindObjectOfType(typeof(MyPlugin));
-            Debug.Log($"Awake cc={cc} {this.name} plugin.name={plugin.name}");
+            Debug.Log($"Awake cc={cruiseControl} {this.name} plugin.name={plugin.name}");
             // tag = PluginInfo.PLUGIN_GUID;
 
             Debug.Log("new ExampleClass()");
@@ -56,21 +56,55 @@ namespace MyFirstPlugin
             Slower = configFile.Bind("Hotkeys", "Slower", new KeyboardShortcut(KeyCode.PageDown, KeyCode.LeftControl));
         }
 
+        int STEP = 5;
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.PageUp))
             {
-                cc.sp += 5;
-                Logger.LogInfo($"sp={cc.sp}");
+                cruiseControl.SetPoint += STEP;
+                Logger.LogInfo($"sp={cruiseControl.SetPoint}");
             }
             if (Input.GetKeyDown(KeyCode.PageDown))
             {
-                cc.sp -= 5;
-                Logger.LogInfo($"sp={cc.sp}");
+                cruiseControl.SetPoint -= STEP;
+                Logger.LogInfo($"sp={cruiseControl.SetPoint}");
             }
             // Logger.LogInfo($"Tick sp={cc.sp}");
-            cc.Tick();
+            cruiseControl.Tick();
         }
+
+        void OnGUI()
+        {
+            GUILayout.BeginArea(new Rect(0, 0, 300, 100));
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Set Point");
+            GUILayout.TextField($"{cruiseControl.SetPoint}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Throttle");
+            GUILayout.TextField($"{cruiseControl.Throttle}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Speed (km/h)");
+            GUILayout.TextField($"{cruiseControl.Speed}");
+            GUILayout.TextField($"{cruiseControl.SetPoint - cruiseControl.Speed}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Acceleration (m/s^2)");
+            GUILayout.TextField($"{cruiseControl.Acceleration}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndArea();
+            // GUILayout.Button("I am not inside an Area");
+            // GUILayout.BeginArea(new Rect(Screen.width / 2, Screen.height / 2, 300, 300));
+            // GUILayout.Button("I am completely inside an Area");
+            // GUILayout.EndArea();
+        }
+
         void Start()
         {
             // Debug.Log("MyPlugin.Start()");
@@ -193,7 +227,7 @@ namespace MyFirstPlugin
             set
             {
                 Debug.Log("speed.set");
-                cc.sp = value;
+                cruiseControl.SetPoint = value;
             }
         }
 
@@ -252,7 +286,7 @@ namespace MyFirstPlugin
             Terminal.Shell.Commands.Remove(cmd);
             Terminal.Shell.Variables.Remove(cmd);
             Debug.Log($"OnDestroy");
-            cc = null;
+            cruiseControl = null;
             tag = null;
             // z = null;
             // Destroy(z);
