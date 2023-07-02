@@ -7,9 +7,33 @@
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
+
+    <ReferencePath>
+      C:\Program Files (x86)\Steam\steamapps\common\Derail Valley\DerailValley_Data\Managed\;
+    </ReferencePath>
+    <AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath);</AssemblySearchPaths>
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Derail Valley -->
+    <Reference Include="Assembly-CSharp" />
+    <Reference Include="CommandTerminal" />
+    <Reference Include="DV.Common" />
+    <Reference Include="DV.Interaction" />
+    <Reference Include="DV.Inventory" />
+    <Reference Include="DV.Localization" />
+    <Reference Include="DV.PointSet" />
+    <Reference Include="DV.TerrainSystem" />
+    <Reference Include="DV.TerrainTools" />
+    <Reference Include="DV.ThingTypes" />
+    <Reference Include="DV.UI" />
+    <Reference Include="DV.UIFramework" />
+    <Reference Include="DV.UserManagement" />
+    <Reference Include="DV.Utils" />
+    <Reference Include="DV.WeatherSystem" />
+    <Reference Include="UnityEngine.UI" />
+    <Reference Include="Unity.TextMeshPro" />
+
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
