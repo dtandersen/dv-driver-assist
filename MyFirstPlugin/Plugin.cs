@@ -75,7 +75,7 @@ namespace MyFirstPlugin
 
         void OnGUI()
         {
-            GUILayout.BeginArea(new Rect(0, 0, 300, 100));
+            GUILayout.BeginArea(new Rect(0, 0, 300, 500));
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Set Point");
@@ -96,6 +96,31 @@ namespace MyFirstPlugin
             GUILayout.BeginHorizontal();
             GUILayout.Label("Acceleration (m/s^2)");
             GUILayout.TextField($"{cruiseControl.Acceleration}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Force");
+            GUILayout.TextField($"{cruiseControl.Force}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Power");
+            GUILayout.TextField($"{cruiseControl.Power}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Hoursepower");
+            GUILayout.TextField($"{cruiseControl.Hoursepower}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Torque");
+            GUILayout.TextField($"{cruiseControl.Torque}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Mass (t)");
+            GUILayout.TextField($"{cruiseControl.Mass / 1000}");
             GUILayout.EndHorizontal();
 
             GUILayout.EndArea();
