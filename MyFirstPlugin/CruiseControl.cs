@@ -235,7 +235,7 @@ class CruiseControlTarget
     {
         TrainCar locoCar = GetLocomotive();
         LocoIndicatorReader locoIndicatorReader = locoCar.loadedInterior?.GetComponent<LocoIndicatorReader>();
-        return locoIndicatorReader.tmTemp.Value > 120f;
+        return locoIndicatorReader.tmTemp.Value >= 100f;
     }
     private TrainCar GetLocomotive()
     {
