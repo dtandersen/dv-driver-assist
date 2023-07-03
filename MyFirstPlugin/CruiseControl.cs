@@ -6,6 +6,7 @@ using CommandTerminal;
 using DV.HUD;
 using DV.Simulation.Cars;
 using DV.UI.LocoHUD;
+using DV.UI.PresetEditors;
 using DV.Utils;
 using LocoSim.Implementations;
 using UnityEngine;
@@ -14,7 +15,8 @@ using UnityEngine.UIElements;
 
 public class CruiseControl
 {
-    public float SetPoint { get; set; }
+    public float DesiredSpeed { get; set; }
+    public float DesiredTorque { get; set; }
     public float Force { get; set; }
     public float Power { get; set; }
     public float Hoursepower { get; set; }
@@ -26,23 +28,39 @@ public class CruiseControl
     public float RPM { get; set; }
     ManualLogSource logger;
     CruiseControlTarget target;
-    float kp = .1f;
-    float kd = 0f;
+    // float kp = .0025f;
+    // float kd = 0f;
+    // float ki = .0006f;
     bool Enabled { get; set; }
     float lastThrottle;
+    private Pid throttlePid;
+    private Pid torquePid;
     float currentTime;
     float dt;
-    float dtMax = 1f;
+    float dtMax = 1f / 30f;
     float lastSpeed = 0;
-    float lastError = 0;
+    // float lastError = 0;
     // float acc
 
     public CruiseControl(ManualLogSource logger)
     {
         target = new CruiseControlTarget();
-        SetPoint = 0;
+        DesiredSpeed = 0;
+        DesiredTorque = 25000;
         this.logger = logger;
         lastThrottle = Time.realtimeSinceStartup;
+        torquePid = new Pid(DesiredSpeed, 10000, 0, 0);
+        torquePid.Bias = 2500;
+        float ku = .0075f;
+        float tu = 2;
+        float kp = .0075f;
+        // float kp = .005f;
+        float ki = .000025f;
+        // throttlePid = new Pid(0, kp, 0.125f * kp * tu, kp / (0.5f * tu));
+        throttlePid = new Pid(0, kp, 0, ki);
+        // throttlePid.MaxInt = 100f;
+        throttlePid.Bias = 10f;
+        // throttlePid.MinInt = -throttlePid.MaxInt;
     }
 
     public void Tick()
@@ -56,7 +74,7 @@ public class CruiseControl
             return;
         }
 
-        if (SetPoint > 0)
+        if (DesiredSpeed > 0)
         {
             Enabled = true;
         }
@@ -64,9 +82,9 @@ public class CruiseControl
         {
             return;
         }
-        if (SetPoint <= 0)
+        if (DesiredSpeed <= 0)
         {
-            SetPoint = 0;
+            DesiredSpeed = 0;
             target.SetThrottle(0f);
             Enabled = false;
             return;
@@ -92,26 +110,28 @@ public class CruiseControl
         Power = Mass * 9.8f / 2f * Speed / 3.6f;
         Force = Mass * 9.8f / 2f;
         Hoursepower = Power / 745.7f;
-        // RPM = target.GetRpm();
         Torque = target.GetTorque();
 
-        float error = SetPoint - currentSpeed;
-        float result = kp * error + kd * (error - lastError);
-        // logger.LogInfo($"sp={SetPoint} currentSpeed={currentSpeed} throttle={throttle} error={error} result={result} reverser={reverser} accel={accel}");
-        // result = Math.Min(result, .2f);
+        torquePid.SetPoint = DesiredSpeed;
+        float torqueResult = torquePid.evaluate(currentSpeed);
+        torqueResult = Math.Min(torqueResult, DesiredTorque);
+
+        throttlePid.SetPoint = torqueResult;
+        float throttleResult = throttlePid.evaluate(Torque) / 100f;
+        // if (throttleResult > 1 || throttleResult < 0)
+        // {
+        //     throttlePid.Unwind();
+        // }
+
         if (Speed < 5)
         {
-            result = (float)Math.Min(.1, result);
+            throttleResult = (float)Math.Min(.1, throttleResult);
         }
-        target.SetThrottle(result);
+        target.SetThrottle(throttleResult);
         lastSpeed = currentSpeed;
-        lastError = error;
+
+        logger.LogInfo($"torquePid={torquePid}, throttlePid={throttlePid}");
     }
-}
-
-class Pid
-{
-
 }
 
 class CruiseControlTarget
@@ -134,10 +154,6 @@ class CruiseControlTarget
     {
         TrainCar locoCar = GetLocomotive();
         BaseControlsOverrider obj = locoCar.GetComponent<SimController>()?.controlsOverrider;
-        // // obj.Brake?.Set(0f);
-        // // obj.IndependentBrake?.Set(1f);
-        // // obj.DynamicBrake?.Set(0f);
-        // // obj.Handbrake?.Set(0f);
         obj.Throttle?.Set(throttle);
     }
 
@@ -145,10 +161,6 @@ class CruiseControlTarget
     {
         TrainCar locoCar = GetLocomotive();
         BaseControlsOverrider obj = locoCar.GetComponent<SimController>()?.controlsOverrider;
-        // // obj.Brake?.Set(0f);
-        // // obj.IndependentBrake?.Set(1f);
-        // // obj.DynamicBrake?.Set(0f);
-        // // obj.Handbrake?.Set(0f);
         return obj.Reverser.Value;
     }
 
@@ -156,7 +168,6 @@ class CruiseControlTarget
     {
         TrainCar locoCar = GetLocomotive();
         BaseControlsOverrider obj = locoCar.GetComponent<SimController>()?.controlsOverrider;
-        // BaseControlsOverrider obj = locoCar.GetComponent<SimController>()?.tractionPortsFeeder.r;
 
         return obj.Throttle.Value;
     }
@@ -165,13 +176,10 @@ class CruiseControlTarget
     {
         float rpm;
         TrainCar locoCar = GetLocomotive();
-        // locoCar.tract
-        // BaseControlsOverrider obj =
         SimulationFlow simFlow = locoCar.GetComponent<SimController>()?.simFlow;
         string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.drivingForce.torqueGeneratedPortId;
         simFlow.TryGetPort(torqueGeneratedPortId, out torqueGeneratedPort);
         rpm = torqueGeneratedPort.Value;
-        // return obj.Throttle.Value;
         return rpm;
     }
     private Port torqueGeneratedPort;

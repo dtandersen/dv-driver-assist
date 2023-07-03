@@ -61,13 +61,13 @@ namespace MyFirstPlugin
         {
             if (Input.GetKeyDown(KeyCode.PageUp))
             {
-                cruiseControl.SetPoint += STEP;
-                Logger.LogInfo($"sp={cruiseControl.SetPoint}");
+                cruiseControl.DesiredSpeed += STEP;
+                Logger.LogInfo($"sp={cruiseControl.DesiredSpeed}");
             }
             if (Input.GetKeyDown(KeyCode.PageDown))
             {
-                cruiseControl.SetPoint -= STEP;
-                Logger.LogInfo($"sp={cruiseControl.SetPoint}");
+                cruiseControl.DesiredSpeed -= STEP;
+                Logger.LogInfo($"sp={cruiseControl.DesiredSpeed}");
             }
             // Logger.LogInfo($"Tick sp={cc.sp}");
             cruiseControl.Tick();
@@ -75,11 +75,14 @@ namespace MyFirstPlugin
 
         void OnGUI()
         {
+            if (Event.current.keyCode == KeyCode.Tab || Event.current.character == '\t')
+                Event.current.Use();
+
             GUILayout.BeginArea(new Rect(0, 0, 300, 500));
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Set Point");
-            GUILayout.TextField($"{cruiseControl.SetPoint}");
+            GUILayout.TextField($"{cruiseControl.DesiredSpeed}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -90,7 +93,7 @@ namespace MyFirstPlugin
             GUILayout.BeginHorizontal();
             GUILayout.Label("Speed (km/h)");
             GUILayout.TextField($"{cruiseControl.Speed}");
-            GUILayout.TextField($"{cruiseControl.SetPoint - cruiseControl.Speed}");
+            GUILayout.TextField($"{cruiseControl.DesiredSpeed - cruiseControl.Speed}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -252,7 +255,7 @@ namespace MyFirstPlugin
             set
             {
                 Debug.Log("speed.set");
-                cruiseControl.SetPoint = value;
+                cruiseControl.DesiredSpeed = value;
             }
         }
 
