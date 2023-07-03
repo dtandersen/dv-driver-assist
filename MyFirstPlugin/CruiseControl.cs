@@ -25,7 +25,8 @@ public class CruiseControl
     public float Acceleration { get; set; }
     public float Speed { get; set; }
     public float Throttle { get; set; }
-    public float RPM { get; set; }
+    public float Temperature { get; set; }
+
     ManualLogSource logger;
     CruiseControlTarget target;
     // float kp = .0025f;
@@ -47,7 +48,7 @@ public class CruiseControl
     {
         target = new CruiseControlTarget();
         DesiredSpeed = 0;
-        DesiredTorque = 22500;
+        DesiredTorque = 25000;
         this.logger = logger;
         lastThrottle = Time.realtimeSinceStartup;
         torquePid = new Pid(DesiredSpeed, 10000, 0, 0);
@@ -119,6 +120,7 @@ public class CruiseControl
 
         throttlePid.SetPoint = torqueResult;
         float throttleResult = throttlePid.evaluate(Torque) / 100f;
+        Temperature = target.GetTemperature();
         // if (throttleResult > 1 || throttleResult < 0)
         // {
         //     throttlePid.Unwind();
@@ -129,6 +131,10 @@ public class CruiseControl
         {
             throttleResult = 0;
         }
+        else if (target.TooHot())
+        {
+            throttleResult = Throttle - step;
+        }
         else if (DesiredTorque > Torque)
         {
             throttleResult = Throttle + step;
@@ -136,6 +142,10 @@ public class CruiseControl
         else if (DesiredTorque < Torque && !(Torque < lastTorque))
         {
             throttleResult = Throttle - step;
+        }
+        else
+        {
+            throttleResult = Throttle;
         }
         // if (throttleResult > Throttle)
         // {
@@ -146,10 +156,10 @@ public class CruiseControl
         //     throttleResult = Throttle - step;
         // }
 
-        if (Speed < 5)
-        {
-            throttleResult = (float)Math.Min(.1, throttleResult);
-        }
+        // if (Speed < 5)
+        // {
+        //     throttleResult = (float)Math.Min(.1, throttleResult);
+        // }
 
         target.SetThrottle(throttleResult);
         lastSpeed = currentSpeed;
@@ -221,6 +231,12 @@ class CruiseControlTarget
         return mass;
     }
 
+    public bool TooHot()
+    {
+        TrainCar locoCar = GetLocomotive();
+        LocoIndicatorReader locoIndicatorReader = locoCar.loadedInterior?.GetComponent<LocoIndicatorReader>();
+        return locoIndicatorReader.tmTemp.Value > 120f;
+    }
     private TrainCar GetLocomotive()
     {
         if (!PlayerManager.Car)
@@ -232,5 +248,12 @@ class CruiseControlTarget
             return null;
         }
         return PlayerManager.Car;
+    }
+
+    internal float GetTemperature()
+    {
+        TrainCar locoCar = GetLocomotive();
+        LocoIndicatorReader locoIndicatorReader = locoCar.loadedInterior?.GetComponent<LocoIndicatorReader>();
+        return locoIndicatorReader.tmTemp.Value;
     }
 }

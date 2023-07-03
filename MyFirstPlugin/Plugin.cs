@@ -126,6 +126,11 @@ namespace MyFirstPlugin
             GUILayout.TextField($"{cruiseControl.Mass / 1000}");
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Temperature");
+            GUILayout.TextField($"{cruiseControl.Temperature}");
+            GUILayout.EndHorizontal();
+
             GUILayout.EndArea();
             // GUILayout.Button("I am not inside an Area");
             // GUILayout.BeginArea(new Rect(Screen.width / 2, Screen.height / 2, 300, 300));
