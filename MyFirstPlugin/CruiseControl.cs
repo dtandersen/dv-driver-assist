@@ -37,8 +37,9 @@ public class CruiseControl
     private Pid torquePid;
     float currentTime;
     float dt;
-    float dtMax = 1f / 30f;
+    float dtMax = 1f;
     float lastSpeed = 0;
+    float lastTorque = 0;
     // float lastError = 0;
     // float acc
 
@@ -46,20 +47,20 @@ public class CruiseControl
     {
         target = new CruiseControlTarget();
         DesiredSpeed = 0;
-        DesiredTorque = 25000;
+        DesiredTorque = 22500;
         this.logger = logger;
         lastThrottle = Time.realtimeSinceStartup;
         torquePid = new Pid(DesiredSpeed, 10000, 0, 0);
         torquePid.Bias = 2500;
-        float ku = .0075f;
+        float ku = .025f;
         float tu = 2;
-        float kp = .0075f;
+        float kp = .01f;
         // float kp = .005f;
-        float ki = .000025f;
+        float ki = .0f;
         // throttlePid = new Pid(0, kp, 0.125f * kp * tu, kp / (0.5f * tu));
         throttlePid = new Pid(0, kp, 0, ki);
         // throttlePid.MaxInt = 100f;
-        throttlePid.Bias = 10f;
+        throttlePid.Bias = 50f;
         // throttlePid.MinInt = -throttlePid.MaxInt;
     }
 
@@ -122,13 +123,37 @@ public class CruiseControl
         // {
         //     throttlePid.Unwind();
         // }
+        float step = 0.1f;
+
+        if (Speed > DesiredSpeed)
+        {
+            throttleResult = 0;
+        }
+        else if (DesiredTorque > Torque)
+        {
+            throttleResult = Throttle + step;
+        }
+        else if (DesiredTorque < Torque && !(Torque < lastTorque))
+        {
+            throttleResult = Throttle - step;
+        }
+        // if (throttleResult > Throttle)
+        // {
+        //     throttleResult = Throttle + step;
+        // }
+        // else if (throttleResult < Throttle)
+        // {
+        //     throttleResult = Throttle - step;
+        // }
 
         if (Speed < 5)
         {
             throttleResult = (float)Math.Min(.1, throttleResult);
         }
+
         target.SetThrottle(throttleResult);
         lastSpeed = currentSpeed;
+        lastTorque = Torque;
 
         logger.LogInfo($"torquePid={torquePid}, throttlePid={throttlePid}");
     }
