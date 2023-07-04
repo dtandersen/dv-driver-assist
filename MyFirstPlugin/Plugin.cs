@@ -7,6 +7,8 @@ using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using CommandTerminal;
+using CruiseControlPlugin;
+using CruiseControlPlugin.Algorithm;
 using DV.HUD;
 using DV.Simulation.Cars;
 using DV.UI.LocoHUD;
@@ -24,6 +26,7 @@ namespace MyFirstPlugin
     {
         private CruiseControl cruiseControl;
         static string cmd = "cc";
+        CruiseControlTarget target;
         // ExampleClass z;
 
         // private InteriorControlsManager manager;
@@ -32,11 +35,15 @@ namespace MyFirstPlugin
         public ConfigEntry<KeyboardShortcut> Slower { get; set; }
         private void Awake()
         {
+            LoggerSingleton.Instance = new UnityLogger();
+            target = new CruiseControlTarget();
             // Plugin startup logic
             Logger.LogInfo($"Plugin2 {PluginInfo.PLUGIN_GUID} is loaded!");
             // manager = GetComponent<InteriorControlsManager>();
             // SingletonBehaviour<HUDInterfacer>.Instance.HUDChanged += OnHUDChanged;
-            cruiseControl = new CruiseControl(Logger);
+            cruiseControl = new CruiseControl(new PlayerLocoController());
+            cruiseControl.Accelerator = new DefaultAccelerationAlgo();
+            cruiseControl.Decelerator = new DefaultDecelerationAlgo();
             RegisterCommands1();
             Debug.Log($"Awake cc={cruiseControl}");
             Debug.Log($"Awake cc={cruiseControl} {this.name}");
@@ -54,11 +61,18 @@ namespace MyFirstPlugin
             ConfigFile configFile = new ConfigFile(PluginInfo.PLUGIN_NAME, true);
             Faster = configFile.Bind("Hotkeys", "Faster", new KeyboardShortcut(KeyCode.PageUp, KeyCode.LeftControl));
             Slower = configFile.Bind("Hotkeys", "Slower", new KeyboardShortcut(KeyCode.PageDown, KeyCode.LeftControl));
+            updateAccumulator = 0;
         }
 
         int STEP = 5;
+        float updateAccumulator;
         void Update()
         {
+            if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftControl))
+            {
+                cruiseControl.Enabled = !cruiseControl.Enabled;
+                Logger.LogInfo($"enabled={cruiseControl.Enabled}");
+            }
             if (Input.GetKeyDown(KeyCode.PageUp))
             {
                 cruiseControl.DesiredSpeed += STEP;
@@ -70,13 +84,31 @@ namespace MyFirstPlugin
                 Logger.LogInfo($"sp={cruiseControl.DesiredSpeed}");
             }
             // Logger.LogInfo($"Tick sp={cc.sp}");
-            cruiseControl.Tick();
+            updateAccumulator += Time.deltaTime;
+            if (updateAccumulator > 1)
+            {
+                cruiseControl.Tick();
+                // Logger.LogInfo("tick");
+                updateAccumulator = 0;
+            }
         }
 
+        float lastSpeed;
         void OnGUI()
         {
             if (Event.current.keyCode == KeyCode.Tab || Event.current.character == '\t')
                 Event.current.Use();
+
+            float Speed = target.GetSpeed();
+            double accel = (Speed / 3.6f - lastSpeed / 3.6f) * Time.deltaTime;
+            float Acceleration = (float)Math.Round(accel, 2);
+            float Throttle = target.GetThrottle();
+            float Mass = target.GetMass();
+            float Power = Mass * 9.8f / 2f * Speed / 3.6f;
+            float Force = Mass * 9.8f / 2f;
+            float Hoursepower = Power / 745.7f;
+            float Torque = target.GetTorque();
+            lastSpeed = Speed;
 
             GUILayout.BeginArea(new Rect(0, 0, 300, 500));
 
@@ -86,49 +118,54 @@ namespace MyFirstPlugin
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
+            GUILayout.Label("Enabled");
+            GUILayout.TextField($"{cruiseControl.Enabled}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
             GUILayout.Label("Throttle");
-            GUILayout.TextField($"{cruiseControl.Throttle}");
+            GUILayout.TextField($"{target.GetThrottle()}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Speed (km/h)");
-            GUILayout.TextField($"{cruiseControl.Speed}");
-            GUILayout.TextField($"{cruiseControl.DesiredSpeed - cruiseControl.Speed}");
+            GUILayout.TextField($"{target.GetSpeed()}");
+            GUILayout.TextField($"{cruiseControl.DesiredSpeed - target.GetSpeed()}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Acceleration (m/s^2)");
-            GUILayout.TextField($"{cruiseControl.Acceleration}");
+            GUILayout.TextField($"{Acceleration}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Force");
-            GUILayout.TextField($"{cruiseControl.Force}");
+            GUILayout.TextField($"{Force}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Power");
-            GUILayout.TextField($"{cruiseControl.Power}");
+            GUILayout.TextField($"{Power}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Hoursepower");
-            GUILayout.TextField($"{cruiseControl.Hoursepower}");
+            GUILayout.Label("Horsepower");
+            GUILayout.TextField($"{Hoursepower}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Torque");
-            GUILayout.TextField($"{cruiseControl.Torque}");
+            GUILayout.TextField($"{Torque}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Mass (t)");
-            GUILayout.TextField($"{cruiseControl.Mass / 1000}");
+            GUILayout.TextField($"{Mass / 1000}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Temperature");
-            GUILayout.TextField($"{cruiseControl.Temperature}");
+            GUILayout.TextField($"{target.GetTemperature()}");
             GUILayout.EndHorizontal();
 
             GUILayout.EndArea();
@@ -136,102 +173,6 @@ namespace MyFirstPlugin
             // GUILayout.BeginArea(new Rect(Screen.width / 2, Screen.height / 2, 300, 300));
             // GUILayout.Button("I am completely inside an Area");
             // GUILayout.EndArea();
-        }
-
-        void Start()
-        {
-            // Debug.Log("MyPlugin.Start()");
-            // GameObject newCanvas = new GameObject("Canvas");
-
-            // Canvas c = newCanvas.AddComponent<Canvas>();
-            // c.renderMode = RenderMode.ScreenSpaceOverlay;
-
-            // newCanvas.AddComponent<CanvasScaler>();
-            // newCanvas.AddComponent<GraphicRaycaster>();
-
-            // GameObject panel = new GameObject("Panel");
-            // panel.AddComponent<CanvasRenderer>();
-
-            // Image i = panel.AddComponent<Image>();
-            // i.color = Color.red;
-
-            // panel.transform.SetParent(newCanvas.transform, false);
-
-
-
-
-
-
-
-
-            // z = new ExampleClass();
-            // GameObject obj = new GameObject("[test]");
-            // Canvas canvas = obj.AddComponent<Canvas>();
-            // canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            // CanvasScaler canvasScaler = obj.AddComponent<CanvasScaler>();
-            // canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            // canvasScaler.matchWidthOrHeight = 1f;
-            // canvasScaler.referenceResolution = new Vector2(1920f, 1080f);
-            // GameObject obj2 = new GameObject("Label");
-            // obj2.transform.SetParent(canvas.transform, worldPositionStays: false);
-            // TextMeshProUGUI textMeshProUGUI = obj2.AddComponent<TextMeshProUGUI>();
-            // RectTransform rectTransform = textMeshProUGUI.rectTransform;
-            // rectTransform.anchorMin = Vector2.zero;
-            // rectTransform.anchorMax = Vector2.one;
-            // rectTransform.sizeDelta = Vector2.zero;
-            // rectTransform.offsetMin = new Vector2(50f, 50f);
-            // rectTransform.offsetMax = new Vector2(-50f, -50f);
-            // Material material = textMeshProUGUI.material;
-            // material.EnableKeyword(ShaderUtilities.Keyword_Underlay);
-            // material.SetFloat("_UnderlayDilate", 1f);
-            // material.SetFloat("_UnderlayOffsetY", -1f);
-            // textMeshProUGUI.material = material;
-            // textMeshProUGUI.color = new Color(1f, 1f, 0.5f, 1f);
-            // textMeshProUGUI.text = "";
-            // textMeshProUGUI.enabled = true;            // z.enabled = true;
-
-        }
-
-        // private void CreateButtons()
-        // {
-        //     presentedButtons = new List<UnityEngine.UI.Button>();
-
-        //     for (int i = 0; i < inventoryToDisplay.Container.ItemLines.Count; i++)
-        //     {
-        //         presentedButtons.Add(Instantiate(ButtonPrefab, new Vector3(XStartPosition, YStartPosition - (i * YSpaceBetweenRows), 0), Quaternion.identity));
-        //         presentedButtons[i].transform.SetParent(GetComponent<RectTransform>(), false);
-        //         TMP_Text txt = presentedButtons[i].GetComponentInChildren<TMP_Text>();
-        //         txt.text = inventoryToDisplay.Container.ItemLines[i].item.Name + " (" + inventoryToDisplay.Container.ItemLines[i].amount + ")";
-
-        //         presentedButtons[i].onClick.AddListener(() =>
-        //         {
-        //             _spawner.testButtonPress(inventoryToDisplay.Container.ItemLines[i].item);
-        //         });
-        //     }
-        // }
-        // public void CreateButton(Transform panel, Vector3 position, Vector2 size,
-        // UnityEngine.Events.UnityAction method)
-        // {
-        //     GameObject button = new GameObject();
-        //     button.transform.parent = panel;
-        //     button.AddComponent<RectTransform>();
-        //     button.AddComponent<Button>();
-        //     button.transform.position = position;
-        //     button.GetComponent<RectTransform>().SetSize(size);
-        //     button.GetComponent<Button>().onClick.AddListener(method);
-        // }
-
-        private void MakeButton()
-        {
-            // GameObject newButton = DefaultControls.CreateButton(new Resources());
-
-            // GameObject button = new GameObject();
-            // button.transform.parent = panel;
-            // button.AddComponent<RectTransform>();
-            // button.AddComponent<Button>();
-            // button.transform.position = position;
-            // button.GetComponent<RectTransform>().SetSize(size);
-            // button.GetComponent<Button>().onClick.AddListener(method);
         }
 
         private void RegisterCommands1()
