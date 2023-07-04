@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using BepInEx.Logging;
 using DV.HUD;
 using DV.Simulation.Cars;
+using LocoSim.Definitions;
 using LocoSim.Implementations;
 
 namespace CruiseControlPlugin
@@ -115,18 +117,6 @@ namespace CruiseControlPlugin
             }
         }
 
-        private TrainCar GetLocomotive()
-        {
-            if (!PlayerManager.Car)
-            {
-                return null;
-            }
-            if (!PlayerManager.Car.IsLoco)
-            {
-                return null;
-            }
-            return PlayerManager.Car;
-        }
         AccelerationMonitor monitor = new AccelerationMonitor();
         float lastSpeed;
         internal void UpdateAcceleration(float deltaTime)
@@ -143,75 +133,109 @@ namespace CruiseControlPlugin
                 return monitor.Sum();
             }
         }
-    }
 
-    internal class AccelerationMonitor
-    {
-        List<Node> nodes;
-        int index;
-        int size;
-
-        internal AccelerationMonitor()
+        public float Amps
         {
-            size = 60;
-            nodes = new List<Node>(size);
-            index = 0;
-        }
-
-        internal void Add(float speed, float deltaTime)
-        {
-            if (nodes.Count < size)
+            get
             {
-                nodes.Add(new Node(speed, deltaTime));
-            }
-            else
-            {
-                nodes[index % nodes.Count] = new Node(speed, deltaTime);
-                index++;
+                TrainCar loco = GetLocomotive();
+                LocoIndicatorReader locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
+                return locoIndicatorReader.amps.Value;
             }
         }
 
-        internal float Sum()
+        public float Rpm
         {
-            float v = 0;
-            float t = 0;
-
-            foreach (Node node in nodes)
+            get
             {
-                v += node.value;
-                t += node.time;
+                TrainCar loco = GetLocomotive();
+                LocoIndicatorReader locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
+                return locoIndicatorReader.engineRpm.Value;
             }
-
-            return v * t;
         }
-    }
 
-    class Node
-    {
-        public float value;
-        public float time;
-
-        public Node(float value, float time)
+        private TrainCar GetLocomotive()
         {
-            this.value = value;
-            this.time = time;
-        }
-    }
-
-    interface PluginLogger
-    {
-        public void Info(string message);
-    }
-
-    class LoggerSingleton
-    {
-        public static PluginLogger Instance = new NullLogger();
-    }
-
-    internal class NullLogger : PluginLogger
-    {
-        public void Info(string message)
-        {
+            if (!PlayerManager.Car)
+            {
+                return null;
+            }
+            if (!PlayerManager.Car.IsLoco)
+            {
+                return null;
+            }
+            return PlayerManager.Car;
         }
     }
 }
+
+internal class AccelerationMonitor
+{
+    List<Node> nodes;
+    int index;
+    int size;
+
+    internal AccelerationMonitor()
+    {
+        size = 60;
+        nodes = new List<Node>(size);
+        index = 0;
+    }
+
+    internal void Add(float speed, float deltaTime)
+    {
+        if (nodes.Count < size)
+        {
+            nodes.Add(new Node(speed, deltaTime));
+        }
+        else
+        {
+            nodes[index % nodes.Count] = new Node(speed, deltaTime);
+            index++;
+        }
+    }
+
+    internal float Sum()
+    {
+        float v = 0;
+        float t = 0;
+
+        foreach (Node node in nodes)
+        {
+            v += node.value;
+            t += node.time;
+        }
+
+        return v * t;
+    }
+}
+
+class Node
+{
+    public float value;
+    public float time;
+
+    public Node(float value, float time)
+    {
+        this.value = value;
+        this.time = time;
+    }
+}
+
+interface PluginLogger
+{
+    public void Info(string message);
+}
+
+class LoggerSingleton
+{
+    public static PluginLogger Instance = new NullLogger();
+}
+
+internal class NullLogger : PluginLogger
+{
+    public void Info(string message)
+    {
+    }
+}
+

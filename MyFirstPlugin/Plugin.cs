@@ -27,42 +27,35 @@ namespace MyFirstPlugin
         private CruiseControl cruiseControl;
         static string cmd = "cc";
         CruiseControlTarget target;
-        // ExampleClass z;
         PlayerLocoController loco;
-        // private InteriorControlsManager manager;
-        // private HUDLocoControls controls;
-        public ConfigEntry<KeyboardShortcut> Faster { get; set; }
-        public ConfigEntry<KeyboardShortcut> Slower { get; set; }
+        public ConfigEntry<string> MaxTorque;
+        public ConfigEntry<KeyboardShortcut> Faster;
+        public ConfigEntry<KeyboardShortcut> Slower;
+        public ConfigEntry<KeyboardShortcut> Toggle;
+        public ConfigEntry<string> Stats;
+
         private void Awake()
         {
             LoggerSingleton.Instance = new UnityLogger();
             target = new CruiseControlTarget();
-            // Plugin startup logic
             Logger.LogInfo($"Plugin2 {PluginInfo.PLUGIN_GUID} is loaded!");
-            // manager = GetComponent<InteriorControlsManager>();
-            // SingletonBehaviour<HUDInterfacer>.Instance.HUDChanged += OnHUDChanged;
             loco = new PlayerLocoController();
-            cruiseControl = new CruiseControl(loco);
+            cruiseControl = new CruiseControl(loco, new BepinexCruiseControlConfig(this));
             cruiseControl.Accelerator = new DefaultAccelerationAlgo();
             cruiseControl.Decelerator = new DefaultDecelerationAlgo();
             RegisterCommands1();
-            Debug.Log($"Awake cc={cruiseControl}");
-            Debug.Log($"Awake cc={cruiseControl} {this.name}");
-            MyPlugin plugin = (MyPlugin)FindObjectOfType(typeof(MyPlugin));
-            Debug.Log($"Awake cc={cruiseControl} {this.name} plugin.name={plugin.name}");
-            // tag = PluginInfo.PLUGIN_GUID;
+            BindConfig();
 
-            Debug.Log("new ExampleClass()");
-
-            // z.Start();
-            // GameObject g = new GameObject();
-            // g.AddComponent<Int64>();
-
-            // MakeButton(); 
-            ConfigFile configFile = new ConfigFile(PluginInfo.PLUGIN_NAME, true);
-            Faster = configFile.Bind("Hotkeys", "Faster", new KeyboardShortcut(KeyCode.PageUp, KeyCode.LeftControl));
-            Slower = configFile.Bind("Hotkeys", "Slower", new KeyboardShortcut(KeyCode.PageDown, KeyCode.LeftControl));
             updateAccumulator = 0;
+        }
+
+        void BindConfig()
+        {
+            MaxTorque = Config.Bind("DE2", "MaxTorque", "25000", "Maximum torque");
+            Faster = Config.Bind("Hotkeys", "Faster", new KeyboardShortcut(KeyCode.PageUp, KeyCode.LeftControl));
+            Slower = Config.Bind("Hotkeys", "Slower", new KeyboardShortcut(KeyCode.PageDown, KeyCode.LeftControl));
+            Toggle = Config.Bind("Hotkeys", "Toggle", new KeyboardShortcut(KeyCode.PageDown, KeyCode.LeftControl));
+            Stats = MaxTorque = Config.Bind("UI", "ShowStats", "1", "Show stats");
         }
 
         int STEP = 5;
@@ -145,14 +138,15 @@ namespace MyFirstPlugin
             GUILayout.TextField($"{Force}");
             GUILayout.EndHorizontal();
 
+            float powerkw = Mass * loco.Acceleration * loco.Speed / 3.6f / 1000;
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Power");
-            GUILayout.TextField($"{Power}");
+            GUILayout.Label("Power (kW)");
+            GUILayout.TextField($"{(int)powerkw}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Horsepower");
-            GUILayout.TextField($"{Hoursepower}");
+            GUILayout.TextField($"{(int)(powerkw * 1.341f)}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -168,6 +162,16 @@ namespace MyFirstPlugin
             GUILayout.BeginHorizontal();
             GUILayout.Label("Temperature");
             GUILayout.TextField($"{(int)target.GetTemperature()}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Amps");
+            GUILayout.TextField($"{(int)loco.Amps}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("RPM");
+            GUILayout.TextField($"{(int)loco.Rpm}");
             GUILayout.EndHorizontal();
 
             GUILayout.EndArea();
@@ -362,6 +366,7 @@ namespace MyFirstPlugin
             // }
         }
     }
+
 
 
     // public class ExampleClass : MonoBehaviour

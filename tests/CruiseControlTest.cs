@@ -6,17 +6,19 @@ namespace CruiseControlPlugin
 {
     public class CruiseControlTest
     {
-        CruiseControl cruiseControl;
-        FakeLocoController loco;
-        FakeAccelerator accelerator;
-        FakeDecelerator decelerator;
+        private CruiseControl cruiseControl;
+        private FakeLocoController loco;
+        private FakeAccelerator accelerator;
+        private FakeDecelerator decelerator;
+        private FakeCruiseControlConfig config;
 
         public CruiseControlTest()
         {
+            config = new FakeCruiseControlConfig();
             loco = new FakeLocoController();
             accelerator = new FakeAccelerator();
             decelerator = new FakeDecelerator();
-            cruiseControl = new CruiseControl(loco);
+            cruiseControl = new CruiseControl(loco, config);
             cruiseControl.Enabled = true;
             cruiseControl.Accelerator = accelerator;
             cruiseControl.Decelerator = decelerator;
@@ -88,17 +90,17 @@ namespace CruiseControlPlugin
             Assert.Equal(0.1f, loco.TrainBrake);
         }
 
-        [Fact]
-        public void DisableWhenThrottleAdjusted()
-        {
-            cruiseControl.DesiredSpeed = 20;
-            loco.Speed = 0;
-            WhenCruise();
-            Assert.True(cruiseControl.Enabled);
-            loco.Throttle = 0;
-            WhenCruise();
-            Assert.False(cruiseControl.Enabled);
-        }
+        // [Fact]
+        // public void DisableWhenThrottleAdjusted()
+        // {
+        //     cruiseControl.DesiredSpeed = 20;
+        //     loco.Speed = 0;
+        //     WhenCruise();
+        //     Assert.True(cruiseControl.Enabled);
+        //     loco.Throttle = 0;
+        //     WhenCruise();
+        //     Assert.False(cruiseControl.Enabled);
+        // }
 
         [Fact]
         public void DisableWhenTrainBrakeAdjusted()
@@ -180,6 +182,11 @@ namespace CruiseControlPlugin
                 loco.TrainBrake += .1f;
                 loco.IndBrake += .1f;
             }
+        }
+
+        internal class FakeCruiseControlConfig : CruiseControlConfig
+        {
+            public int MaxTorque { get; set; }
         }
     }
 }

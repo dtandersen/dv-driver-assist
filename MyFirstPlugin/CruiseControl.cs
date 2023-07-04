@@ -1,5 +1,6 @@
 using System;
 using CruiseControlPlugin.Algorithm;
+using MyFirstPlugin;
 
 namespace CruiseControlPlugin
 {
@@ -42,7 +43,7 @@ namespace CruiseControlPlugin
         private float lastTrainBrake;
         private float lastIndBrake;
 
-        public CruiseControl(LocoController loco)
+        public CruiseControl(LocoController loco, CruiseControlConfig bepinexCruiseControlConfig)
         {
             this.loco = loco;
         }
@@ -51,7 +52,7 @@ namespace CruiseControlPlugin
         {
             if (IsControlsChanged())
             {
-                Log($"controls changed lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
+                Log($"Disabled cruise control lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
                 Enabled = false;
             }
 
@@ -60,19 +61,19 @@ namespace CruiseControlPlugin
                 return;
             }
             float estspeed = loco.Acceleration * 10;
-            Log($"controls lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
+            // Log($"controls lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
             if (loco.Speed + estspeed < minSpeed)
             {
                 // Debug.Log($"speed={loco.Speed} minspeed={minSpeed}");
                 Accelerator.Tick(loco);
                 minSpeed = desiredSpeed + offset;
-                Log($"Accelerating to {minSpeed}");
+                // Log($"Accelerating to {minSpeed}");
             }
             else if (loco.Speed + estspeed > maxSpeed)
             {
                 Decelerator.Tick(loco);
                 maxSpeed = desiredSpeed + offset;
-                Log($"Decelerating to {maxSpeed}");
+                // Log($"Decelerating to {maxSpeed}");
             }
             else
             {
@@ -86,7 +87,7 @@ namespace CruiseControlPlugin
             lastThrottle = loco.Throttle;
             lastTrainBrake = loco.TrainBrake;
             lastIndBrake = loco.IndBrake;
-            Log($"controls lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
+            // Log($"controls lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
         }
 
         private void Log(string message)
@@ -97,14 +98,14 @@ namespace CruiseControlPlugin
         private bool IsControlsChanged()
         {
             return
-                changed(lastThrottle, loco.Throttle) ||
-                changed(lastTrainBrake, loco.TrainBrake) ||
-                changed(lastIndBrake, loco.IndBrake);
+                // changed(lastThrottle, loco.Throttle) ||
+                changed(lastTrainBrake, loco.TrainBrake, 0) ||
+                changed(lastIndBrake, loco.IndBrake, 0);
         }
 
-        bool changed(float v1, float v2)
+        bool changed(float v1, float v2, float amount)
         {
-            return Math.Abs(v1 - v2) > .1f;
+            return Math.Abs(v1 - v2) > amount;
         }
     }
 }

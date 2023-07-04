@@ -6,7 +6,7 @@ namespace CruiseControlPlugin
     {
         public void Info(string message)
         {
-            Debug.Log("zzzzzzzzz" + message);
+            Debug.Log(message);
         }
     }
 }
