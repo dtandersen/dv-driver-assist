@@ -28,7 +28,7 @@ namespace MyFirstPlugin
         static string cmd = "cc";
         CruiseControlTarget target;
         // ExampleClass z;
-
+        PlayerLocoController loco;
         // private InteriorControlsManager manager;
         // private HUDLocoControls controls;
         public ConfigEntry<KeyboardShortcut> Faster { get; set; }
@@ -41,7 +41,8 @@ namespace MyFirstPlugin
             Logger.LogInfo($"Plugin2 {PluginInfo.PLUGIN_GUID} is loaded!");
             // manager = GetComponent<InteriorControlsManager>();
             // SingletonBehaviour<HUDInterfacer>.Instance.HUDChanged += OnHUDChanged;
-            cruiseControl = new CruiseControl(new PlayerLocoController());
+            loco = new PlayerLocoController();
+            cruiseControl = new CruiseControl(loco);
             cruiseControl.Accelerator = new DefaultAccelerationAlgo();
             cruiseControl.Decelerator = new DefaultDecelerationAlgo();
             RegisterCommands1();
@@ -84,6 +85,7 @@ namespace MyFirstPlugin
                 Logger.LogInfo($"sp={cruiseControl.DesiredSpeed}");
             }
             // Logger.LogInfo($"Tick sp={cc.sp}");
+            loco.UpdateAcceleration(Time.deltaTime);
             updateAccumulator += Time.deltaTime;
             if (updateAccumulator > 1)
             {
@@ -100,8 +102,8 @@ namespace MyFirstPlugin
                 Event.current.Use();
 
             float Speed = target.GetSpeed();
-            double accel = (Speed / 3.6f - lastSpeed / 3.6f) * Time.deltaTime;
-            float Acceleration = (float)Math.Round(accel, 2);
+            // double accel = (Speed / 3.6f - lastSpeed / 3.6f) * Time.deltaTime;
+            // float Acceleration = (float)Math.Round(accel, 2);
             float Throttle = target.GetThrottle();
             float Mass = target.GetMass();
             float Power = Mass * 9.8f / 2f * Speed / 3.6f;
@@ -124,18 +126,18 @@ namespace MyFirstPlugin
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Throttle");
-            GUILayout.TextField($"{target.GetThrottle()}");
+            GUILayout.TextField($"{(int)(target.GetThrottle() * 100)}%");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Speed (km/h)");
-            GUILayout.TextField($"{target.GetSpeed()}");
-            GUILayout.TextField($"{cruiseControl.DesiredSpeed - target.GetSpeed()}");
+            GUILayout.TextField($"{(int)target.GetSpeed()}");
+            GUILayout.TextField($"{(int)(loco.Speed + loco.Acceleration * 10)}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Acceleration (m/s^2)");
-            GUILayout.TextField($"{Acceleration}");
+            GUILayout.TextField($"{Math.Round(loco.Acceleration, 2)}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -160,12 +162,12 @@ namespace MyFirstPlugin
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Mass (t)");
-            GUILayout.TextField($"{Mass / 1000}");
+            GUILayout.TextField($"{(int)(Mass / 1000)}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Temperature");
-            GUILayout.TextField($"{target.GetTemperature()}");
+            GUILayout.TextField($"{(int)target.GetTemperature()}");
             GUILayout.EndHorizontal();
 
             GUILayout.EndArea();

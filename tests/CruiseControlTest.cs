@@ -158,6 +158,7 @@ namespace CruiseControlPlugin
             public float Temperature { get; set; }
             public float Torque { get; set; }
             public float Reverser { get; set; }
+            public float Acceleration { get; set; }
         }
 
         internal class FakeAccelerator : CruiseControlAlgorithm

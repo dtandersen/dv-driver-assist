@@ -59,15 +59,16 @@ namespace CruiseControlPlugin
             {
                 return;
             }
+            float estspeed = loco.Acceleration * 10;
             Log($"controls lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
-            if (loco.Speed < minSpeed)
+            if (loco.Speed + estspeed < minSpeed)
             {
                 // Debug.Log($"speed={loco.Speed} minspeed={minSpeed}");
                 Accelerator.Tick(loco);
                 minSpeed = desiredSpeed + offset;
                 Log($"Accelerating to {minSpeed}");
             }
-            else if (loco.Speed > maxSpeed)
+            else if (loco.Speed + estspeed > maxSpeed)
             {
                 Decelerator.Tick(loco);
                 maxSpeed = desiredSpeed + offset;

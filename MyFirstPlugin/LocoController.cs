@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using DV.HUD;
 using DV.Simulation.Cars;
 using LocoSim.Implementations;
@@ -14,6 +17,7 @@ namespace CruiseControlPlugin
         float Temperature { get; }
         float Torque { get; }
         float Reverser { get; }
+        float Acceleration { get; }
     }
 
     class PlayerLocoController : LocoController
@@ -122,6 +126,75 @@ namespace CruiseControlPlugin
                 return null;
             }
             return PlayerManager.Car;
+        }
+        AccelerationMonitor monitor = new AccelerationMonitor();
+        float lastSpeed;
+        internal void UpdateAcceleration(float deltaTime)
+        {
+            float a = Speed / 3.6f - lastSpeed / 3.6f;
+            monitor.Add(a, deltaTime);
+            lastSpeed = Speed;
+        }
+
+        public float Acceleration
+        {
+            get
+            {
+                return monitor.Sum();
+            }
+        }
+    }
+
+    internal class AccelerationMonitor
+    {
+        List<Node> nodes;
+        int index;
+        int size;
+
+        internal AccelerationMonitor()
+        {
+            size = 60;
+            nodes = new List<Node>(size);
+            index = 0;
+        }
+
+        internal void Add(float speed, float deltaTime)
+        {
+            if (nodes.Count < size)
+            {
+                nodes.Add(new Node(speed, deltaTime));
+            }
+            else
+            {
+                nodes[index % nodes.Count] = new Node(speed, deltaTime);
+                index++;
+            }
+        }
+
+        internal float Sum()
+        {
+            float v = 0;
+            float t = 0;
+
+            foreach (Node node in nodes)
+            {
+                v += node.value;
+                t += node.time;
+            }
+
+            return v * t;
+        }
+    }
+
+    class Node
+    {
+        public float value;
+        public float time;
+
+        public Node(float value, float time)
+        {
+            this.value = value;
+            this.time = time;
         }
     }
 
