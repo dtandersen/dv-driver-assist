@@ -113,8 +113,8 @@ namespace MyFirstPlugin
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Enabled");
-            GUILayout.TextField($"{cruiseControl.Enabled}");
+            GUILayout.Label("Status");
+            GUILayout.TextField($"{cruiseControl.Status}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -173,6 +173,11 @@ namespace MyFirstPlugin
             GUILayout.Label("RPM");
             GUILayout.TextField($"{(int)loco.Rpm}");
             GUILayout.EndHorizontal();
+
+            // GUILayout.BeginHorizontal();
+            // GUILayout.Label("Reverser");
+            // GUILayout.TextField($"{loco.Reverser}");
+            // GUILayout.EndHorizontal();
 
             GUILayout.EndArea();
             // GUILayout.Button("I am not inside an Area");

@@ -18,7 +18,7 @@ namespace CruiseControlPlugin
         float Speed { get; }
         float Temperature { get; }
         float Torque { get; }
-        float Reverser { get; }
+        float Reverser { get; set; }
         float Acceleration { get; }
     }
 
@@ -98,6 +98,13 @@ namespace CruiseControlPlugin
                 TrainCar locoCar = GetLocomotive();
                 BaseControlsOverrider obj = locoCar.GetComponent<SimController>()?.controlsOverrider;
                 return obj.Reverser.Value;
+            }
+
+            set
+            {
+                TrainCar locoCar = GetLocomotive();
+                BaseControlsOverrider obj = locoCar.GetComponent<SimController>()?.controlsOverrider;
+                obj.Reverser.Set(value);
             }
         }
 

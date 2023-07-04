@@ -16,6 +16,7 @@ namespace CruiseControlPlugin
         {
             config = new FakeCruiseControlConfig();
             loco = new FakeLocoController();
+            loco.Reverser = 1;
             accelerator = new FakeAccelerator();
             decelerator = new FakeDecelerator();
             cruiseControl = new CruiseControl(loco, config);
@@ -33,6 +34,7 @@ namespace CruiseControlPlugin
 
             loco.Speed = 24;
             WhenCruise();
+            Assert.Equal("Accelerating to 27.5 km/h", cruiseControl.Status);
 
             Assert.Equal(0.1f, loco.Throttle);
 
@@ -45,6 +47,7 @@ namespace CruiseControlPlugin
             WhenCruise();
 
             Assert.Equal(0f, loco.Throttle);
+            Assert.Equal("Cruising", cruiseControl.Status);
 
             loco.Speed = 27.4f;
             WhenCruise();
@@ -66,6 +69,8 @@ namespace CruiseControlPlugin
 
             loco.Speed = 20.1f;
             WhenCruise();
+            Assert.Equal("Decelerating to 17.5 km/h", cruiseControl.Status);
+
 
             Assert.Equal(0.1f, loco.TrainBrake);
 
@@ -134,16 +139,109 @@ namespace CruiseControlPlugin
             loco.Speed = 20;
             WhenCruise();
             Assert.Equal(0, loco.IndBrake);
+            Assert.Equal("Disabled", cruiseControl.Status);
         }
 
         [Fact]
-        public void ResetControls()
+        public void HaltTrainIfDesiredSpeedIsNegativeAndTrainIsInForwardGear()
         {
-            cruiseControl.DesiredSpeed = 10;
-            loco.Throttle = 1;
-            cruiseControl.Enabled = true;
+            cruiseControl.DesiredSpeed = -10;
+            // loco.Reverser=1;
+            loco.Throttle = 0.5f;
+            // cruiseControl.Enabled = true;
+            WhenCruise();
+            // Assert.True(cruiseControl.Enabled);
+            Assert.Equal(0, loco.Throttle);
+            Assert.Equal(1, loco.TrainBrake);
+            Assert.Equal("Direction change", cruiseControl.Status);
+
             WhenCruise();
             Assert.True(cruiseControl.Enabled);
+        }
+
+        [Fact]
+        public void HaltTrainIfDesiredSpeedIsPositiveAndTrainIsInReverse()
+        {
+            cruiseControl.DesiredSpeed = 10;
+            loco.Reverser = 0;
+            loco.Throttle = 0.5f;
+            // cruiseControl.Enabled = true;
+            WhenCruise();
+            // Assert.True(cruiseControl.Enabled);
+            Assert.Equal(0, loco.Throttle);
+            Assert.Equal(1, loco.TrainBrake);
+            Assert.Equal("Direction change", cruiseControl.Status);
+
+            WhenCruise();
+            Assert.True(cruiseControl.Enabled);
+        }
+
+        [Fact]
+        public void ChangeFromReverseToForward()
+        {
+            cruiseControl.DesiredSpeed = 10;
+            loco.Reverser = 0;
+            // loco.Throttle = 0.5f;
+            // cruiseControl.Enabled = true;
+            WhenCruise();
+            // Assert.True(cruiseControl.Enabled);
+            Assert.Equal(1, loco.Reverser);
+            Assert.Equal(0, loco.Throttle);
+            Assert.Equal(1, loco.TrainBrake);
+            Assert.Equal("Direction change", cruiseControl.Status);
+
+            // WhenCruise();
+            // Assert.True(cruiseControl.Enabled);
+        }
+
+        [Fact]
+        public void ChangeFromForwardToReverse()
+        {
+            cruiseControl.DesiredSpeed = -10;
+            loco.Reverser = 1;
+            // loco.Throttle = 0.5f;
+            // cruiseControl.Enabled = true;
+            WhenCruise();
+            // Assert.True(cruiseControl.Enabled);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0, loco.Throttle);
+            Assert.Equal(1, loco.TrainBrake);
+            Assert.Equal("Direction change", cruiseControl.Status);
+
+            // WhenCruise();
+            // Assert.True(cruiseControl.Enabled);
+        }
+
+        // [Fact]
+        // public void AccelerateInReverse()
+        // {
+        //     cruiseControl.DesiredSpeed = -10;
+        //     loco.Reverser = 0;
+        //     // loco.Throttle = 0.5f;
+        //     // cruiseControl.Enabled = true;
+        //     WhenCruise();
+        //     // Assert.True(cruiseControl.Enabled);
+        //     Assert.Equal(0, loco.Reverser);
+        //     Assert.Equal(0.1f, loco.Throttle);
+        //     Assert.Equal(0, loco.TrainBrake);
+        //     Assert.Equal("Accelerating to 7.5 km/h", cruiseControl.Status);
+
+        //     // WhenCruise();
+        //     // Assert.True(cruiseControl.Enabled);
+        // }
+
+        [Fact]
+        public void ZeroThrottleIfInNeutral()
+        {
+            cruiseControl.DesiredSpeed = 10;
+            loco.Speed = 0;
+            loco.Throttle = 1;
+            loco.Reverser = .5f;
+            // loco.Throttle = 1;
+            // cruiseControl.Enabled = true;
+            WhenCruise();
+            Assert.Equal(0, loco.Throttle);
+            Assert.Equal("Idle: Reverser is in neutral", cruiseControl.Status);
         }
 
         public void WhenCruise()
