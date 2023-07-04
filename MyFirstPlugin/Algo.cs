@@ -38,17 +38,28 @@ namespace CruiseControlPlugin.Algorithm
 
         public void Tick(LocoController loco)
         {
-            Debug.Log($"DesiredSpeed={DesiredSpeed}");
+            // Debug.Log($"DesiredSpeed={DesiredSpeed}");
 
-            float speed = loco.Speed;
-            float throttle = loco.Throttle;
             float reverser = loco.Reverser;
+            float speed;
+            float desiredSpeed;
+            if (reverser == 1)
+            {
+                speed = loco.Speed;
+                desiredSpeed = DesiredSpeed;
+            }
+            else
+            {
+                speed = -loco.Speed;
+                desiredSpeed = -DesiredSpeed;
+            }
+            float throttle = loco.Throttle;
             float torque = loco.Torque;
             float temperature = loco.Temperature;
 
             float throttleResult;
 
-            if (speed > DesiredSpeed)
+            if (speed > desiredSpeed)
             {
                 throttleResult = 0;
             }

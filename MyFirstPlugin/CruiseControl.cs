@@ -13,8 +13,8 @@ namespace CruiseControlPlugin
             set
             {
                 desiredSpeed = value;
-                minSpeed = desiredSpeed + offset - diff;
-                maxSpeed = desiredSpeed + offset + diff;
+                minSpeed = Math.Abs(desiredSpeed) + offset - diff;
+                maxSpeed = Math.Abs(desiredSpeed) + offset + diff;
                 Accelerator.DesiredSpeed = value;
                 Decelerator.DesiredSpeed = value;
             }
@@ -72,9 +72,24 @@ namespace CruiseControlPlugin
                 return;
             }
 
-            float estspeed = loco.Acceleration * 10;
-            float desiredForwardSpeed = Math.Abs(desiredSpeed);
-            float locoForwardSpeed = Math.Abs(loco.Speed);
+            // float estspeed = loco.Acceleration * 10;
+            float estspeed = 0;
+            float desiredForwardSpeed;
+            float locoForwardSpeed;
+            if (loco.Reverser == 1)
+            {
+                desiredForwardSpeed = desiredSpeed;
+                locoForwardSpeed = loco.Speed;
+            }
+            else if (loco.Reverser == 0)
+            {
+                desiredForwardSpeed = -desiredSpeed;
+                locoForwardSpeed = -loco.Speed;
+            }
+            else
+            {
+                return;
+            }
 
             if (IsWrongDirection)
             {
@@ -90,18 +105,18 @@ namespace CruiseControlPlugin
                     loco.Reverser = 0f;
                 }
             }
-            else if (loco.Speed + estspeed < minSpeed)
+            else if (locoForwardSpeed + estspeed < minSpeed)
             {
                 // Debug.Log($"speed={loco.Speed} minspeed={minSpeed}");
                 Accelerator.Tick(loco);
-                minSpeed = desiredSpeed + offset;
+                minSpeed = desiredForwardSpeed + offset;
                 Status = $"Accelerating to {minSpeed} km/h";
                 // Log($"Accelerating to {minSpeed}");
             }
-            else if (loco.Speed + estspeed > maxSpeed)
+            else if (locoForwardSpeed + estspeed > maxSpeed)
             {
                 Decelerator.Tick(loco);
-                maxSpeed = desiredSpeed + offset;
+                maxSpeed = desiredForwardSpeed + offset;
                 Status = $"Decelerating to {maxSpeed} km/h";
                 // Log($"Decelerating to {maxSpeed}");
             }

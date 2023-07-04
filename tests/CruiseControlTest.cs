@@ -212,23 +212,45 @@ namespace CruiseControlPlugin
             // Assert.True(cruiseControl.Enabled);
         }
 
-        // [Fact]
-        // public void AccelerateInReverse()
-        // {
-        //     cruiseControl.DesiredSpeed = -10;
-        //     loco.Reverser = 0;
-        //     // loco.Throttle = 0.5f;
-        //     // cruiseControl.Enabled = true;
-        //     WhenCruise();
-        //     // Assert.True(cruiseControl.Enabled);
-        //     Assert.Equal(0, loco.Reverser);
-        //     Assert.Equal(0.1f, loco.Throttle);
-        //     Assert.Equal(0, loco.TrainBrake);
-        //     Assert.Equal("Accelerating to 7.5 km/h", cruiseControl.Status);
+        [Fact]
+        public void AccelerateInReverse()
+        {
+            cruiseControl.DesiredSpeed = -10;
+            loco.Speed = -4;
+            loco.Reverser = 0;
+            WhenCruise();
+            Assert.Equal("Accelerating to 7.5 km/h", cruiseControl.Status);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0.1f, loco.Throttle);
+            Assert.Equal(0, loco.TrainBrake);
 
-        //     // WhenCruise();
-        //     // Assert.True(cruiseControl.Enabled);
-        // }
+            loco.Speed = -7.5f;
+            WhenCruise();
+            Assert.Equal("Cruising", cruiseControl.Status);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0f, loco.Throttle);
+            Assert.Equal(0f, loco.TrainBrake);
+        }
+
+        [Fact]
+        public void DecelerateInReverse()
+        {
+            cruiseControl.DesiredSpeed = -10;
+            loco.Speed = -11;
+            loco.Reverser = 0;
+            WhenCruise();
+            Assert.Equal("Decelerating to 7.5 km/h", cruiseControl.Status);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0f, loco.Throttle);
+            Assert.Equal(0.1f, loco.TrainBrake);
+
+            loco.Speed = -7.5f;
+            WhenCruise();
+            Assert.Equal("Cruising", cruiseControl.Status);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0f, loco.Throttle);
+            Assert.Equal(0f, loco.TrainBrake);
+        }
 
         [Fact]
         public void ZeroThrottleIfInNeutral()
