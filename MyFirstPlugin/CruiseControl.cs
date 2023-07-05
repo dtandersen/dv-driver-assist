@@ -87,7 +87,13 @@ namespace CruiseControlPlugin
             // float estspeed = loco.Acceleration * 10;
             float estspeed = 0;
 
-            if (IsWrongDirection)
+            if (positiveDesiredSpeed == 0)
+            {
+                Status = "Stopping";
+                loco.Throttle = 0;
+                loco.TrainBrake = 1;
+            }
+            else if (IsWrongDirection)
             {
                 Status = "Direction change";
                 loco.Throttle = 0;

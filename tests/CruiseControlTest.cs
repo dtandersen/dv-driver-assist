@@ -96,17 +96,19 @@ namespace CruiseControlPlugin
             Assert.Equal(0.1f, loco.TrainBrake);
         }
 
-        // [Fact]
-        // public void DisableWhenThrottleAdjusted()
-        // {
-        //     cruiseControl.DesiredSpeed = 20;
-        //     loco.Speed = 0;
-        //     WhenCruise();
-        //     Assert.True(cruiseControl.Enabled);
-        //     loco.Throttle = 0;
-        //     WhenCruise();
-        //     Assert.False(cruiseControl.Enabled);
-        // }
+        [Fact]
+        public void ApplyBrakesWhenZeroSetpoint()
+        {
+            cruiseControl.DesiredSpeed = 0;
+            loco.Speed = 20;
+            loco.Throttle = 1;
+
+            WhenCruise();
+
+            Assert.Equal(1, loco.TrainBrake);
+            Assert.Equal(0, loco.Throttle);
+            Assert.Equal("Stopping", cruiseControl.Status);
+        }
 
         [Fact]
         public void DisableWhenTrainBrakeAdjusted()
