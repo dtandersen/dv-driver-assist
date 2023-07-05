@@ -29,6 +29,8 @@ namespace MyFirstPlugin
         CruiseControlTarget target;
         PlayerLocoController loco;
         public ConfigEntry<string> MaxTorque;
+        public ConfigEntry<string> Offset;
+        public ConfigEntry<string> Diff;
         public ConfigEntry<KeyboardShortcut> Faster;
         public ConfigEntry<KeyboardShortcut> Slower;
         public ConfigEntry<KeyboardShortcut> Toggle;
@@ -51,6 +53,8 @@ namespace MyFirstPlugin
 
         void BindConfig()
         {
+            MaxTorque = Config.Bind("CruiseControl", "Offset", "0", "Added to setpoint");
+            MaxTorque = Config.Bind("CruiseControl", "Diff", "2.5", "Added to min and max speed");
             MaxTorque = Config.Bind("DE2", "MaxTorque", "25000", "Maximum torque");
             Faster = Config.Bind("Hotkeys", "Faster", new KeyboardShortcut(KeyCode.PageUp, KeyCode.LeftControl));
             Slower = Config.Bind("Hotkeys", "Slower", new KeyboardShortcut(KeyCode.PageDown, KeyCode.LeftControl));

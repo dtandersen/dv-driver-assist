@@ -15,6 +15,8 @@ namespace CruiseControlPlugin
         public CruiseControlTest()
         {
             config = new FakeCruiseControlConfig();
+            config.Offset = -2.5f;
+            config.Diff = 2.5f;
             loco = new FakeLocoController();
             loco.Reverser = 1;
             accelerator = new FakeAccelerator();
@@ -69,11 +71,22 @@ namespace CruiseControlPlugin
         }
 
         [Fact]
+        public void AccelerationNearZero()
+        {
+            config.Offset = 0;
+            config.Diff = 2.5f;
+            cruiseControl.DesiredSpeed = 5;
+
+            loco.Speed = 0;
+            WhenCruise();
+            Assert.Equal("Accelerating to 5 km/h", cruiseControl.Status);
+            Assert.Equal(0.1f, loco.Throttle);
+        }
+
+        [Fact]
         public void ShouldDecelerate()
         {
             loco.TrainBrake = 0;
-            // loco.Reverser = 1;
-
             cruiseControl.DesiredSpeed = 20;
 
             loco.Speed = 20.1f;
@@ -366,6 +379,8 @@ namespace CruiseControlPlugin
         internal class FakeCruiseControlConfig : CruiseControlConfig
         {
             public int MaxTorque { get; set; }
+            public float Offset { get; set; }
+            public float Diff { get; set; }
         }
     }
 }

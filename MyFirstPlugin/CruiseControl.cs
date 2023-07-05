@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CruiseControlPlugin.Algorithm;
 using MyFirstPlugin;
+using VLB;
 
 namespace CruiseControlPlugin
 {
@@ -24,8 +25,8 @@ namespace CruiseControlPlugin
 
                 desiredSpeed = value;
                 positiveDesiredSpeed = Math.Abs(value);
-                minSpeed = positiveDesiredSpeed + offset - diff;
-                maxSpeed = positiveDesiredSpeed + offset + diff;
+                minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
+                maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
                 Accelerator.DesiredSpeed = positiveDesiredSpeed;
                 Decelerator.DesiredSpeed = positiveDesiredSpeed;
             }
@@ -50,17 +51,19 @@ namespace CruiseControlPlugin
         private LocoController loco;
         private float minSpeed;
         private float maxSpeed;
-        private float offset = -2.5f;
-        private float diff = 2.5f;
+        // private float offset = -2.5f;
+        // private float diff = 2.5f;
         private float desiredSpeed = 0;
         private float positiveDesiredSpeed;
         private float lastThrottle;
         private float lastTrainBrake;
         private float lastIndBrake;
+        private CruiseControlConfig config;
 
-        public CruiseControl(LocoController loco, CruiseControlConfig bepinexCruiseControlConfig)
+        public CruiseControl(LocoController loco, CruiseControlConfig config)
         {
             this.loco = loco;
+            this.config = config;
         }
 
         public void Tick()
@@ -109,15 +112,16 @@ namespace CruiseControlPlugin
             }
             else if (loco.PositiveSpeed + estspeed < minSpeed)
             {
+                // Decelerator.DesiredSpeed = minSpeed;
                 Accelerator.Tick(loco);
-                minSpeed = positiveDesiredSpeed + offset;
+                minSpeed = positiveDesiredSpeed + config.Offset;
                 Status = $"Accelerating to {minSpeed} km/h";
             }
             else if (loco.PositiveSpeed + estspeed > maxSpeed)
             {
                 Decelerator.DesiredSpeed = maxSpeed;
                 Decelerator.Tick(loco);
-                maxSpeed = positiveDesiredSpeed + offset;
+                maxSpeed = positiveDesiredSpeed + config.Offset;
                 Status = $"Decelerating to {maxSpeed} km/h";
             }
             else
@@ -125,8 +129,8 @@ namespace CruiseControlPlugin
                 Status = "Coast";
                 loco.Throttle = 0;
                 loco.TrainBrake = 0;
-                minSpeed = positiveDesiredSpeed + offset - diff;
-                maxSpeed = positiveDesiredSpeed + offset + diff;
+                minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
+                maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
             }
 
             lastThrottle = loco.Throttle;

@@ -8,6 +8,16 @@ namespace CruiseControlPlugin
         {
             get;
         }
+
+        float Offset
+        {
+            get;
+        }
+
+        float Diff
+        {
+            get;
+        }
     }
 
     class BepinexCruiseControlConfig : CruiseControlConfig
@@ -24,6 +34,32 @@ namespace CruiseControlPlugin
             get
             {
                 if (!int.TryParse(plugin.MaxTorque.Value, out int result))
+                {
+                    return 0;
+                }
+
+                return result;
+            }
+        }
+
+        public float Offset
+        {
+            get
+            {
+                if (!float.TryParse(plugin.Offset.Value, out float result))
+                {
+                    return 0;
+                }
+
+                return result;
+            }
+        }
+
+        public float Diff
+        {
+            get
+            {
+                if (!float.TryParse(plugin.Diff.Value, out float result))
                 {
                     return 0;
                 }
