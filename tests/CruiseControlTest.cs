@@ -64,19 +64,20 @@ namespace CruiseControlPlugin
         public void ShouldDecelerate()
         {
             loco.TrainBrake = 0;
+            // loco.Reverser = 1;
 
             cruiseControl.DesiredSpeed = 20;
 
             loco.Speed = 20.1f;
             WhenCruise();
             Assert.Equal("Decelerating to 17.5 km/h", cruiseControl.Status);
-
-
             Assert.Equal(0.1f, loco.TrainBrake);
 
+            // still going above 17.5, should brake
             loco.Speed = 17.6f;
             WhenCruise();
-
+            Assert.Equal("Decelerating to 17.5 km/h", cruiseControl.Status);
+            Assert.Equal(0, loco.Throttle);
             Assert.Equal(0.2f, loco.TrainBrake);
 
             loco.Speed = 17.5f;
@@ -230,14 +231,36 @@ namespace CruiseControlPlugin
             Assert.Equal(0, loco.Reverser);
             Assert.Equal(0f, loco.Throttle);
             Assert.Equal(0f, loco.TrainBrake);
+
+            loco.Speed = -4;
+            WhenCruise();
+            Assert.Equal("Accelerating to 7.5 km/h", cruiseControl.Status);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0.1f, loco.Throttle);
+            Assert.Equal(0, loco.TrainBrake);
         }
 
         [Fact]
         public void DecelerateInReverse()
         {
             cruiseControl.DesiredSpeed = -10;
-            loco.Speed = -11;
             loco.Reverser = 0;
+
+            loco.Speed = -10f;
+            WhenCruise();
+            Assert.Equal("Cruising", cruiseControl.Status);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0f, loco.Throttle);
+            Assert.Equal(0f, loco.TrainBrake);
+
+            loco.Speed = -9f;
+            WhenCruise();
+            Assert.Equal("Cruising", cruiseControl.Status);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0f, loco.Throttle);
+            Assert.Equal(0f, loco.TrainBrake);
+
+            loco.Speed = -11;
             WhenCruise();
             Assert.Equal("Decelerating to 7.5 km/h", cruiseControl.Status);
             Assert.Equal(0, loco.Reverser);
@@ -250,6 +273,13 @@ namespace CruiseControlPlugin
             Assert.Equal(0, loco.Reverser);
             Assert.Equal(0f, loco.Throttle);
             Assert.Equal(0f, loco.TrainBrake);
+
+            loco.Speed = -11;
+            WhenCruise();
+            Assert.Equal("Decelerating to 7.5 km/h", cruiseControl.Status);
+            Assert.Equal(0, loco.Reverser);
+            Assert.Equal(0f, loco.Throttle);
+            Assert.Equal(0.1f, loco.TrainBrake);
         }
 
         [Fact]
@@ -266,7 +296,7 @@ namespace CruiseControlPlugin
             Assert.Equal("Idle: Reverser is in neutral", cruiseControl.Status);
         }
 
-        public void WhenCruise()
+        void WhenCruise()
         {
             cruiseControl.Tick();
         }
@@ -281,6 +311,17 @@ namespace CruiseControlPlugin
             public float Torque { get; set; }
             public float Reverser { get; set; }
             public float Acceleration { get; set; }
+
+            public float PositiveSpeed
+            {
+                get
+                {
+                    if (Reverser > 0)
+                        return Speed;
+                    else
+                        return -Speed;
+                }
+            }
         }
 
         internal class FakeAccelerator : CruiseControlAlgorithm
@@ -289,7 +330,10 @@ namespace CruiseControlPlugin
 
             public void Tick(LocoController loco)
             {
-                loco.Throttle += .1f;
+                if (loco.PositiveSpeed < DesiredSpeed)
+                {
+                    loco.Throttle += .1f;
+                }
             }
         }
 
@@ -299,8 +343,11 @@ namespace CruiseControlPlugin
 
             public void Tick(LocoController loco)
             {
-                loco.TrainBrake += .1f;
-                loco.IndBrake += .1f;
+                if (loco.PositiveSpeed > DesiredSpeed)
+                {
+                    loco.TrainBrake += .1f;
+                    loco.IndBrake += .1f;
+                }
             }
         }
 

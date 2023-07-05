@@ -16,6 +16,7 @@ namespace CruiseControlPlugin
         float TrainBrake { get; set; }
         float IndBrake { get; set; }
         float Speed { get; }
+        float PositiveSpeed { get; }
         float Temperature { get; }
         float Torque { get; }
         float Reverser { get; set; }
@@ -31,6 +32,17 @@ namespace CruiseControlPlugin
                 TrainCar locoCar = GetLocomotive();
                 float speed = locoCar.GetForwardSpeed() * 3.6f;
                 return speed;
+            }
+        }
+
+        public float PositiveSpeed
+        {
+            get
+            {
+                if (Reverser > 0)
+                    return Speed;
+                else
+                    return -Speed;
             }
         }
 
