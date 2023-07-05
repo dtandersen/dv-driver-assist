@@ -89,7 +89,7 @@ namespace CruiseControlPlugin
 
             if (positiveDesiredSpeed == 0)
             {
-                Status = "Stopping";
+                Status = "Stop";
                 loco.Throttle = 0;
                 loco.TrainBrake = 1;
             }
@@ -122,7 +122,7 @@ namespace CruiseControlPlugin
             }
             else
             {
-                Status = "Cruising";
+                Status = "Coast";
                 loco.Throttle = 0;
                 loco.TrainBrake = 0;
                 minSpeed = positiveDesiredSpeed + offset - diff;

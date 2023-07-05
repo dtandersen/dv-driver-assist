@@ -32,31 +32,39 @@ namespace CruiseControlPlugin
 
             cruiseControl.DesiredSpeed = 30;
 
-            loco.Speed = 24;
+            loco.Speed = 29.9f;
+            WhenCruise();
+            Assert.Equal("Coast", cruiseControl.Status);
+            Assert.Equal(0, loco.Throttle);
+
+            loco.Speed = 25;
+            WhenCruise();
+            Assert.Equal("Coast", cruiseControl.Status);
+            Assert.Equal(0, loco.Throttle);
+
+            loco.Speed = 24.9f;
             WhenCruise();
             Assert.Equal("Accelerating to 27.5 km/h", cruiseControl.Status);
-
             Assert.Equal(0.1f, loco.Throttle);
 
             loco.Speed = 27.4f;
             WhenCruise();
-
+            Assert.Equal("Accelerating to 27.5 km/h", cruiseControl.Status);
             Assert.Equal(0.2f, loco.Throttle);
 
             loco.Speed = 27.5f;
             WhenCruise();
-
+            Assert.Equal("Coast", cruiseControl.Status);
             Assert.Equal(0f, loco.Throttle);
-            Assert.Equal("Cruising", cruiseControl.Status);
 
             loco.Speed = 27.4f;
             WhenCruise();
-
+            Assert.Equal("Coast", cruiseControl.Status);
             Assert.Equal(0f, loco.Throttle);
 
             loco.Speed = 24;
             WhenCruise();
-
+            Assert.Equal("Accelerating to 27.5 km/h", cruiseControl.Status);
             Assert.Equal(0.1f, loco.Throttle);
         }
 
@@ -107,7 +115,7 @@ namespace CruiseControlPlugin
 
             Assert.Equal(1, loco.TrainBrake);
             Assert.Equal(0, loco.Throttle);
-            Assert.Equal("Stopping", cruiseControl.Status);
+            Assert.Equal("Stop", cruiseControl.Status);
         }
 
         [Fact]
@@ -229,7 +237,7 @@ namespace CruiseControlPlugin
 
             loco.Speed = -7.5f;
             WhenCruise();
-            Assert.Equal("Cruising", cruiseControl.Status);
+            Assert.Equal("Coast", cruiseControl.Status);
             Assert.Equal(0, loco.Reverser);
             Assert.Equal(0f, loco.Throttle);
             Assert.Equal(0f, loco.TrainBrake);
@@ -250,14 +258,14 @@ namespace CruiseControlPlugin
 
             loco.Speed = -10f;
             WhenCruise();
-            Assert.Equal("Cruising", cruiseControl.Status);
+            Assert.Equal("Coast", cruiseControl.Status);
             Assert.Equal(0, loco.Reverser);
             Assert.Equal(0f, loco.Throttle);
             Assert.Equal(0f, loco.TrainBrake);
 
             loco.Speed = -9f;
             WhenCruise();
-            Assert.Equal("Cruising", cruiseControl.Status);
+            Assert.Equal("Coast", cruiseControl.Status);
             Assert.Equal(0, loco.Reverser);
             Assert.Equal(0f, loco.Throttle);
             Assert.Equal(0f, loco.TrainBrake);
@@ -271,7 +279,7 @@ namespace CruiseControlPlugin
 
             loco.Speed = -7.5f;
             WhenCruise();
-            Assert.Equal("Cruising", cruiseControl.Status);
+            Assert.Equal("Coast", cruiseControl.Status);
             Assert.Equal(0, loco.Reverser);
             Assert.Equal(0f, loco.Throttle);
             Assert.Equal(0f, loco.TrainBrake);
@@ -313,6 +321,8 @@ namespace CruiseControlPlugin
             public float Torque { get; set; }
             public float Reverser { get; set; }
             public float Acceleration { get; set; }
+            public float Amps { get; set; }
+            public float Rpm { get; set; }
 
             public float PositiveSpeed
             {

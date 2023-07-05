@@ -27,7 +27,8 @@ namespace CruiseControlPlugin.Algorithm
         public float DesiredTorque { get; set; }
 
         float lastTorque = 0;
-        float step = 0.1f;
+        float lastAmps = 0;
+        float step = 1f / 11f;
         private DefaultAccelerationAlgo accelerate;
         private DefaultDecelerationAlgo decelerate;
 
@@ -41,25 +42,27 @@ namespace CruiseControlPlugin.Algorithm
             // Debug.Log($"DesiredSpeed={DesiredSpeed}");
 
             float reverser = loco.Reverser;
-            float speed;
-            float desiredSpeed;
-            if (reverser == 1)
-            {
-                speed = loco.Speed;
-                desiredSpeed = DesiredSpeed;
-            }
-            else
-            {
-                speed = -loco.Speed;
-                desiredSpeed = -DesiredSpeed;
-            }
+            float speed = loco.PositiveSpeed;
+            float desiredSpeed = DesiredSpeed;
+            // if (reverser == 1)
+            // {
+            //     desiredSpeed = DesiredSpeed;
+            // }
+            // else
+            // {
+            //     desiredSpeed = -DesiredSpeed;
+            // }
             float throttle = loco.Throttle;
             float torque = loco.Torque;
             float temperature = loco.Temperature;
-
+            float ampDelta = loco.Amps - lastAmps;
             float throttleResult;
-
-            if (speed > desiredSpeed)
+            float projectedAmps = loco.Amps + ampDelta * 3f;
+            if (speed < 5)
+            {
+                throttleResult = step;
+            }
+            else if (speed > desiredSpeed)
             {
                 throttleResult = 0;
             }
@@ -67,11 +70,15 @@ namespace CruiseControlPlugin.Algorithm
             {
                 throttleResult = throttle - step;
             }
-            else if (DesiredTorque > torque)
+            else if (projectedAmps > 550)
+            {
+                throttleResult = throttle - step;
+            }
+            else if (projectedAmps < 450)
             {
                 throttleResult = throttle + step;
             }
-            else if (DesiredTorque < torque && !(torque < lastTorque))
+            else if (loco.Amps > 600 && !(loco.Amps < lastAmps))
             {
                 throttleResult = throttle - step;
             }
@@ -85,6 +92,7 @@ namespace CruiseControlPlugin.Algorithm
             loco.TrainBrake = 0;
 
             lastTorque = torque;
+            lastAmps = loco.Amps;
         }
     }
 

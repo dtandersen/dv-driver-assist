@@ -21,6 +21,8 @@ namespace CruiseControlPlugin
         float Torque { get; }
         float Reverser { get; set; }
         float Acceleration { get; }
+        float Amps { get; }
+        float Rpm { get; }
     }
 
     class PlayerLocoController : LocoController
