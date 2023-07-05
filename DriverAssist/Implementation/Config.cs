@@ -13,8 +13,6 @@ namespace DriverAssist.Implementation
         private ConfigEntry<KeyboardShortcut> toggle;
         private ConfigEntry<string> showStats;
 
-        public ConfigEntry<string> Stats; private readonly DriverAssistPlugin plugin;
-
         public BepInExCruiseControlConfig(ConfigFile config)
         {
             offset = config.Bind("CruiseControl", "Offset", "0", "This amount is subtracted from setpoint before adding the diff");

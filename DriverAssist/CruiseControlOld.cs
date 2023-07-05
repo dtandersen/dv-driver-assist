@@ -38,7 +38,7 @@ namespace DriverAssist
         float elapsedTime;
         float dtMax = 1f;
         float lastSpeed = 0;
-        float lastTorque = 0;
+        // float lastTorque = 0;
         private DefaultAccelerationAlgo accelerate;
         private DefaultDecelerationAlgo decelerate;
 

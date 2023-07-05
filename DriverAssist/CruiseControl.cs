@@ -5,19 +5,19 @@ namespace DriverAssist
 {
     public class CruiseControl
     {
-        bool reverse;
+        bool forward;
         public float DesiredSpeed
         {
             get { return desiredSpeed; }
             set
             {
-                if (value < 0)
+                if (value >= 0)
                 {
-                    reverse = true;
+                    forward = true;
                 }
                 else
                 {
-                    reverse = false;
+                    forward = false;
                 }
 
                 desiredSpeed = value;
@@ -107,14 +107,14 @@ namespace DriverAssist
                     loco.Reverser = 0f;
                 }
             }
-            else if (loco.PositiveSpeed + estspeed < minSpeed)
+            else if (loco.RelativeSpeed + estspeed < minSpeed)
             {
                 // Decelerator.DesiredSpeed = minSpeed;
                 Accelerator.Tick(loco);
                 minSpeed = positiveDesiredSpeed + config.Offset;
                 Status = $"Accelerating to {minSpeed} km/h";
             }
-            else if (loco.PositiveSpeed + estspeed > maxSpeed)
+            else if (loco.RelativeSpeed + estspeed > maxSpeed)
             {
                 Decelerator.DesiredSpeed = maxSpeed;
                 Decelerator.Tick(loco);

@@ -327,24 +327,36 @@ namespace DriverAssist
         public class FakeLocoController : LocoController
         {
             public float Speed { get; set; }
+
+            public float RelativeSpeed
+            {
+                get
+                {
+                    if (Reverser >= 0.5f)
+                        return Speed;
+                    else
+                        return -Speed;
+                }
+            }
+
             public float Throttle { get; set; }
             public float TrainBrake { get; set; }
             public float IndBrake { get; set; }
             public float Temperature { get; set; }
             public float Torque { get; set; }
             public float Reverser { get; set; }
-            public float Acceleration { get; set; }
             public float Amps { get; set; }
             public float Rpm { get; set; }
+            public float Acceleration { get; set; }
 
-            public float PositiveSpeed
+            public float RelativeAcceleration
             {
                 get
                 {
-                    if (Reverser > 0)
-                        return Speed;
+                    if (Reverser >= 0.5f)
+                        return Acceleration;
                     else
-                        return -Speed;
+                        return -Acceleration;
                 }
             }
         }
@@ -355,7 +367,7 @@ namespace DriverAssist
 
             public void Tick(LocoController loco)
             {
-                if (loco.PositiveSpeed < DesiredSpeed)
+                if (loco.RelativeSpeed < DesiredSpeed)
                 {
                     loco.Throttle += .1f;
                 }
@@ -368,7 +380,7 @@ namespace DriverAssist
 
             public void Tick(LocoController loco)
             {
-                if (loco.PositiveSpeed > DesiredSpeed)
+                if (loco.RelativeSpeed > DesiredSpeed)
                 {
                     loco.TrainBrake += .1f;
                     loco.IndBrake += .1f;

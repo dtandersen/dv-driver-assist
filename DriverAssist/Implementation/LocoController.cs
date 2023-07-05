@@ -6,6 +6,9 @@ namespace DriverAssist.Implementation
 {
     class PlayerLocoController : LocoController
     {
+        private Integrator speedIntegrator = new Integrator();
+        private float lastSpeed;
+
         public float Speed
         {
             get
@@ -16,11 +19,11 @@ namespace DriverAssist.Implementation
             }
         }
 
-        public float PositiveSpeed
+        public float RelativeSpeed
         {
             get
             {
-                if (Reverser > 0)
+                if (Reverser >= 0.5f)
                     return Speed;
                 else
                     return -Speed;
@@ -117,20 +120,30 @@ namespace DriverAssist.Implementation
             }
         }
 
-        AccelerationMonitor monitor = new AccelerationMonitor();
-        float lastSpeed;
         internal void UpdateAcceleration(float deltaTime)
         {
-            float a = Speed / 3.6f - lastSpeed / 3.6f;
-            monitor.Add(a, deltaTime);
-            lastSpeed = Speed;
+            float speed = Speed;
+            float a = speed / 3.6f - lastSpeed / 3.6f;
+            speedIntegrator.Add(a, deltaTime);
+            lastSpeed = speed;
         }
 
         public float Acceleration
         {
             get
             {
-                return monitor.Sum();
+                return speedIntegrator.Integrate();
+            }
+        }
+
+        public float RelativeAcceleration
+        {
+            get
+            {
+                if (Reverser >= 0.5f)
+                    return Acceleration;
+                else
+                    return -Acceleration;
             }
         }
 

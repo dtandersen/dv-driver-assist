@@ -7,43 +7,46 @@ namespace DriverAssist
         float Throttle { get; set; }
         float TrainBrake { get; set; }
         float IndBrake { get; set; }
+        float Reverser { get; set; }
         float Speed { get; }
-        float PositiveSpeed { get; }
+        /// Speed relative to the Reverser (1=Speed, 0=-Speed)
+        float RelativeSpeed { get; }
         float Temperature { get; }
         float Torque { get; }
-        float Reverser { get; set; }
         float Acceleration { get; }
+        /// Acceleration relative to the Reverser (1=Speed, 0=-Speed)
+        float RelativeAcceleration { get; }
         float Amps { get; }
         float Rpm { get; }
     }
 
-    internal class AccelerationMonitor
+    internal class Integrator
     {
-        List<Node> nodes;
-        int index;
-        int size;
+        private List<Node> nodes;
+        private int index;
+        private int size;
 
-        internal AccelerationMonitor()
+        internal Integrator(int size = 60)
         {
-            size = 60;
-            nodes = new List<Node>(size);
-            index = 0;
+            this.size = size;
+            this.nodes = new List<Node>(size);
+            this.index = 0;
         }
 
-        internal void Add(float speed, float deltaTime)
+        internal void Add(float value, float time)
         {
             if (nodes.Count < size)
             {
-                nodes.Add(new Node(speed, deltaTime));
+                nodes.Add(new Node(value, time));
             }
             else
             {
-                nodes[index % nodes.Count] = new Node(speed, deltaTime);
+                nodes[index % nodes.Count] = new Node(value, time);
                 index++;
             }
         }
 
-        internal float Sum()
+        internal float Integrate()
         {
             float v = 0;
             float t = 0;
@@ -57,7 +60,7 @@ namespace DriverAssist
             return v * t;
         }
 
-        class Node
+        internal class Node
         {
             public float value;
             public float time;
@@ -70,4 +73,3 @@ namespace DriverAssist
         }
     }
 }
-

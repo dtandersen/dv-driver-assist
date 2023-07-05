@@ -17,8 +17,8 @@ namespace DriverAssist.Algorithm
         float lastTorque = 0;
         float lastAmps = 0;
         float step = 1f / 11f;
-        private DefaultAccelerationAlgo accelerate;
-        private DefaultDecelerationAlgo decelerate;
+        // private DefaultAccelerationAlgo accelerate;
+        // private DefaultDecelerationAlgo decelerate;
 
         public DefaultAccelerationAlgo()
         {
@@ -30,7 +30,7 @@ namespace DriverAssist.Algorithm
             // Debug.Log($"DesiredSpeed={DesiredSpeed}");
 
             float reverser = loco.Reverser;
-            float speed = loco.PositiveSpeed;
+            float speed = loco.RelativeSpeed;
             float desiredSpeed = DesiredSpeed;
             // if (reverser == 1)
             // {
@@ -115,21 +115,21 @@ namespace DriverAssist.Algorithm
         public float Temperature { get; set; }
 
         // ManualLogSource logger;
-        CruiseControlTarget target;
+        CruiseControlTarget target = null;
         // float kp = .0025f;
         // float kd = 0f;
         // float ki = .0006f;
         bool Enabled { get; set; }
         float lastThrottle;
-        private Pid throttlePid;
-        private Pid torquePid;
+        private Pid throttlePid = new Pid(0, 0, 0, 0);
+        private Pid torquePid = new Pid(0, 0, 0, 0);
         float currentTime;
         float dt;
         float dtMax = 1f;
         float lastSpeed = 0;
         float lastTorque = 0;
-        private DefaultAccelerationAlgo accelerate;
-        private DefaultDecelerationAlgo decelerate;
+        // private DefaultAccelerationAlgo accelerate = null;
+        // private DefaultDecelerationAlgo decelerate = null;
 
         public PidAccelerationAlgo()
         {
