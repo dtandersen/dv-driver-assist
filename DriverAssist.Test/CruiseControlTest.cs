@@ -1,8 +1,8 @@
-using CruiseControlPlugin.Algorithm;
+using DriverAssist.Algorithm;
 using UnityEngine.SocialPlatforms;
 using Xunit;
 
-namespace CruiseControlPlugin
+namespace DriverAssist
 {
     public class CruiseControlTest
     {
@@ -381,6 +381,7 @@ namespace CruiseControlPlugin
             public int MaxTorque { get; set; }
             public float Offset { get; set; }
             public float Diff { get; set; }
+            public float UpdateInterval { get; set; }
         }
     }
 }

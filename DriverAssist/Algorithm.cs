@@ -1,18 +1,6 @@
 using System;
-using System.Collections;
-using BepInEx;
-using BepInEx.Logging;
-using CommandTerminal;
-using DV.HUD;
-using DV.Simulation.Cars;
-using DV.UI.LocoHUD;
-using DV.UI.PresetEditors;
-using DV.Utils;
-using LocoSim.Implementations;
-using UnityEngine;
-using UnityEngine.UIElements;
 
-namespace CruiseControlPlugin.Algorithm
+namespace DriverAssist.Algorithm
 {
     public interface CruiseControlAlgorithm
     {
@@ -126,7 +114,7 @@ namespace CruiseControlPlugin.Algorithm
         public float Throttle { get; set; }
         public float Temperature { get; set; }
 
-        ManualLogSource logger;
+        // ManualLogSource logger;
         CruiseControlTarget target;
         // float kp = .0025f;
         // float kd = 0f;
@@ -150,7 +138,7 @@ namespace CruiseControlPlugin.Algorithm
         public void Tick(LocoController loco)
         {
             // logger.LogInfo("tick");
-            currentTime = Time.realtimeSinceStartup;
+            currentTime = 0;
             dt = currentTime - lastThrottle;
             if (!target.IsLoco())
             {
@@ -184,7 +172,7 @@ namespace CruiseControlPlugin.Algorithm
             {
                 return;
             }
-            lastThrottle = Time.realtimeSinceStartup;
+            lastThrottle = 0;
             float currentSpeed = target.GetSpeed();
             double accel = (currentSpeed / 3.6f - lastSpeed / 3.6f) * dtMax;
             Speed = currentSpeed;
@@ -247,7 +235,7 @@ namespace CruiseControlPlugin.Algorithm
             lastSpeed = currentSpeed;
             lastTorque = Torque;
 
-            logger.LogInfo($"torquePid={torquePid}, throttlePid={throttlePid}");
+            // logger.LogInfo($"torquePid={torquePid}, throttlePid={throttlePid}");
         }
     }
 }

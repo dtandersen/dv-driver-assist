@@ -4,7 +4,7 @@ using System.Data;
 using BepInEx;
 using BepInEx.Logging;
 using CommandTerminal;
-using CruiseControlPlugin.Algorithm;
+using DriverAssist.Algorithm;
 using DV.HUD;
 using DV.Simulation.Cars;
 using DV.UI.LocoHUD;
@@ -15,7 +15,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 // using UnityEngine;
 
-namespace CruiseControlPlugin
+namespace DriverAssist
 {
     public class CruiseControlOld
     {

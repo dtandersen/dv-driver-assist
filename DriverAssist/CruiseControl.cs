@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
-using CruiseControlPlugin.Algorithm;
-using MyFirstPlugin;
-using VLB;
+using DriverAssist.Algorithm;
 
-namespace CruiseControlPlugin
+namespace DriverAssist
 {
     public class CruiseControl
     {
@@ -148,13 +145,12 @@ namespace CruiseControlPlugin
 
         private void Log(string message)
         {
-            LoggerSingleton.Instance.Info(message);
+            PluginLoggerSingleton.Instance.Info(message);
         }
 
         private bool IsControlsChanged()
         {
             return
-                // changed(lastThrottle, loco.Throttle) ||
                 changed(lastTrainBrake, loco.TrainBrake, 1f / 11f) ||
                 changed(lastIndBrake, loco.IndBrake, 1f / 11f);
         }
@@ -163,5 +159,13 @@ namespace CruiseControlPlugin
         {
             return Math.Abs(v1 - v2) > amount;
         }
+    }
+
+    public interface CruiseControlConfig
+    {
+        int MaxTorque { get; }
+        float Offset { get; }
+        float Diff { get; }
+        float UpdateInterval { get; }
     }
 }

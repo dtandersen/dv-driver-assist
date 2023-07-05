@@ -59,7 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyFirstPlugin\MyFirstPlugin.csproj" />
+    <ProjectReference Include="..\DriverAssist\DriverAssist.csproj" />
   </ItemGroup>
 
 </Project>
