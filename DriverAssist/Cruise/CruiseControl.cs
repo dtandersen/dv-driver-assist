@@ -1,7 +1,6 @@
 using System;
-using DriverAssist.Algorithm;
 
-namespace DriverAssist
+namespace DriverAssist.Cruise
 {
     public class CruiseControl
     {

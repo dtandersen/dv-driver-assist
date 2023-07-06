@@ -4,7 +4,7 @@ using System.Data;
 using BepInEx;
 using BepInEx.Logging;
 using CommandTerminal;
-using DriverAssist.Algorithm;
+using DriverAssist.Cruise;
 using DV.HUD;
 using DV.Simulation.Cars;
 using DV.UI.LocoHUD;
@@ -39,8 +39,8 @@ namespace DriverAssist
         float dtMax = 1f;
         float lastSpeed = 0;
         // float lastTorque = 0;
-        private DefaultAccelerationAlgo accelerate;
-        private DefaultDecelerationAlgo decelerate;
+        private PredictiveAcceleration accelerate;
+        private PredictiveDeceleration decelerate;
 
 
         public CruiseControlOld(ManualLogSource logger)
@@ -50,8 +50,8 @@ namespace DriverAssist
             DesiredTorque = 25000;
             this.logger = logger;
             // lastThrottle = Time.realtimeSinceStartup;
-            accelerate = new DefaultAccelerationAlgo();
-            decelerate = new DefaultDecelerationAlgo();
+            accelerate = new PredictiveAcceleration();
+            decelerate = new PredictiveDeceleration();
         }
 
         public void Tick()

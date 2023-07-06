@@ -1,8 +1,8 @@
-using DriverAssist.Algorithm;
+using DriverAssist.Cruise;
 using UnityEngine.SocialPlatforms;
 using Xunit;
 
-namespace DriverAssist
+namespace DriverAssist.Cruise
 {
     public class CruiseControlTest
     {

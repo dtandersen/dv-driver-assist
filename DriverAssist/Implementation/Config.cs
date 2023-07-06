@@ -1,4 +1,5 @@
 using BepInEx.Configuration;
+using DriverAssist.Cruise;
 using UnityEngine;
 
 namespace DriverAssist.Implementation

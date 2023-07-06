@@ -4,7 +4,7 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using CommandTerminal;
-using DriverAssist.Algorithm;
+using DriverAssist.Cruise;
 using DriverAssist.Implementation;
 using DV.HUD;
 using DV.UI.LocoHUD;
@@ -32,8 +32,8 @@ namespace DriverAssist
             loco = new PlayerLocoController();
             config = new BepInExCruiseControlConfig(Config);
             cruiseControl = new CruiseControl(loco, config);
-            cruiseControl.Accelerator = new DefaultAccelerationAlgo();
-            cruiseControl.Decelerator = new DefaultDecelerationAlgo();
+            cruiseControl.Accelerator = new PredictiveAcceleration();
+            cruiseControl.Decelerator = new PredictiveDeceleration();
             RegisterCommands1();
 
             updateAccumulator = 0;
