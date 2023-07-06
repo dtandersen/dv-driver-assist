@@ -43,15 +43,16 @@ namespace DriverAssist.Cruise
             bool ampsdecreased = amps <= lastAmps;
             float maxtemp;
             bool overdrive = true;
-            if (!overdrive || loco.Acceleration > -.05)
+            if (!overdrive || loco.Acceleration >= 0)
             {
                 maxtemp = 104;
-                maxamps = 590;
+                maxamps = 750;
             }
             else
             {
-                maxtemp = 120;
-                maxamps = 725;
+                maxtemp = 118;
+                maxamps = 750;
+                // maxamps = 725;
             }
             // if (speed < 5)
             // {
@@ -83,7 +84,7 @@ namespace DriverAssist.Cruise
             {
                 throttleResult = throttle - step;
             }
-            else if (ampsdecreased && torque < 18000)
+            else if (ampsdecreased && torque < 20000)
             {
                 throttleResult = throttle + step;
             }
