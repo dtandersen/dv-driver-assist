@@ -6,6 +6,7 @@ namespace DriverAssist
     public class CruiseControl
     {
         bool forward;
+        private float desiredSpeed = 0;
         public float DesiredSpeed
         {
             get { return desiredSpeed; }
@@ -48,9 +49,6 @@ namespace DriverAssist
         private LocoController loco;
         private float minSpeed;
         private float maxSpeed;
-        // private float offset = -2.5f;
-        // private float diff = 2.5f;
-        private float desiredSpeed = 0;
         private float positiveDesiredSpeed;
         private float lastThrottle;
         private float lastTrainBrake;
