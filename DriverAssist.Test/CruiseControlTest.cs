@@ -365,9 +365,10 @@ namespace DriverAssist.Cruise
         {
             public float DesiredSpeed { get; set; }
 
-            public void Tick(LocoController loco)
+            public void Tick(CruiseControlContext context)
             {
-                if (loco.RelativeSpeed < DesiredSpeed)
+                LocoController loco = context.LocoController;
+                if (loco.RelativeSpeed < context.DesiredSpeed)
                 {
                     loco.Throttle += .1f;
                 }
@@ -378,9 +379,10 @@ namespace DriverAssist.Cruise
         {
             public float DesiredSpeed { get; set; }
 
-            public void Tick(LocoController loco)
+            public void Tick(CruiseControlContext context)
             {
-                if (loco.RelativeSpeed > DesiredSpeed)
+                LocoController loco = context.LocoController;
+                if (loco.RelativeSpeed > context.DesiredSpeed)
                 {
                     loco.TrainBrake += .1f;
                     loco.IndBrake += .1f;

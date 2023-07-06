@@ -37,8 +37,9 @@ namespace DriverAssist.Cruise
         {
         }
 
-        public void Tick(LocoController loco)
+        public void Tick(CruiseControlContext context)
         {
+            LocoController loco = context.LocoController;
             // logger.LogInfo("tick");
             currentTime = 0;
             dt = currentTime - lastThrottle;

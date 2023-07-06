@@ -24,8 +24,6 @@ namespace DriverAssist.Cruise
                 positiveDesiredSpeed = Math.Abs(value);
                 minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
                 maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
-                Accelerator.DesiredSpeed = positiveDesiredSpeed;
-                Decelerator.DesiredSpeed = positiveDesiredSpeed;
             }
         }
         public CruiseControlAlgorithm Accelerator { get; set; }
@@ -53,11 +51,13 @@ namespace DriverAssist.Cruise
         private float lastTrainBrake;
         private float lastIndBrake;
         private CruiseControlConfig config;
+        private CruiseControlContext context;
 
         public CruiseControl(LocoController loco, CruiseControlConfig config)
         {
             this.loco = loco;
             this.config = config;
+            this.context = new CruiseControlContext(config, loco);
         }
 
         public void Tick()
@@ -106,15 +106,15 @@ namespace DriverAssist.Cruise
             }
             else if (loco.RelativeSpeed + estspeed < minSpeed)
             {
-                // Decelerator.DesiredSpeed = minSpeed;
-                Accelerator.Tick(loco);
+                context.DesiredSpeed = Math.Abs(DesiredSpeed);
+                Accelerator.Tick(context);
                 minSpeed = positiveDesiredSpeed + config.Offset;
                 Status = $"Accelerating to {minSpeed} km/h";
             }
             else if (loco.RelativeSpeed + estspeed > maxSpeed)
             {
-                Decelerator.DesiredSpeed = maxSpeed;
-                Decelerator.Tick(loco);
+                context.DesiredSpeed = maxSpeed;
+                Decelerator.Tick(context);
                 maxSpeed = positiveDesiredSpeed + config.Offset;
                 Status = $"Decelerating to {maxSpeed} km/h";
             }

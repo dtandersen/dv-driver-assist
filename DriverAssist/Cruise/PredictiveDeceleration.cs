@@ -1,5 +1,3 @@
-using System;
-
 namespace DriverAssist.Cruise
 {
     public class PredictiveDeceleration : CruiseControlAlgorithm
@@ -10,8 +8,9 @@ namespace DriverAssist.Cruise
         {
         }
 
-        public void Tick(LocoController loco)
+        public void Tick(CruiseControlContext context)
         {
+            LocoController loco = context.LocoController;
             loco.Throttle = 0;
             loco.IndBrake = 0;
             loco.TrainBrake += .1f;

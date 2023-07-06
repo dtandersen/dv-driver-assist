@@ -18,8 +18,9 @@ namespace DriverAssist.Cruise
             DesiredTorque = 25000;
         }
 
-        public void Tick(LocoController loco)
+        public void Tick(CruiseControlContext context)
         {
+            LocoController loco = context.LocoController;
             // Debug.Log($"DesiredSpeed={DesiredSpeed}");
 
             float reverser = loco.Reverser;

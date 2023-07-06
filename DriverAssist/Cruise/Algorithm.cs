@@ -2,8 +2,19 @@ namespace DriverAssist.Cruise
 {
     public interface CruiseControlAlgorithm
     {
-        float DesiredSpeed { get; set; }
+        void Tick(CruiseControlContext context);
+    }
 
-        void Tick(LocoController loco);
+    public class CruiseControlContext
+    {
+        public CruiseControlConfig Config { get; }
+        public LocoController LocoController { get; }
+        public float DesiredSpeed { get; set; }
+
+        public CruiseControlContext(CruiseControlConfig config, LocoController loco)
+        {
+            Config = config;
+            LocoController = loco;
+        }
     }
 }
