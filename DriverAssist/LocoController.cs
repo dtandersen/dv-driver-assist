@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace DriverAssist
@@ -18,6 +19,8 @@ namespace DriverAssist
         float RelativeAcceleration { get; }
         float Amps { get; }
         float Rpm { get; }
+        float AmpsRoc { get; }
+        float AverageAmps { get; }
     }
 
     internal class Integrator
@@ -44,6 +47,18 @@ namespace DriverAssist
                 nodes[index % nodes.Count] = new Node(value, time);
                 index++;
             }
+        }
+
+        internal float Average()
+        {
+            float sum = 0;
+
+            foreach (Node node in nodes)
+            {
+                sum += node.value;
+            }
+
+            return sum / nodes.Count;
         }
 
         internal float Integrate()

@@ -16,11 +16,7 @@ namespace DriverAssist.Cruise
         public float Throttle { get; set; }
         public float Temperature { get; set; }
 
-        // ManualLogSource logger;
         CruiseControlTarget target = null;
-        // float kp = .0025f;
-        // float kd = 0f;
-        // float ki = .0006f;
         bool Enabled { get; set; }
         float lastThrottle;
         private Pid throttlePid = new Pid(0, 0, 0, 0);
@@ -30,8 +26,6 @@ namespace DriverAssist.Cruise
         float dtMax = 1f;
         float lastSpeed = 0;
         float lastTorque = 0;
-        // private DefaultAccelerationAlgo accelerate = null;
-        // private DefaultDecelerationAlgo decelerate = null;
 
         public PidAcceleration()
         {

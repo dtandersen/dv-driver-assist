@@ -26,8 +26,10 @@ namespace DriverAssist.Cruise
                 maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
             }
         }
+
         public CruiseControlAlgorithm Accelerator { get; set; }
         public CruiseControlAlgorithm Decelerator { get; set; }
+
         bool enabled;
         public bool Enabled
         {
@@ -35,15 +37,15 @@ namespace DriverAssist.Cruise
             set
             {
                 enabled = value;
-                lastThrottle = loco.Throttle;
-                lastTrainBrake = loco.TrainBrake;
-                lastIndBrake = loco.IndBrake;
+                lastThrottle = context.LocoController.Throttle;
+                lastTrainBrake = context.LocoController.TrainBrake;
+                lastIndBrake = context.LocoController.IndBrake;
             }
         }
 
         public string Status { get; internal set; }
 
-        private LocoController loco;
+        // private LocoController loco;
         private float minSpeed;
         private float maxSpeed;
         private float positiveDesiredSpeed;
@@ -55,13 +57,23 @@ namespace DriverAssist.Cruise
 
         public CruiseControl(LocoController loco, CruiseControlConfig config)
         {
-            this.loco = loco;
+            // this.loco = loco;
             this.config = config;
             this.context = new CruiseControlContext(config, loco);
+            Accelerator = CreateAlgo(config.Acceleration);
+            Decelerator = CreateAlgo(config.Deceleration);
+        }
+
+        private CruiseControlAlgorithm CreateAlgo(string name)
+        {
+            Type type = Type.GetType(name, true);
+            CruiseControlAlgorithm instance = (CruiseControlAlgorithm)Activator.CreateInstance(type);
+            return instance;
         }
 
         public void Tick()
         {
+            LocoController loco = context.LocoController;
             if (IsControlsChanged())
             {
                 Log($"Disabled cruise control lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
@@ -136,7 +148,7 @@ namespace DriverAssist.Cruise
         {
             get
             {
-                return loco.Reverser == 1 && DesiredSpeed < 0 || loco.Reverser == 0 && DesiredSpeed > 0;
+                return context.LocoController.Reverser == 1 && DesiredSpeed < 0 || context.LocoController.Reverser == 0 && DesiredSpeed > 0;
             }
         }
 
@@ -148,8 +160,8 @@ namespace DriverAssist.Cruise
         private bool IsControlsChanged()
         {
             return
-                changed(lastTrainBrake, loco.TrainBrake, 1f / 11f) ||
-                changed(lastIndBrake, loco.IndBrake, 1f / 11f);
+                changed(lastTrainBrake, context.LocoController.TrainBrake, 1f / 11f) ||
+                changed(lastIndBrake, context.LocoController.IndBrake, 1f / 11f);
         }
 
         bool changed(float v1, float v2, float amount)
@@ -164,5 +176,7 @@ namespace DriverAssist.Cruise
         float Offset { get; }
         float Diff { get; }
         float UpdateInterval { get; }
+        string Acceleration { get; }
+        string Deceleration { get; }
     }
 }

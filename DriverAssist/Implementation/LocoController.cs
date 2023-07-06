@@ -7,7 +7,10 @@ namespace DriverAssist.Implementation
     class PlayerLocoController : LocoController
     {
         private Integrator speedIntegrator = new Integrator();
+        private Integrator ampsIntegrator = new Integrator(60 * 6);
+        private Integrator averageAmps = new Integrator(30);
         private float lastSpeed;
+        private float lastAmps;
 
         public float Speed
         {
@@ -125,6 +128,14 @@ namespace DriverAssist.Implementation
             float speed = Speed;
             float a = speed / 3.6f - lastSpeed / 3.6f;
             speedIntegrator.Add(a, deltaTime);
+
+            float amps = Amps;
+            float ampdelta = amps - lastAmps;
+            ampsIntegrator.Add(ampdelta, deltaTime);
+
+            averageAmps.Add(amps, deltaTime);
+
+            lastAmps = amps;
             lastSpeed = speed;
         }
 
@@ -157,6 +168,22 @@ namespace DriverAssist.Implementation
             }
         }
 
+        public float AmpsRoc
+        {
+            get
+            {
+                return ampsIntegrator.Integrate();
+            }
+        }
+
+        public float AverageAmps
+        {
+            get
+            {
+                return averageAmps.Average();
+            }
+        }
+
         public float Rpm
         {
             get
@@ -164,6 +191,23 @@ namespace DriverAssist.Implementation
                 TrainCar loco = GetLocomotive();
                 LocoIndicatorReader locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
                 return locoIndicatorReader.engineRpm.Value;
+            }
+        }
+
+        public string TypeText
+        {
+            get
+            {
+                TrainCar loco = GetLocomotive();
+                return loco.carType.ToString();
+            }
+        }
+
+        public bool IsLoco
+        {
+            get
+            {
+                return GetLocomotive() != null;
             }
         }
 

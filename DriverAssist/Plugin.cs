@@ -54,12 +54,15 @@ namespace DriverAssist
                 cruiseControl.DesiredSpeed -= CC_SPEED_STEP;
             }
 
-            loco.UpdateAcceleration(Time.deltaTime);
-            updateAccumulator += Time.deltaTime;
-            if (updateAccumulator > config.UpdateInterval)
+            if (loco.IsLoco)
             {
-                cruiseControl.Tick();
-                updateAccumulator = 0;
+                loco.UpdateAcceleration(Time.deltaTime);
+                updateAccumulator += Time.deltaTime;
+                if (updateAccumulator > config.UpdateInterval)
+                {
+                    cruiseControl.Tick();
+                    updateAccumulator = 0;
+                }
             }
         }
 
@@ -67,6 +70,8 @@ namespace DriverAssist
         {
             if (Event.current.keyCode == KeyCode.Tab || Event.current.character == '\t')
                 Event.current.Use();
+
+            if (!loco.IsLoco) return;
 
             float Speed = target.GetSpeed();
             float Throttle = target.GetThrottle();
@@ -86,6 +91,11 @@ namespace DriverAssist
             GUILayout.BeginHorizontal();
             GUILayout.Label("Status");
             GUILayout.TextField($"{cruiseControl.Status}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Type");
+            GUILayout.TextField($"{loco.TypeText}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -138,6 +148,16 @@ namespace DriverAssist
             GUILayout.BeginHorizontal();
             GUILayout.Label("Amps");
             GUILayout.TextField($"{(int)loco.Amps}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("ROC Amps");
+            GUILayout.TextField($"{(int)loco.AmpsRoc}");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Average Amps");
+            GUILayout.TextField($"{(int)loco.AverageAmps}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();

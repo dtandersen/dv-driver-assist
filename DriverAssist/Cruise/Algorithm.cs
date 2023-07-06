@@ -17,4 +17,29 @@ namespace DriverAssist.Cruise
             LocoController = loco;
         }
     }
+
+    public class FakeAccelerator : CruiseControlAlgorithm
+    {
+        public void Tick(CruiseControlContext context)
+        {
+            LocoController loco = context.LocoController;
+            if (loco.RelativeSpeed < context.DesiredSpeed)
+            {
+                loco.Throttle += .1f;
+            }
+        }
+    }
+
+    public class FakeDecelerator : CruiseControlAlgorithm
+    {
+        public void Tick(CruiseControlContext context)
+        {
+            LocoController loco = context.LocoController;
+            if (loco.RelativeSpeed > context.DesiredSpeed)
+            {
+                loco.TrainBrake += .1f;
+                loco.IndBrake += .1f;
+            }
+        }
+    }
 }

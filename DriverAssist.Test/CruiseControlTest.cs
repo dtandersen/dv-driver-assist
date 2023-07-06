@@ -1,5 +1,3 @@
-using DriverAssist.Cruise;
-using UnityEngine.SocialPlatforms;
 using Xunit;
 
 namespace DriverAssist.Cruise
@@ -8,8 +6,6 @@ namespace DriverAssist.Cruise
     {
         private CruiseControl cruiseControl;
         private FakeLocoController loco;
-        private FakeAccelerator accelerator;
-        private FakeDecelerator decelerator;
         private FakeCruiseControlConfig config;
 
         public CruiseControlTest()
@@ -17,14 +13,16 @@ namespace DriverAssist.Cruise
             config = new FakeCruiseControlConfig();
             config.Offset = -2.5f;
             config.Diff = 2.5f;
+            config.Acceleration = "DriverAssist.Cruise.FakeAccelerator";
+            config.Deceleration = "DriverAssist.Cruise.FakeDecelerator";
             loco = new FakeLocoController();
             loco.Reverser = 1;
-            accelerator = new FakeAccelerator();
-            decelerator = new FakeDecelerator();
+            // accelerator = new FakeAccelerator();
+            // decelerator = new FakeDecelerator();
             cruiseControl = new CruiseControl(loco, config);
             cruiseControl.Enabled = true;
-            cruiseControl.Accelerator = accelerator;
-            cruiseControl.Decelerator = decelerator;
+            // cruiseControl.Accelerator = accelerator;
+            // cruiseControl.Decelerator = decelerator;
         }
 
         [Fact]
@@ -345,6 +343,8 @@ namespace DriverAssist.Cruise
             public float Temperature { get; set; }
             public float Torque { get; set; }
             public float Reverser { get; set; }
+            public float AmpsRoc { get; set; }
+            public float AverageAmps { get; set; }
             public float Amps { get; set; }
             public float Rpm { get; set; }
             public float Acceleration { get; set; }
@@ -360,42 +360,15 @@ namespace DriverAssist.Cruise
                 }
             }
         }
+    }
 
-        internal class FakeAccelerator : CruiseControlAlgorithm
-        {
-            public float DesiredSpeed { get; set; }
-
-            public void Tick(CruiseControlContext context)
-            {
-                LocoController loco = context.LocoController;
-                if (loco.RelativeSpeed < context.DesiredSpeed)
-                {
-                    loco.Throttle += .1f;
-                }
-            }
-        }
-
-        internal class FakeDecelerator : CruiseControlAlgorithm
-        {
-            public float DesiredSpeed { get; set; }
-
-            public void Tick(CruiseControlContext context)
-            {
-                LocoController loco = context.LocoController;
-                if (loco.RelativeSpeed > context.DesiredSpeed)
-                {
-                    loco.TrainBrake += .1f;
-                    loco.IndBrake += .1f;
-                }
-            }
-        }
-
-        internal class FakeCruiseControlConfig : CruiseControlConfig
-        {
-            public int MaxTorque { get; set; }
-            public float Offset { get; set; }
-            public float Diff { get; set; }
-            public float UpdateInterval { get; set; }
-        }
+    public class FakeCruiseControlConfig : CruiseControlConfig
+    {
+        public int MaxTorque { get; set; }
+        public float Offset { get; set; }
+        public float Diff { get; set; }
+        public float UpdateInterval { get; set; }
+        public string Acceleration { get; set; }
+        public string Deceleration { get; set; }
     }
 }

@@ -9,6 +9,8 @@ namespace DriverAssist.Implementation
         private ConfigEntry<string> maxTorque;
         private ConfigEntry<string> offset;
         private ConfigEntry<string> diff;
+        private ConfigEntry<string> acceleration;
+        private ConfigEntry<string> deceleration;
         private ConfigEntry<KeyboardShortcut> faster;
         private ConfigEntry<KeyboardShortcut> slower;
         private ConfigEntry<KeyboardShortcut> toggle;
@@ -19,6 +21,8 @@ namespace DriverAssist.Implementation
             offset = config.Bind("CruiseControl", "Offset", "0", "This amount is subtracted from setpoint before adding the diff");
             diff = config.Bind("CruiseControl", "Diff", "2.5", "speed = setpoint +/- diff");
             maxTorque = config.Bind("DE2", "MaxTorque", "25000", "Maximum torque");
+            acceleration = config.Bind("DE2", "Acceleration", "DriverAssist.Cruise.PredictiveAcceleration", "Maximum torque");
+            deceleration = config.Bind("DE2", "Deceleration", "DriverAssist.Cruise.PredictiveDeceleration", "Maximum torque");
 
             faster = config.Bind("Hotkeys", "Faster", new KeyboardShortcut(KeyCode.PageUp, KeyCode.LeftControl));
             slower = config.Bind("Hotkeys", "Slower", new KeyboardShortcut(KeyCode.PageDown, KeyCode.LeftControl));
@@ -67,5 +71,21 @@ namespace DriverAssist.Implementation
         }
 
         public float UpdateInterval { get { return 1; } }
+
+        public string Acceleration
+        {
+            get
+            {
+                return acceleration.Value;
+            }
+        }
+
+        public string Deceleration
+        {
+            get
+            {
+                return deceleration.Value;
+            }
+        }
     }
 }
