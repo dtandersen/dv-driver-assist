@@ -1,4 +1,5 @@
 using DV.HUD;
+using LocoSim.Implementations;
 
 namespace DriverAssist.Cruise
 {
@@ -28,63 +29,36 @@ namespace DriverAssist.Cruise
             float predictedAmps = loco.Amps + ampDelta * 2f;
             float acceleration = loco.RelativeAcceleration;
             float maxamps;
-            float maxtorque;
-            if (acceleration < 0)
-                maxamps = 750;
-            else
-                maxamps = 600;
-
-            if (acceleration < 0)
-                maxtorque = 25000;
-            else
-                maxtorque = 20000;
-
+            float minTorque;
             float amps = loco.Amps; //.AverageAmps + 0.05f * loco.AmpsRoc;
             bool ampsdecreased = amps <= lastAmps;
             float maxtemp;
-            bool overdrive = true;
-            if (!overdrive || loco.Acceleration >= 0)
+            bool overDriveEnabled = true;
+            float minAmps;
+            if (overDriveEnabled && loco.Acceleration < 0)
             {
-                maxtemp = 104;
+                minTorque = 20000;
+                maxtemp = 118;
+                minAmps = 400;
                 maxamps = 750;
             }
             else
             {
-                maxtemp = 118;
+                minTorque = 20000;
+                maxtemp = 104;
                 maxamps = 750;
-                // maxamps = 725;
+                minAmps = 400;
             }
-            // if (speed < 5)
-            // {
-            //     throttleResult = step;
-            // }
+
             if (speed > desiredSpeed)
             {
                 throttleResult = 0;
             }
-            // else if (cooling && acceleration < 0.5f)
-            // {
-            //     cooling = false;
-            //     throttleResult = throttle + step;
-            // }
-            else if (amps < 400)
-            {
-                throttleResult = throttle + step;
-            }
-            // else if (loco.Acceleration >= 0.1f)
-            // {
-            //     // if (amps > 400)
-            //     // {
-            //     throttleResult = throttle - step;
-            //     cooling = true;
-            //     // }
-            //     // else throttleResult = 0;
-            // }
-            else if (loco.Temperature >= maxtemp)
+            else if (loco.Temperature > maxtemp)
             {
                 throttleResult = throttle - step;
             }
-            else if (ampsdecreased && torque < 20000)
+            else if (amps < minAmps)
             {
                 throttleResult = throttle + step;
             }
@@ -92,26 +66,10 @@ namespace DriverAssist.Cruise
             {
                 throttleResult = throttle - step;
             }
-            // else if (loco.Torque > maxtorque && !(loco.Torque < lastTorque))
-            // {
-            //     throttleResult = throttle - step;
-            // }
-            // else if (loco.Amps > maxamps && !(loco.Amps < lastAmps))
-            // {
-            //     throttleResult = throttle - step;
-            // }
-            // else if (predictedAmps > maxamps)
-            // {
-            //     throttleResult = throttle - step;
-            // }
-            // else if (predictedAmps < maxamps)
-            // {
-            //     throttleResult = throttle + step;
-            // }
-            // else if (loco.Torque < maxtorque)
-            // {
-            //     throttleResult = throttle + step;
-            // }
+            else if (ampsdecreased && torque < minTorque)
+            {
+                throttleResult = throttle + step;
+            }
             else
             {
                 throttleResult = throttle;
