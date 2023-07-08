@@ -178,10 +178,10 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                switch (TypeText)
+                switch (LocoType)
                 {
-                    case LocoType.DE2:
-                    case LocoType.DE6:
+                    case DriverAssist.LocoType.DE2:
+                    case DriverAssist.LocoType.DE6:
                         return true;
                     default:
                         return false;
@@ -293,7 +293,7 @@ namespace DriverAssist.Implementation
             }
         }
 
-        public string TypeText
+        public string LocoType
         {
             get
             {

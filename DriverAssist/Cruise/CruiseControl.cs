@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace DriverAssist.Cruise
 {
@@ -74,6 +75,16 @@ namespace DriverAssist.Cruise
         public void Tick()
         {
             LocoController loco = context.LocoController;
+            try
+            {
+                context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco);
+            }
+            catch (KeyNotFoundException)
+            {
+                Status = $"No settings found for {loco.LocoType}";
+                return;
+            }
+
             if (IsControlsChanged())
             {
                 Log($"Disabled cruise control lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
@@ -168,20 +179,5 @@ namespace DriverAssist.Cruise
         {
             return Math.Abs(v1 - v2) > amount;
         }
-    }
-
-    public interface CruiseControlConfig
-    {
-        float Offset { get; }
-        float Diff { get; }
-        int MinTorque { get; }
-        int MinAmps { get; }
-        int MaxAmps { get; }
-        int MaxTemperature { get; }
-        int OverdriveTemperature { get; }
-        bool OverdriveEnabled { get; }
-        float UpdateInterval { get; }
-        string Acceleration { get; }
-        string Deceleration { get; }
     }
 }

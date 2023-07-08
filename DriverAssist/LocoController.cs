@@ -24,6 +24,7 @@ namespace DriverAssist
         bool IsElectric { get; }
         bool IsForward { get; }
         bool IsReversing { get; }
+        string LocoType { get; }
     }
 
     public class LocoType

@@ -106,7 +106,7 @@ namespace DriverAssist
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Type");
-                GUILayout.TextField($"{loco.TypeText}");
+                GUILayout.TextField($"{loco.LocoType}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();

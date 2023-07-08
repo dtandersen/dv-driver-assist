@@ -42,6 +42,8 @@ namespace DriverAssist.Implementation
             showStats = config.Bind("UI", "ShowStats", true, "Show stats");
         }
 
+        public Dictionary<string, LocoConfig> LocoSettings { get; }
+
         public int MinTorque
         {
             get

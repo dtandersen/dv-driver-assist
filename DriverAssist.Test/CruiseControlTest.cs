@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Xunit;
 
 namespace DriverAssist.Cruise
@@ -7,6 +8,8 @@ namespace DriverAssist.Cruise
         private CruiseControl cruiseControl;
         private FakeLocoController loco;
         private FakeCruiseControlConfig config;
+        private LocoConfig de2settings;
+        private LocoConfig dh4settings;
 
         public CruiseControlTest()
         {
@@ -15,7 +18,13 @@ namespace DriverAssist.Cruise
             config.Diff = 2.5f;
             config.Acceleration = "DriverAssist.Cruise.FakeAccelerator";
             config.Deceleration = "DriverAssist.Cruise.FakeDecelerator";
+
+            de2settings = new FakeLocoConfig();
+            dh4settings = new FakeLocoConfig();
+            config.LocoSettings[LocoType.DE2] = de2settings;
+            config.LocoSettings[LocoType.DH4] = dh4settings;
             loco = new FakeLocoController();
+            loco.LocoType = LocoType.DE2;
             loco.Reverser = 1;
             // accelerator = new FakeAccelerator();
             // decelerator = new FakeDecelerator();
@@ -317,6 +326,28 @@ namespace DriverAssist.Cruise
             Assert.Equal("Idle: Reverser is in neutral", cruiseControl.Status);
         }
 
+        [Fact]
+        public void UseTheSettingsForTheLocoType()
+        {
+            loco.LocoType = LocoType.DH4;
+            cruiseControl.DesiredSpeed = 10;
+            loco.Speed = 0;
+
+            WhenCruise();
+
+            Assert.Equal(dh4settings, ((FakeAccelerator)cruiseControl.Accelerator).Settings);
+        }
+
+        [Fact]
+        public void ReportIfLocoHasNoSettings()
+        {
+            loco.LocoType = LocoType.DE6;
+
+            WhenCruise();
+
+            Assert.Equal("No settings found for LocoDiesel", cruiseControl.Status);
+        }
+
         void WhenCruise()
         {
             cruiseControl.Tick();
@@ -324,6 +355,7 @@ namespace DriverAssist.Cruise
 
         public class FakeLocoController : LocoController
         {
+            public string LocoType { get; set; }
             public float Speed { get; set; }
 
             public float RelativeSpeed
@@ -381,6 +413,11 @@ namespace DriverAssist.Cruise
 
     public class FakeCruiseControlConfig : CruiseControlConfig
     {
+        public FakeCruiseControlConfig()
+        {
+            LocoSettings = new Dictionary<string, LocoConfig>();
+        }
+
         public int MinTorque { get; set; }
         public int MinAmps { get; }
         public int MaxAmps { get; }
@@ -392,5 +429,16 @@ namespace DriverAssist.Cruise
         public float UpdateInterval { get; set; }
         public string Acceleration { get; set; }
         public string Deceleration { get; set; }
+        public Dictionary<string, LocoConfig> LocoSettings { get; }
+    }
+
+    public class FakeLocoConfig : LocoConfig
+    {
+        public int MinTorque { get; }
+        public int MinAmps { get; }
+        public int MaxAmps { get; }
+        public int MaxTemperature { get; }
+        public int OverdriveTemperature { get; }
+        public bool OverdriveEnabled { get; }
     }
 }
