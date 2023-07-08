@@ -19,7 +19,6 @@ namespace DriverAssist
         private static string CC_CMD = "cc";
 
         private CruiseControl cruiseControl;
-        private CruiseControlTarget target;
         private PlayerLocoController loco;
         private BepInExDriverAssistConfig config;
         private float updateAccumulator;
@@ -27,7 +26,6 @@ namespace DriverAssist
         private void Awake()
         {
             PluginLoggerSingleton.Instance = new BepInExLogger(Logger);
-            target = new CruiseControlTarget();
             Logger.LogInfo($"{PluginInfo.PLUGIN_NAME} ({PluginInfo.PLUGIN_GUID}) is loaded!");
             loco = new PlayerLocoController();
             config = new BepInExDriverAssistConfig(Config);
@@ -84,13 +82,13 @@ namespace DriverAssist
 
             if (!loco.IsLoco) return;
 
-            float Speed = target.GetSpeed();
-            float Throttle = target.GetThrottle();
-            float Mass = target.GetMass();
+            float Speed = loco.Speed;
+            float Throttle = loco.Throttle;
+            float Mass = loco.Mass;
             float Power = Mass * 9.8f / 2f * Speed / 3.6f;
             float Force = Mass * 9.8f / 2f;
             float Hoursepower = Power / 745.7f;
-            float Torque = target.GetTorque();
+            float Torque = loco.Torque;
 
             GUILayout.BeginArea(new Rect(0, 0, 300, 500));
 
@@ -117,13 +115,18 @@ namespace DriverAssist
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
+                GUILayout.Label("Traction Motors");
+                GUILayout.TextField($"{loco.TractionMotors}");
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
                 GUILayout.Label("Throttle");
-                GUILayout.TextField($"{(int)(target.GetThrottle() * 100)}%");
+                GUILayout.TextField($"{(int)(loco.Throttle * 100)}%");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Speed (km/h)");
-                GUILayout.TextField($"{(int)target.GetSpeed()}");
+                GUILayout.TextField($"{(int)loco.Speed}");
                 GUILayout.TextField($"{(int)(loco.Speed + loco.Acceleration * 10)}");
                 GUILayout.EndHorizontal();
 
@@ -155,7 +158,7 @@ namespace DriverAssist
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Temperature");
-                GUILayout.TextField($"{(int)target.GetTemperature()}");
+                GUILayout.TextField($"{(int)loco.Temperature}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
@@ -241,7 +244,6 @@ namespace DriverAssist
             Terminal.Shell.Variables.Remove(CC_CMD);
             Debug.Log($"OnDestroy");
             cruiseControl = null;
-            tag = null;
         }
 
         private TrainCar GetLocomotive()

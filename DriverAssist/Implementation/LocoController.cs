@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using BepInEx.Logging;
 using DV.HUD;
 using DV.Simulation.Cars;
 using LocoSim.Implementations;
@@ -86,7 +89,17 @@ namespace DriverAssist.Implementation
             {
                 TrainCar locoCar = GetLocomotive();
                 LocoIndicatorReader locoIndicatorReader = locoCar.loadedInterior?.GetComponent<LocoIndicatorReader>();
-                return locoIndicatorReader.tmTemp.Value;
+                if (!locoIndicatorReader)
+                {
+                    return 0;
+                }
+
+                if (locoIndicatorReader?.tmTemp)
+                    return locoIndicatorReader?.tmTemp?.Value ?? 0;
+                if (locoIndicatorReader?.oilTemp)
+                    return locoIndicatorReader?.oilTemp?.Value ?? 0;
+
+                return 0;
             }
         }
 
@@ -120,6 +133,42 @@ namespace DriverAssist.Implementation
                 simFlow.TryGetPort(torqueGeneratedPortId, out torqueGeneratedPort);
                 torque = torqueGeneratedPort.Value;
                 return torque;
+            }
+        }
+
+        public string TractionMotors
+        {
+            get
+            {
+                TrainCar locoCar = GetLocomotive();
+                // int x = locoCar.GetComponent<TractionMotor>().numberOfTractionMotors;
+                // SimulationFlow simFlow = locoCar.GetComponent<SimController>()?.simFlow;
+                // Port port;
+                // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.drivingForce.torqueGeneratedPortId;
+                try
+                {
+                    // simFlow.TryGetPort("tm.MAX_AMPS", out port);
+                }
+                catch (Exception e)
+                {
+                    return "error";
+                }
+                // simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port);
+
+                // foreach (SimComponent x in simFlow.orderedSimComps)
+                // {
+                //     List<Port> ports = x.GetAllPorts();
+                //     foreach (Port p in ports)
+                //     {
+                //         PluginLoggerSingleton.Instance.Info($"{x} {p.id}");
+                //     }
+                // }
+                // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.tr;
+
+                // locoCar.def
+                // return "" + port.Value;
+                return "";
+                // return torqueGeneratedPortId;
             }
         }
 
@@ -164,7 +213,7 @@ namespace DriverAssist.Implementation
             {
                 TrainCar loco = GetLocomotive();
                 LocoIndicatorReader locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
-                return locoIndicatorReader.amps.Value;
+                return locoIndicatorReader?.amps?.Value ?? 0;
             }
         }
 
@@ -190,7 +239,7 @@ namespace DriverAssist.Implementation
             {
                 TrainCar loco = GetLocomotive();
                 LocoIndicatorReader locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
-                return locoIndicatorReader.engineRpm.Value;
+                return locoIndicatorReader?.engineRpm?.Value ?? 0;
             }
         }
 
@@ -200,6 +249,22 @@ namespace DriverAssist.Implementation
             {
                 TrainCar loco = GetLocomotive();
                 return loco.carType.ToString();
+            }
+        }
+
+        public float Mass
+        {
+            get
+            {
+                float mass = 0;
+
+                TrainCar locoCar = GetLocomotive();
+                foreach (TrainCar car in locoCar.trainset.cars)
+                {
+                    mass += car.massController.TotalMass;
+                }
+
+                return mass;
             }
         }
 
