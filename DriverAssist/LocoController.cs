@@ -21,6 +21,18 @@ namespace DriverAssist
         float Rpm { get; }
         float AmpsRoc { get; }
         float AverageAmps { get; }
+        bool IsElectric { get; }
+        bool IsForward { get; }
+        bool IsReversing { get; }
+    }
+
+    public class LocoType
+    {
+        public const string DE2 = "LocoShunter";
+        public const string DH4 = "LocoDH2";
+        public const string DE6 = "LocoDiesel";
+        public const string DM3 = "LocoDM1";
+        public const string STEAM = "LocoSteamHeavy";
     }
 
     internal class Integrator

@@ -330,7 +330,7 @@ namespace DriverAssist.Cruise
             {
                 get
                 {
-                    if (Reverser >= 0.5f)
+                    if (IsForward)
                         return Speed;
                     else
                         return -Speed;
@@ -348,15 +348,29 @@ namespace DriverAssist.Cruise
             public float Amps { get; set; }
             public float Rpm { get; set; }
             public float Acceleration { get; set; }
-            public int[] AccelerateKeys { get; }
-            public int[] DecelerateKeys { get; }
-            public int[] ToggleKeys { get; }
+            public bool IsElectric { get; set; }
+
+            public bool IsForward
+            {
+                get
+                {
+                    return Reverser >= 0.5f;
+                }
+            }
+
+            public bool IsReversing
+            {
+                get
+                {
+                    return !IsForward;
+                }
+            }
 
             public float RelativeAcceleration
             {
                 get
                 {
-                    if (Reverser >= 0.5f)
+                    if (IsForward)
                         return Acceleration;
                     else
                         return -Acceleration;

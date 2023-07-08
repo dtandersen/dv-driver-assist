@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using BepInEx.Logging;
 using DV.HUD;
 using DV.Simulation.Cars;
 using LocoSim.Implementations;
@@ -29,7 +27,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                if (Reverser >= 0.5f)
+                if (IsForward)
                     return Speed;
                 else
                     return -Speed;
@@ -142,33 +140,85 @@ namespace DriverAssist.Implementation
             {
                 TrainCar locoCar = GetLocomotive();
                 // int x = locoCar.GetComponent<TractionMotor>().numberOfTractionMotors;
-                // SimulationFlow simFlow = locoCar.GetComponent<SimController>()?.simFlow;
-                // Port port;
+                SimulationFlow simFlow = locoCar.GetComponent<SimController>()?.simFlow;
+                Port port;
+                String maxAmps = "";
+                String motors = "";
                 // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.drivingForce.torqueGeneratedPortId;
-                try
+                if (IsElectric)
                 {
-                    // simFlow.TryGetPort("tm.MAX_AMPS", out port);
+                    if (simFlow.TryGetPort("tm.MAX_AMPS", out port))
+                        maxAmps = "" + port.Value;
+                    if (simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port))
+                        motors = "" + port.Value;
+                    return $"{motors} / {maxAmps}";
                 }
-                catch (Exception e)
+                else { return ""; }
+            }
+
+            // simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port);
+
+            // foreach (SimComponent x in simFlow.orderedSimComps)
+            // {
+            //     List<Port> ports = x.GetAllPorts();
+            //     foreach (Port p in ports)
+            //     {
+            //         PluginLoggerSingleton.Instance.Info($"{x} {p.id}");
+            //     }
+            // }
+            // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.tr;
+
+            // locoCar.def
+            // return "" + port.Value;
+            // return torqueGeneratedPortId;
+            // }
+        }
+
+        public bool IsElectric
+        {
+            get
+            {
+                switch (TypeText)
                 {
-                    return "error";
+                    case LocoType.DE2:
+                    case LocoType.DE6:
+                        return true;
+                    default:
+                        return false;
                 }
-                // simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port);
+            }
 
-                // foreach (SimComponent x in simFlow.orderedSimComps)
-                // {
-                //     List<Port> ports = x.GetAllPorts();
-                //     foreach (Port p in ports)
-                //     {
-                //         PluginLoggerSingleton.Instance.Info($"{x} {p.id}");
-                //     }
-                // }
-                // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.tr;
+            // simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port);
 
-                // locoCar.def
-                // return "" + port.Value;
-                return "";
-                // return torqueGeneratedPortId;
+            // foreach (SimComponent x in simFlow.orderedSimComps)
+            // {
+            //     List<Port> ports = x.GetAllPorts();
+            //     foreach (Port p in ports)
+            //     {
+            //         PluginLoggerSingleton.Instance.Info($"{x} {p.id}");
+            //     }
+            // }
+            // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.tr;
+
+            // locoCar.def
+            // return "" + port.Value;
+            // return torqueGeneratedPortId;
+            // }
+        }
+
+        public bool IsForward
+        {
+            get
+            {
+                return Reverser >= 0.5f;
+            }
+        }
+
+        public bool IsReversing
+        {
+            get
+            {
+                return !IsForward;
             }
         }
 
@@ -200,7 +250,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                if (Reverser >= 0.5f)
+                if (IsForward)
                     return Acceleration;
                 else
                     return -Acceleration;

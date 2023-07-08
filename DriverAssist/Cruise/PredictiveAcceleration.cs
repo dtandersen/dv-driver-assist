@@ -1,3 +1,5 @@
+using System;
+
 namespace DriverAssist.Cruise
 {
     public class PredictiveAcceleration : CruiseControlAlgorithm
@@ -19,7 +21,7 @@ namespace DriverAssist.Cruise
             float speed = loco.RelativeSpeed;
             float desiredSpeed = context.DesiredSpeed;
             float throttle = loco.Throttle;
-            float torque = loco.Torque;
+            float torque = Math.Abs(loco.Torque);
             float temperature = loco.Temperature;
             float ampDelta = loco.Amps - lastAmps;
             float throttleResult;
@@ -55,7 +57,7 @@ namespace DriverAssist.Cruise
             {
                 throttleResult = throttle - step;
             }
-            else if (amps < minAmps)
+            else if (amps < minAmps && loco.IsElectric)
             {
                 throttleResult = throttle + step;
             }
@@ -63,7 +65,7 @@ namespace DriverAssist.Cruise
             {
                 throttleResult = throttle - step;
             }
-            else if (ampsdecreased && torque < minTorque)
+            else if (torque <= lastTorque && torque < minTorque)
             {
                 throttleResult = throttle + step;
             }
