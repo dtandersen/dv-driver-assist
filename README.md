@@ -2,6 +2,10 @@
 
 The Driver Assist plugin adds cruise control to Derail Valley.
 
+# Features
+
+* Cruise Control
+
 # Community
 
 Please join the [Just Another Snake Cult Discord](https://discord.gg/KNmFpwyzYf) if you have suggestions about the mod or need help.
@@ -24,13 +28,7 @@ The `DriverAssist.cfg` file is in the `BepInEx\config` folder.
 
 You can also use the [Configuration Manager plugin](https://github.com/BepInEx/BepInEx.ConfigurationManager) to change the settings. If you install it, change the keyboard shortcut to it to `F10`, as the default `F1` key interfers with the first person camera.
 
-## Key bindings
-
-* `PAGE UP` - Increase speed
-* `PAGE DOWN` - Decrease speed
-* `RIGHT CONTROL` - Toggle cruise control on/off
-
-## Cruise control settings
+## Cruise control
 
 * `MinTorque` - Upshift torque threshold
 * `MinAmps` - Upshift amperage threshold
@@ -38,6 +36,18 @@ You can also use the [Configuration Manager plugin](https://github.com/BepInEx/B
 * `MaxTemperature` - Downshift temperature threshhold
 * `OverdriveTemperature` - Downshift temperature threshhold during overdrive
 * `Overdrive` - Enable overdrive when train is slowing down
+
+## Key bindings
+
+The default key bindings are:
+
+* `PAGE UP` - Increase speed
+* `PAGE DOWN` - Decrease speed
+* `RIGHT CONTROL` - Toggle cruise control on/off
+
+# Usage
+
+Put the reverser into neutral. Press `PAGE DOWN` to increase the set point to 10 km/h. Press `RIGHT CTRL` to the cruise control. Now press `PAGE DOWN` and decrease the setpoing to -10 km/h. The train should no come to a halt and reverse.
 
 # Development
 
