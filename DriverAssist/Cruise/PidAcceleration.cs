@@ -98,10 +98,10 @@ namespace DriverAssist.Cruise
             {
                 throttleResult = 0;
             }
-            else if (target.TooHot())
-            {
-                throttleResult = Throttle - step;
-            }
+            // else if (target.TooHot())
+            // {
+            //     throttleResult = Throttle - step;
+            // }
             else if (DesiredTorque > Torque)
             {
                 throttleResult = Throttle + step;

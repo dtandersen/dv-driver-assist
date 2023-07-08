@@ -79,12 +79,13 @@ namespace DriverAssist
             return mass;
         }
 
-        public bool TooHot()
-        {
-            TrainCar locoCar = GetLocomotive();
-            LocoIndicatorReader locoIndicatorReader = locoCar.loadedInterior?.GetComponent<LocoIndicatorReader>();
-            return locoIndicatorReader.tmTemp.Value >= 100f;
-        }
+        // public bool TooHot()
+        // {
+        //     TrainCar locoCar = GetLocomotive();
+        //     LocoIndicatorReader locoIndicatorReader = locoCar.loadedInterior?.GetComponent<LocoIndicatorReader>();
+        //     return locoIndicatorReader?.tmTemp?.Value >= 100f;
+        // }
+
         private TrainCar GetLocomotive()
         {
             if (!PlayerManager.Car)
@@ -101,8 +102,13 @@ namespace DriverAssist
         internal float GetTemperature()
         {
             TrainCar locoCar = GetLocomotive();
+            // if (!locoCar.loadedInterior)
+            // {
+            //     return 0;
+            // }
             LocoIndicatorReader locoIndicatorReader = locoCar.loadedInterior?.GetComponent<LocoIndicatorReader>();
-            return locoIndicatorReader.tmTemp.Value;
+            // locoIndicatorReader.
+            return locoIndicatorReader?.tmTemp?.Value ?? 0;
         }
     }
 }
