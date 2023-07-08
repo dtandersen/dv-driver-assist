@@ -21,7 +21,7 @@ namespace DriverAssist
         private CruiseControl cruiseControl;
         private CruiseControlTarget target;
         private PlayerLocoController loco;
-        private CruiseControlConfig config;
+        private BepInExDriverAssistConfig config;
         private float updateAccumulator;
 
         private void Awake()
@@ -30,26 +30,26 @@ namespace DriverAssist
             target = new CruiseControlTarget();
             Logger.LogInfo($"{PluginInfo.PLUGIN_NAME} ({PluginInfo.PLUGIN_GUID}) is loaded!");
             loco = new PlayerLocoController();
-            config = new BepInExCruiseControlConfig(Config);
+            config = new BepInExDriverAssistConfig(Config);
             cruiseControl = new CruiseControl(loco, config);
             cruiseControl.Accelerator = new PredictiveAcceleration();
             cruiseControl.Decelerator = new PredictiveDeceleration();
-            RegisterCommands1();
+            // RegisterCommands1();
 
             updateAccumulator = 0;
         }
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftControl))
+            if (IsKeyPressed(config.ToggleKeys))
             {
                 cruiseControl.Enabled = !cruiseControl.Enabled;
             }
-            if (Input.GetKeyDown(KeyCode.PageUp))
+            if (IsKeyPressed(config.AccelerateKeys))
             {
                 cruiseControl.DesiredSpeed += CC_SPEED_STEP;
             }
-            if (Input.GetKeyDown(KeyCode.PageDown))
+            if (IsKeyPressed(config.DecelerateKeys))
             {
                 cruiseControl.DesiredSpeed -= CC_SPEED_STEP;
             }
@@ -64,6 +64,17 @@ namespace DriverAssist
                     updateAccumulator = 0;
                 }
             }
+        }
+
+        bool IsKeyPressed(int[] keys)
+        {
+            foreach (KeyCode key in keys)
+            {
+                if (!Input.GetKeyDown(key))
+                    return false;
+            }
+
+            return true;
         }
 
         void OnGUI()
@@ -93,78 +104,80 @@ namespace DriverAssist
             GUILayout.TextField($"{cruiseControl.Status}");
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Type");
-            GUILayout.TextField($"{loco.TypeText}");
-            GUILayout.EndHorizontal();
+            if (config.ShowStats)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Type");
+                GUILayout.TextField($"{loco.TypeText}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Throttle");
-            GUILayout.TextField($"{(int)(target.GetThrottle() * 100)}%");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Mass (t)");
+                GUILayout.TextField($"{(int)(Mass / 1000)}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Speed (km/h)");
-            GUILayout.TextField($"{(int)target.GetSpeed()}");
-            GUILayout.TextField($"{(int)(loco.Speed + loco.Acceleration * 10)}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Throttle");
+                GUILayout.TextField($"{(int)(target.GetThrottle() * 100)}%");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Acceleration (m/s^2)");
-            GUILayout.TextField($"{Math.Round(loco.Acceleration, 2)}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Speed (km/h)");
+                GUILayout.TextField($"{(int)target.GetSpeed()}");
+                GUILayout.TextField($"{(int)(loco.Speed + loco.Acceleration * 10)}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Force");
-            GUILayout.TextField($"{Force}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Acceleration (m/s^2)");
+                GUILayout.TextField($"{Math.Round(loco.Acceleration, 3)}");
+                GUILayout.EndHorizontal();
 
-            float powerkw = Mass * loco.Acceleration * loco.Speed / 3.6f / 1000;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Power (kW)");
-            GUILayout.TextField($"{(int)powerkw}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Force");
+                GUILayout.TextField($"{(int)Force}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Horsepower");
-            GUILayout.TextField($"{(int)(powerkw * 1.341f)}");
-            GUILayout.EndHorizontal();
+                float powerkw = Mass * loco.Acceleration * loco.Speed / 3.6f / 1000;
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Power (kW)");
+                GUILayout.TextField($"{(int)powerkw}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Torque");
-            GUILayout.TextField($"{Torque}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Horsepower");
+                GUILayout.TextField($"{(int)(powerkw * 1.341f)}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Mass (t)");
-            GUILayout.TextField($"{(int)(Mass / 1000)}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Torque");
+                GUILayout.TextField($"{(int)Torque}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Temperature");
-            GUILayout.TextField($"{(int)target.GetTemperature()}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Temperature");
+                GUILayout.TextField($"{(int)target.GetTemperature()}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Amps");
-            GUILayout.TextField($"{(int)loco.Amps}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Amps");
+                GUILayout.TextField($"{(int)loco.Amps}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("ROC Amps");
-            GUILayout.TextField($"{(int)loco.AmpsRoc}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("ROC Amps");
+                GUILayout.TextField($"{(int)loco.AmpsRoc}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Average Amps");
-            GUILayout.TextField($"{(int)loco.AverageAmps}");
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Average Amps");
+                GUILayout.TextField($"{(int)loco.AverageAmps}");
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("RPM");
-            GUILayout.TextField($"{(int)loco.Rpm}");
-            GUILayout.EndHorizontal();
-
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("RPM");
+                GUILayout.TextField($"{(int)loco.Rpm}");
+                GUILayout.EndHorizontal();
+            }
             // GUILayout.BeginHorizontal();
             // GUILayout.Label("Reverser");
             // GUILayout.TextField($"{loco.Reverser}");
@@ -177,13 +190,13 @@ namespace DriverAssist
             // GUILayout.EndArea();
         }
 
-        private void RegisterCommands1()
-        {
-            if (Application.isPlaying)
-            {
-                UnityEngine.Object.FindObjectOfType<Terminal>().StartCoroutine(RegisterCommands());
-            }
-        }
+        // private void RegisterCommands1()
+        // {
+        //     if (Application.isPlaying)
+        //     {
+        //         UnityEngine.Object.FindObjectOfType<Terminal>().StartCoroutine(RegisterCommands());
+        //     }
+        // }
 
         private IEnumerator RegisterCommands()
         {
@@ -267,5 +280,13 @@ namespace DriverAssist
                 }
             }
         }
+    }
+
+    public interface DriverAssistConfig
+    {
+        int[] AccelerateKeys { get; }
+        int[] DecelerateKeys { get; }
+        int[] ToggleKeys { get; }
+        bool ShowStats { get; }
     }
 }

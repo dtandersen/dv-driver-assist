@@ -348,6 +348,9 @@ namespace DriverAssist.Cruise
             public float Amps { get; set; }
             public float Rpm { get; set; }
             public float Acceleration { get; set; }
+            public int[] AccelerateKeys { get; }
+            public int[] DecelerateKeys { get; }
+            public int[] ToggleKeys { get; }
 
             public float RelativeAcceleration
             {
@@ -364,7 +367,12 @@ namespace DriverAssist.Cruise
 
     public class FakeCruiseControlConfig : CruiseControlConfig
     {
-        public int MaxTorque { get; set; }
+        public int MinTorque { get; set; }
+        public int MinAmps { get; }
+        public int MaxAmps { get; }
+        public int MaxTemperature { get; }
+        public int OverdriveTemperature { get; }
+        public bool OverdriveEnabled { get; }
         public float Offset { get; set; }
         public float Diff { get; set; }
         public float UpdateInterval { get; set; }

@@ -1,6 +1,3 @@
-using DV.HUD;
-using LocoSim.Implementations;
-
 namespace DriverAssist.Cruise
 {
     public class PredictiveAcceleration : CruiseControlAlgorithm
@@ -33,21 +30,21 @@ namespace DriverAssist.Cruise
             float amps = loco.Amps; //.AverageAmps + 0.05f * loco.AmpsRoc;
             bool ampsdecreased = amps <= lastAmps;
             float maxtemp;
-            bool overDriveEnabled = true;
+            bool overDriveEnabled = context.Config.OverdriveEnabled;
             float minAmps;
             if (overDriveEnabled && loco.Acceleration < 0)
             {
-                minTorque = 20000;
-                maxtemp = 118;
-                minAmps = 400;
-                maxamps = 750;
+                minTorque = context.Config.MinTorque;
+                maxtemp = context.Config.OverdriveTemperature;
+                minAmps = context.Config.MinAmps;
+                maxamps = context.Config.MaxAmps;
             }
             else
             {
-                minTorque = 20000;
-                maxtemp = 104;
-                maxamps = 750;
-                minAmps = 400;
+                minTorque = context.Config.MinTorque;
+                maxtemp = context.Config.MaxTemperature;
+                minAmps = context.Config.MinAmps;
+                maxamps = context.Config.MaxAmps;
             }
 
             if (speed > desiredSpeed)

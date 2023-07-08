@@ -172,9 +172,14 @@ namespace DriverAssist.Cruise
 
     public interface CruiseControlConfig
     {
-        int MaxTorque { get; }
         float Offset { get; }
         float Diff { get; }
+        int MinTorque { get; }
+        int MinAmps { get; }
+        int MaxAmps { get; }
+        int MaxTemperature { get; }
+        int OverdriveTemperature { get; }
+        bool OverdriveEnabled { get; }
         float UpdateInterval { get; }
         string Acceleration { get; }
         string Deceleration { get; }
