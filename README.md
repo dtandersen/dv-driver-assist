@@ -5,9 +5,9 @@ The Driver Assist plugin adds cruise control to Derail Valley.
 # Features
 
 * Maintain speed with cruise control. It handles both acceleration and braking.
-* (planned) DM3 shifting
-* (planned) Handbrake set/release
-* (planned) Automatic sander
+* (idea) DM3 shifting
+* (idea) Handbrake set/release
+* (idea) Automatic sander
 
 # Community
 
