@@ -70,6 +70,8 @@ Put the reverser into neutral to avoid speeding away. Press `PAGE UP` to increas
 
 # Development
 
+Open the browser to [91X](https://player.listenlive.co/36281).
+
 Install the BepInEx [ScriptEngine plugin](https://github.com/BepInEx/BepInEx.Debug) and run `build.bat`. This builds the solution with `dotnet build` and copies the DLL to `BepInEx\scripts`.
 
 In game, press `F6` to load the plugin.
