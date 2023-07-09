@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
+using System.Globalization;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using CommandTerminal;
 using DriverAssist.Cruise;
 using DriverAssist.Implementation;
+using DriverAssist.Localization;
 using DV.HUD;
 using DV.UI.LocoHUD;
 using UnityEngine;
@@ -16,15 +18,18 @@ namespace DriverAssist
     public class DriverAssistPlugin : BaseUnityPlugin
     {
         private static int CC_SPEED_STEP = 5;
-        private static string CC_CMD = "cc";
+        // private static string CC_CMD = "cc";
 
         private CruiseControl cruiseControl;
         private PlayerLocoController loco;
         private BepInExDriverAssistSettings config;
         private float updateAccumulator;
+        private Translation localization;
 
         private void Awake()
         {
+            TranslationManager.Init();
+            localization = TranslationManager.Current;
             PluginLoggerSingleton.Instance = new BepInExLogger(Logger);
             Logger.LogInfo($"{PluginInfo.PLUGIN_NAME} ({PluginInfo.PLUGIN_GUID}) is loaded!");
             loco = new PlayerLocoController();
@@ -91,24 +96,24 @@ namespace DriverAssist
             GUILayout.BeginArea(new Rect(0, 0, 300, 500));
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Set Point");
+            GUILayout.Label(localization.CC_SETPOINT);
             GUILayout.TextField($"{cruiseControl.DesiredSpeed}");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Status");
+            GUILayout.Label(localization.CC_STATUS);
             GUILayout.TextField($"{cruiseControl.Status}");
             GUILayout.EndHorizontal();
 
             if (config.ShowStats)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Type");
+                GUILayout.Label(localization.STAT_LOCOMOTIVE);
                 GUILayout.TextField($"{loco.LocoType}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Mass (t)");
+                GUILayout.Label(localization.STAT_MASS);
                 GUILayout.TextField($"{(int)(Mass / 1000)}");
                 GUILayout.EndHorizontal();
 
@@ -119,13 +124,13 @@ namespace DriverAssist
 
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Speed (km/h)");
+                GUILayout.Label(localization.STAT_SPEED);
                 GUILayout.TextField($"{(int)loco.RelativeSpeedKmh}");
                 GUILayout.TextField($"{(int)(loco.RelativeSpeedKmh + 10 * loco.RelativeAccelerationMs * 3.6f)}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Acceleration (m/s^2)");
+                GUILayout.Label(localization.STAT_ACCELERATION);
                 GUILayout.TextField($"{Math.Round(loco.RelativeAccelerationMs, 2)}");
                 GUILayout.EndHorizontal();
 
@@ -135,32 +140,32 @@ namespace DriverAssist
                 // GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Torque");
+                GUILayout.Label(localization.STAT_TORQUE);
                 GUILayout.TextField($"{(int)loco.RelativeTorque}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Power (kW)");
+                GUILayout.Label(localization.STAT_POWER);
                 GUILayout.TextField($"{(int)powerkw}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Horsepower");
+                GUILayout.Label(localization.STAT_HORSEPOWER);
                 GUILayout.TextField($"{(int)(powerkw * 1.341f)}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Throttle");
+                GUILayout.Label(localization.STAT_THROTTLE);
                 GUILayout.TextField($"{(int)(loco.Throttle * 100)}%");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Temperature");
+                GUILayout.Label(localization.STAT_TEMPERATURE);
                 GUILayout.TextField($"{(int)loco.Temperature}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Amps");
+                GUILayout.Label(localization.STAT_AMPS);
                 GUILayout.TextField($"{(int)loco.Amps}");
                 GUILayout.EndHorizontal();
 
@@ -175,7 +180,7 @@ namespace DriverAssist
                 // GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("RPM");
+                GUILayout.Label(localization.STAT_RPM);
                 GUILayout.TextField($"{(int)loco.Rpm}");
                 GUILayout.EndHorizontal();
             }
@@ -199,12 +204,12 @@ namespace DriverAssist
         //     }
         // }
 
-        private IEnumerator RegisterCommands()
-        {
-            yield return WaitFor.EndOfFrame;
+        // private IEnumerator RegisterCommands()
+        // {
+        //     yield return WaitFor.EndOfFrame;
 
-            CommandInfo command = Terminal.Shell.AddCommand(CC_CMD, Cruise, 1, 1, "");
-        }
+        //     CommandInfo command = Terminal.Shell.AddCommand(CC_CMD, Cruise, 1, 1, "");
+        // }
 
         private static void Cruise(CommandArg[] args)
         {
@@ -238,9 +243,9 @@ namespace DriverAssist
 
         void OnDestroy()
         {
-            Terminal.Shell.Commands.Remove(CC_CMD);
-            Terminal.Shell.Variables.Remove(CC_CMD);
-            Debug.Log($"OnDestroy");
+            // Terminal.Shell.Commands.Remove(CC_CMD);
+            // Terminal.Shell.Variables.Remove(CC_CMD);
+            // Debug.Log($"OnDestroy");
             cruiseControl = null;
         }
 
@@ -257,29 +262,29 @@ namespace DriverAssist
             return PlayerManager.Car;
         }
 
-        private void OnHUDChanged(HUDInterfacer.HUDChangeEvent obj)
-        {
-            Logger.LogInfo($"OnHUDChanged oldBase={obj.oldBase} oldControls={obj.oldControls} oldManager={obj.oldManager}");
-            Logger.LogInfo($"OnHUDChanged newBase={obj.newBase} newControls={obj.newControls} newManager={obj.newManager}");
-            if (!obj.newManager)
-            {
-                Logger.LogInfo("hud removed");
-                return;
-            }
-            Logger.LogInfo("hud changed2");
-            InteriorControlsManager manager = obj.newManager;
-            HUDLocoControls locoControls = obj.newControls;
+        // private void OnHUDChanged(HUDInterfacer.HUDChangeEvent obj)
+        // {
+        //     Logger.LogInfo($"OnHUDChanged oldBase={obj.oldBase} oldControls={obj.oldControls} oldManager={obj.oldManager}");
+        //     Logger.LogInfo($"OnHUDChanged newBase={obj.newBase} newControls={obj.newControls} newManager={obj.newManager}");
+        //     if (!obj.newManager)
+        //     {
+        //         Logger.LogInfo("hud removed");
+        //         return;
+        //     }
+        //     Logger.LogInfo("hud changed2");
+        //     InteriorControlsManager manager = obj.newManager;
+        //     HUDLocoControls locoControls = obj.newControls;
 
-            LocoIndicatorReader indicatorReader = manager.indicatorReader;
-            if (indicatorReader != null)
-            {
-                if ((bool)locoControls.basicControls.speedMeter)
-                {
-                    float speed = indicatorReader.speed.Value;
-                    Logger.LogInfo(speed);
-                }
-            }
-        }
+        //     LocoIndicatorReader indicatorReader = manager.indicatorReader;
+        //     if (indicatorReader != null)
+        //     {
+        //         if ((bool)locoControls.basicControls.speedMeter)
+        //         {
+        //             float speed = indicatorReader.speed.Value;
+        //             Logger.LogInfo(speed);
+        //         }
+        //     }
+        // }
     }
 
     public interface DriverAssistSettings
