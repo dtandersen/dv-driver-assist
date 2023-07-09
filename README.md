@@ -21,20 +21,20 @@ This mod requires [BepInEx](https://github.com/BepInEx/BepInEx/releases/tag/v5.4
 * [YouTube Tutorial](https://youtu.be/PXwa4WMUie4)
 * [Altfuture Discord](https://discord.gg/altfuture)
 
-Once BepInEx is installed, unzip the [release](https://github.com/dtandersen/dv-driver-assist/releases) and copy the `DriverAssist.dll` into the  `BepInEx\plugins` folder.
+Once BepInEx is installed, download the [release](https://github.com/dtandersen/dv-driver-assist/releases), unzip it, and copy `DriverAssist.dll` into the `BepInEx\plugins` folder.
 
 An easy way to do this is to download the ZIP, double-click it, copy the DLL to the clipboard, and then paste it into the plugins folder. The standard location of the plugins folder is `c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\BepInEx\plugins`.
 
 # Configuration
 
-The `DriverAssist.cfg` file is in the `BepInEx\config` folder. 
-
-You can also use the [Configuration Manager plugin](https://github.com/BepInEx/BepInEx.ConfigurationManager) to change the settings. If you install it, change the keyboard shortcut to it to `F10`, as the default `F1` key interfers with the first person camera.
+The `DriverAssist.cfg` file is in the `BepInEx\config` folder. However, it's recommended to use the [Configuration Manager plugin](https://github.com/BepInEx/BepInEx.ConfigurationManager) to change the settings. If you install Configuration Manager, change the keyboard shortcut to it to `F10`, as the default `F1` key interfers with the first person camera.
 
 ## Cruise control
 
-* `Diff` - Try to stay in the speed range of setpoint +/- diff. For example, if the setpoint is 60 km/h and the diff is 2.5 km/h, cruise control will keep the train in the range of 57.5 to 62.5 km/h.
-* `Offset` - Add this value to the setpoint. In the above example if `Offset` is -2.5 km/h the speed range would be 55 km/h to 60 km/h.
+There are many settings to play with for the cruise control. The first group of settings determines how close to the setpoint the locomotive will travel.
+
+* `Diff` - Try to stay in the speed range of setpoint +/- diff. For example, if the setpoint is 60 km/h and the diff is 2.5 km/h, cruise control will keep the train in the range of 57.5 to 62.5 km/h (default: 2.5 km/h).
+* `Offset` - Add this value to the setpoint. In the above example if `Offset` is -2.5 km/h the speed range would be 55 km/h to 60 km/h (default: 0 km/h).
 
 ### Locomotive Profiles
 
