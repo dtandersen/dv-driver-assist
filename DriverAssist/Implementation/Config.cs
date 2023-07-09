@@ -66,7 +66,7 @@ namespace DriverAssist.Implementation
             // dh4OverdriveEnabled = config.Bind("DH4", "Overdrive", true, "Enable overdrive when train is slowing down");
 
             brakingTime = config.Bind("Braking", "DecelerationTime", 10, "Time to decelerate");
-            brakeReleaseFactor = config.Bind("Braking", "BrakeReleaseFactor", .5f, "Brake = Brake * BrakeReleaseFactor * Brake");
+            brakeReleaseFactor = config.Bind("Braking", "BrakeReleaseFactor", .5f, "Brake = Brake - BrakeReleaseFactor * Brake");
             minBrake = config.Bind("Braking", "MinBrake", .1f, "Minimum braking (0=0%, 1=100%)");
 
             // acceleration = config.Bind("CruiseControl", "Acceleration", "DriverAssist.Cruise.PredictiveAcceleration", "Maximum torque");
