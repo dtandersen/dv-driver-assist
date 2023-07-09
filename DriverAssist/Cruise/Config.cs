@@ -19,7 +19,6 @@ namespace DriverAssist.Cruise
         int MaxAmps { get; }
         int MaxTemperature { get; }
         int OverdriveTemperature { get; }
-        bool OverdriveEnabled { get; }
         int BrakingTime { get; }
     }
 }

@@ -81,7 +81,6 @@ namespace DriverAssist.Implementation
                 maxAmps: de2MaxAmps,
                 maxTemperature: de2MaxTemperature,
                 overdriveTemperature: de2OverdriveTemperature,
-                overdriveEnabled: null,
                 brakingTime: brakingTime
             );
             LocoSettings[LocoType.DE6] = new BepInExLocoSettings(
@@ -90,7 +89,6 @@ namespace DriverAssist.Implementation
                 maxAmps: de6MaxAmps,
                 maxTemperature: de6MaxTemperature,
                 overdriveTemperature: de6OverdriveTemperature,
-                overdriveEnabled: null,
                 brakingTime: brakingTime
             );
             LocoSettings[LocoType.DH4] = new BepInExLocoSettings(
@@ -99,7 +97,6 @@ namespace DriverAssist.Implementation
                 maxAmps: null,
                 maxTemperature: dh4MaxTemperature,
                 overdriveTemperature: dh4OverdriveTemperature,
-                overdriveEnabled: null,
                 brakingTime: brakingTime
             );
         }
@@ -242,7 +239,6 @@ namespace DriverAssist.Implementation
         private ConfigEntry<int> maxAmps;
         private ConfigEntry<int> maxTemperature;
         private ConfigEntry<int> overdriveTemperature;
-        private ConfigEntry<bool> overdriveEnabled;
         private ConfigEntry<int> brakingTime;
 
         public BepInExLocoSettings(
@@ -251,7 +247,6 @@ namespace DriverAssist.Implementation
             ConfigEntry<int> maxAmps,
             ConfigEntry<int> maxTemperature,
             ConfigEntry<int> overdriveTemperature,
-            ConfigEntry<bool> overdriveEnabled,
             ConfigEntry<int> brakingTime
             )
         {
@@ -260,7 +255,6 @@ namespace DriverAssist.Implementation
             this.maxAmps = maxAmps;
             this.maxTemperature = maxTemperature;
             this.overdriveTemperature = overdriveTemperature;
-            this.overdriveEnabled = overdriveEnabled;
             this.brakingTime = brakingTime;
         }
 
@@ -304,13 +298,6 @@ namespace DriverAssist.Implementation
             }
         }
 
-        public bool OverdriveEnabled
-        {
-            get
-            {
-                return overdriveEnabled?.Value ?? false;
-            }
-        }
 
         public int BrakingTime
         {

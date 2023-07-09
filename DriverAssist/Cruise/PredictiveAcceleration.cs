@@ -32,7 +32,7 @@ namespace DriverAssist.Cruise
             float amps = loco.Amps; //.AverageAmps + 0.05f * loco.AmpsRoc;
             bool ampsdecreased = amps <= lastAmps;
             float maxtemp;
-            bool overDriveEnabled = context.Config.OverdriveEnabled;
+            bool overDriveEnabled = true;
             float minAmps;
             if (overDriveEnabled && loco.AccelerationMs < 0)
             {
