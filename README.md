@@ -77,3 +77,7 @@ Install the BepInEx [ScriptEngine plugin](https://github.com/BepInEx/BepInEx.Deb
 In game, press `F6` to load the plugin.
 
 Use `dotnet test` to run the unit tests.
+
+# Translation
+
+The mod is translated to English and Deutch. If you would like to provide a translation for another language please join the Discord server.
