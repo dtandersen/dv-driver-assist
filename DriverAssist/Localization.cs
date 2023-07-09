@@ -7,6 +7,14 @@ namespace DriverAssist.Localization
     {
         string CC_SETPOINT { get; }
         string CC_STATUS { get; }
+        string CC_COASTING { get; }
+        string CC_DECELERATING { get; }
+        string CC_ACCELERATING { get; }
+        string CC_CHANGING_DIRECTION { get; }
+        string CC_STOPPING { get; }
+        string CC_WARNING_NEUTRAL { get; }
+        string CC_DISABLED { get; }
+        string CC_UNSUPPORTED { get; }
 
         string STAT_LOCOMOTIVE { get; }
         string STAT_MASS { get; }
@@ -25,7 +33,7 @@ namespace DriverAssist.Localization
     {
         public static Translation Current { get; internal set; }
 
-        internal static void Init()
+        public static void Init()
         {
             string language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             switch (language)
@@ -47,6 +55,14 @@ namespace DriverAssist.Localization
     {
         public string CC_SETPOINT => "Setpoint";
         public string CC_STATUS => "Status";
+        public string CC_COASTING => "Coast";
+        public string CC_DECELERATING => "Decelerating to {0} km/h";
+        public string CC_ACCELERATING => "Accelerating to {0} km/h";
+        public string CC_CHANGING_DIRECTION => "Direction change";
+        public string CC_STOPPING => "Stop";
+        public string CC_WARNING_NEUTRAL => "Idle: Reverser is in neutral";
+        public string CC_DISABLED => "Disabled";
+        public string CC_UNSUPPORTED => "No settings found for {0}";
 
         public string STAT_LOCOMOTIVE => "Locomotive";
         public string STAT_MASS => "Mass (t)";
@@ -65,6 +81,14 @@ namespace DriverAssist.Localization
     {
         public string CC_SETPOINT => "Sollwert";
         public string CC_STATUS => "Status";
+        public string CC_COASTING => "Rollt";
+        public string CC_DECELERATING => "Verlangsamung auf {0} km/h";
+        public string CC_ACCELERATING => "Beschleunigung auf {0} km/h";
+        public string CC_CHANGING_DIRECTION => "Richtung ändern";
+        public string CC_STOPPING => "Anhalten";
+        public string CC_WARNING_NEUTRAL => "Leerlauf: Reversierer steht im Leerlauf";
+        public string CC_DISABLED => "Behinderte";
+        public string CC_UNSUPPORTED => "Keine Einstellungen für {0} gefunden";
 
         public string STAT_LOCOMOTIVE => "Lokomotive";
         public string STAT_MASS => "Masse (t)";

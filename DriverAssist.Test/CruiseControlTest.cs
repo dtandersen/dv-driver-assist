@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DriverAssist.Localization;
 using Xunit;
 
 namespace DriverAssist.Cruise
@@ -13,6 +14,7 @@ namespace DriverAssist.Cruise
 
         public CruiseControlTest()
         {
+            TranslationManager.Init();
             config = new FakeCruiseControlConfig();
             config.Offset = -2.5f;
             config.Diff = 2.5f;

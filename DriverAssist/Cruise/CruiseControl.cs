@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DriverAssist.Localization;
 
 namespace DriverAssist.Cruise
 {
@@ -55,6 +56,7 @@ namespace DriverAssist.Cruise
         private float lastIndBrake;
         private CruiseControlSettings config;
         private CruiseControlContext context;
+        private Translation localization;
 
         public CruiseControl(LocoController loco, CruiseControlSettings config)
         {
@@ -68,6 +70,7 @@ namespace DriverAssist.Cruise
         {
             Type type = Type.GetType(name, true);
             CruiseControlAlgorithm instance = (CruiseControlAlgorithm)Activator.CreateInstance(type);
+            localization = TranslationManager.Current;
             return instance;
         }
 
@@ -79,7 +82,8 @@ namespace DriverAssist.Cruise
             }
             catch (KeyNotFoundException)
             {
-                Status = $"No settings found for {loco.LocoType}";
+                Status = String.Format(localization.CC_UNSUPPORTED, loco.LocoType);
+                // Status = String.Format("No settings found for {0}", loco.LocoType);
                 return;
             }
 
@@ -91,13 +95,15 @@ namespace DriverAssist.Cruise
 
             if (!Enabled)
             {
-                Status = "Disabled";
+                Status = String.Format(localization.CC_DISABLED);
+                // Status = String.Format("Disabled");
                 return;
             }
 
             if (loco.Reverser == 0.5f)
             {
-                Status = "Idle: Reverser is in neutral";
+                Status = String.Format(localization.CC_WARNING_NEUTRAL);
+                // Status = String.Format("Idle: Reverser is in neutral");
                 loco.Throttle = 0;
                 return;
             }
@@ -107,13 +113,15 @@ namespace DriverAssist.Cruise
 
             if (positiveDesiredSpeed == 0)
             {
-                Status = "Stop";
+                Status = String.Format(localization.CC_STOPPING);
+                // Status = String.Format("Stop");
                 loco.Throttle = 0;
                 loco.TrainBrake = 1;
             }
             else if (IsWrongDirection)
             {
-                Status = "Direction change";
+                Status = String.Format(localization.CC_CHANGING_DIRECTION);
+                // Status = String.Format("Direction change");
                 loco.Throttle = 0;
                 loco.TrainBrake = 1;
                 if (loco.Reverser == 0 && DesiredSpeed > 0 && loco.SpeedKmh == 0)
@@ -130,18 +138,21 @@ namespace DriverAssist.Cruise
                 context.DesiredSpeed = Math.Abs(DesiredSpeed);
                 Accelerator.Tick(context);
                 minSpeed = positiveDesiredSpeed + config.Offset;
-                Status = $"Accelerating to {minSpeed} km/h";
+                Status = String.Format(localization.CC_ACCELERATING, minSpeed);
+                // Status = String.Format("Accelerating to {0} km/h", minSpeed);
             }
             else if (loco.RelativeSpeedKmh + estspeed > maxSpeed)
             {
                 context.DesiredSpeed = maxSpeed;
                 Decelerator.Tick(context);
                 maxSpeed = positiveDesiredSpeed + config.Offset;
-                Status = $"Decelerating to {maxSpeed} km/h";
+                // Status = String.Format("Decelerating to {0} km/h", maxSpeed);
+                Status = String.Format(localization.CC_DECELERATING, maxSpeed);
             }
             else
             {
-                Status = "Coast";
+                // Status = String.Format("Coast");
+                Status = String.Format(localization.CC_COASTING);
                 loco.Throttle = 0;
                 loco.TrainBrake = 0;
                 minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
