@@ -25,7 +25,7 @@ Once you get BepInEx install, unzip the [release](https://github.com/dtandersen/
 
 An easy way to do this is to download the ZIP, double-click it, copy the DLL to the clipboard, and then paste it into the plugins folder. The standard location of the plugins folder is `c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\BepInEx\plugins`.
 
-## Configuration
+# Configuration
 
 The `DriverAssist.cfg` file is in the `BepInEx\config` folder. 
 
@@ -33,20 +33,30 @@ You can also use the [Configuration Manager plugin](https://github.com/BepInEx/B
 
 ## Cruise control
 
-* `MinTorque` - Upshift torque threshold
-* `MinAmps` - Upshift amperage threshold
-* `MaxAmps` - Downshift amperage threshold
-* `MaxTemperature` - Downshift temperature threshhold
-* `OverdriveTemperature` - Downshift temperature threshhold during overdrive
-* `Overdrive` - Enable overdrive when train is slowing down
+* `Diff` - Try to stay in the speed range of setpoint +/- diff. For example, if the setpoint is 60 km/h and the diff is 2.5 km/h, cruise control will keep the train in the range of 57.5 to 62.5 km/h.
+* `Offset` - Add this value to the setpoint. In the above example if `Offset` is -2.5 km/h the speed range would be 55 km/h to 60 km/h.
 
-## Key bindings
+### Locomotive Profiles
+
+Currently the DE2, DE6, and DH4 are supported. Each locomotive type has its own settings.
+
+* `MinTorque` - Throttle up if torque is below this threshold (only if torque is going down)
+* `MinAmps` - Throttle up if amps are below this threshold.
+* `MaxAmps` - Throttle down if amps are above this threshold.
+* `MaxTemperature` - Throttle down if temperture is above this threshold.
+* `OverdriveTemperature` - If the train is slowing down use this heat threshold.
+
+### Braking
+
+* `DecelerationTime` - Cruise control will attempt to decelerate in this amount of time. Lower values may lead to overshoot due to the delay in pressurizing the brake lines.
+
+### Key bindings
 
 The default key bindings are:
 
-* `PAGE UP` - Increase speed
-* `PAGE DOWN` - Decrease speed
-* `RIGHT CONTROL` - Toggle cruise control on/off
+* `Faster` - Increase speed (default: `PAGE UP`)
+* `Slower` - Decrease speed (default: `PAGE DOWN`)
+* `Toggle` - Toggle cruise control on/off (default: `RIGHT CTRL`)
 
 # Usage
 
