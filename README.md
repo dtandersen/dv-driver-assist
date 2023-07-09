@@ -21,7 +21,7 @@ This mod requires [BepInEx](https://github.com/BepInEx/BepInEx/releases/tag/v5.4
 * [YouTube Tutorial](https://youtu.be/PXwa4WMUie4)
 * [Altfuture Discord](https://discord.gg/altfuture)
 
-Once you get BepInEx install, unzip the [release](https://github.com/dtandersen/dv-driver-assist/releases) and copy the `DriverAssist.dll` into the  `BepInEx\plugins` folder.
+Once BepInEx is installed, unzip the [release](https://github.com/dtandersen/dv-driver-assist/releases) and copy the `DriverAssist.dll` into the  `BepInEx\plugins` folder.
 
 An easy way to do this is to download the ZIP, double-click it, copy the DLL to the clipboard, and then paste it into the plugins folder. The standard location of the plugins folder is `c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\BepInEx\plugins`.
 
