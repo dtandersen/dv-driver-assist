@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netframework4.8</TargetFramework>
     <AssemblyName>DriverAssist</AssemblyName>
-    <Description>My first plugin</Description>
-    <Version>0.3.0</Version>
+    <Description>Driver Assist: A cruise control mod for Derail Valley</Description>
+    <Version>0.4.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
 
