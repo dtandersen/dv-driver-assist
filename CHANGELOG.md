@@ -1,3 +1,9 @@
+0.5.0 - 7/9/2023
+
+- Added German localization
+- The setting `MinBrake` can be used to prevent the brakes from completely disengaging during deceleration
+- The setting `BrakeReleaseFactor` controls how quickly the brakes will be released
+
 0.4.0 - 7/8/2023
 
 - Overdrive works again!

@@ -449,5 +449,7 @@ namespace DriverAssist.Cruise
         public int OverdriveTemperature { get; }
         public bool OverdriveEnabled { get; }
         public int BrakingTime { get; }
+        public float BrakeReleaseFactor { get; }
+        public float MinBrake { get; }
     }
 }

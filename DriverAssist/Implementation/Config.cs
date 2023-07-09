@@ -30,6 +30,8 @@ namespace DriverAssist.Implementation
         // private ConfigEntry<bool> dh4OverdriveEnabled;
 
         private ConfigEntry<int> brakingTime;
+        private ConfigEntry<float> brakeReleaseFactor;
+        private ConfigEntry<float> minBrake;
 
         // private ConfigEntry<string> acceleration;
         // private ConfigEntry<string> deceleration;
@@ -64,6 +66,8 @@ namespace DriverAssist.Implementation
             // dh4OverdriveEnabled = config.Bind("DH4", "Overdrive", true, "Enable overdrive when train is slowing down");
 
             brakingTime = config.Bind("Braking", "DecelerationTime", 10, "Time to decelerate");
+            brakeReleaseFactor = config.Bind("Braking", "BrakeReleaseFactor", .5f, "Brake = Brake * BrakeReleaseFactor * Brake");
+            minBrake = config.Bind("Braking", "MinBrake", .1f, "Minimum braking (0=0%, 1=100%)");
 
             // acceleration = config.Bind("CruiseControl", "Acceleration", "DriverAssist.Cruise.PredictiveAcceleration", "Maximum torque");
             // deceleration = config.Bind("CruiseControl", "Deceleration", "DriverAssist.Cruise.PredictiveDeceleration", "Maximum torque");
@@ -81,7 +85,9 @@ namespace DriverAssist.Implementation
                 maxAmps: de2MaxAmps,
                 maxTemperature: de2MaxTemperature,
                 overdriveTemperature: de2OverdriveTemperature,
-                brakingTime: brakingTime
+                brakingTime: brakingTime,
+                brakeReleaseFactor: brakeReleaseFactor,
+                minBrake: minBrake
             );
             LocoSettings[LocoType.DE6] = new BepInExLocoSettings(
                 minTorque: de6MinTorque,
@@ -89,7 +95,9 @@ namespace DriverAssist.Implementation
                 maxAmps: de6MaxAmps,
                 maxTemperature: de6MaxTemperature,
                 overdriveTemperature: de6OverdriveTemperature,
-                brakingTime: brakingTime
+                brakingTime: brakingTime,
+                brakeReleaseFactor: brakeReleaseFactor,
+                minBrake: minBrake
             );
             LocoSettings[LocoType.DH4] = new BepInExLocoSettings(
                 minTorque: dh4MinTorque,
@@ -97,7 +105,9 @@ namespace DriverAssist.Implementation
                 maxAmps: null,
                 maxTemperature: dh4MaxTemperature,
                 overdriveTemperature: dh4OverdriveTemperature,
-                brakingTime: brakingTime
+                brakingTime: brakingTime,
+                brakeReleaseFactor: brakeReleaseFactor,
+                minBrake: minBrake
             );
         }
 
@@ -240,6 +250,8 @@ namespace DriverAssist.Implementation
         private ConfigEntry<int> maxTemperature;
         private ConfigEntry<int> overdriveTemperature;
         private ConfigEntry<int> brakingTime;
+        private ConfigEntry<float> brakeReleaseFactor;
+        private ConfigEntry<float> minBrake;
 
         public BepInExLocoSettings(
             ConfigEntry<int> minTorque,
@@ -247,7 +259,9 @@ namespace DriverAssist.Implementation
             ConfigEntry<int> maxAmps,
             ConfigEntry<int> maxTemperature,
             ConfigEntry<int> overdriveTemperature,
-            ConfigEntry<int> brakingTime
+            ConfigEntry<int> brakingTime,
+            ConfigEntry<float> brakeReleaseFactor,
+            ConfigEntry<float> minBrake
             )
         {
             this.minTorque = minTorque;
@@ -256,6 +270,8 @@ namespace DriverAssist.Implementation
             this.maxTemperature = maxTemperature;
             this.overdriveTemperature = overdriveTemperature;
             this.brakingTime = brakingTime;
+            this.brakeReleaseFactor = brakeReleaseFactor;
+            this.minBrake = minBrake;
         }
 
         public int MinTorque
@@ -298,12 +314,27 @@ namespace DriverAssist.Implementation
             }
         }
 
-
         public int BrakingTime
         {
             get
             {
                 return brakingTime?.Value ?? 0;
+            }
+        }
+
+        public float BrakeReleaseFactor
+        {
+            get
+            {
+                return brakeReleaseFactor?.Value ?? 0;
+            }
+        }
+
+        public float MinBrake
+        {
+            get
+            {
+                return minBrake?.Value ?? 0;
             }
         }
     }

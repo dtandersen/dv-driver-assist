@@ -20,5 +20,7 @@ namespace DriverAssist.Cruise
         int MaxTemperature { get; }
         int OverdriveTemperature { get; }
         int BrakingTime { get; }
+        float BrakeReleaseFactor { get; }
+        float MinBrake { get; }
     }
 }
