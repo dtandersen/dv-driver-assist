@@ -40,32 +40,37 @@ There are many settings to play with for the cruise control. The first group of 
 
 Currently the DE2, DE6, and DH4 are supported. Each locomotive type has its own settings.
 
+All locomotives
+
 * `MinTorque` - Throttle up if torque is below this threshold (only if torque is going down)
-* `MinAmps` - Throttle up if amps are below this threshold.
-* `MaxAmps` - Throttle down if amps are above this threshold.
 * `MaxTemperature` - Throttle down if temperture is above this threshold.
 * `OverdriveTemperature` - If the train is slowing down use this heat threshold.
 
+The DE2 and DE6 have an electrical traction motor. `MinAmps` forces the locomotive to throttle up if the amps are low. `MaxAmps` forces the locomotive to throttle down in order to avoid blowing up the traction motor.
+
+* `MinAmps` - Throttle up if amps are below this threshold.
+* `MaxAmps` - Throttle down if amps are above this threshold.
+
 ### Braking
 
-* `DecelerationTime` - Cruise control will attempt to decelerate in this amount of time. Lower values may lead to overshoot due to the delay in pressurizing the brake lines.
+* `DecelerationTime` - Cruise control attempts to decelerate in this amount of time. A low time may lead to braking overshoot due to the delay in pressurizing/depressurzing the brake lines (default: 10 seconds).
 
 ### Key bindings
 
 The default key bindings are:
 
-* `Faster` - Increase speed (default: `PAGE UP`)
-* `Slower` - Decrease speed (default: `PAGE DOWN`)
+* `Faster` - Increase speed (default: `PAGE UP`).
+* `Slower` - Decrease speed (default: `PAGE DOWN`).
 * `Toggle` - Toggle cruise control on/off (default: `RIGHT CTRL`)
 
 # Usage
 
-Put the reverser into neutral. Press `PAGE DOWN` to increase the set point to 10 km/h. Press `RIGHT CTRL` to the cruise control. Now press `PAGE DOWN` and decrease the setpoing to -10 km/h. The train should no come to a halt and reverse.
+Put the reverser into neutral to avoid speeding away. Press `PAGE UP` to increase the setpoint to 10 km/h. Press `RIGHT CTRL` to enable cruise control. Now press `PAGE DOWN` and decrease the setpoint to -10 km/h. The train should no come to a halt and reverse. Finally press `PAGE UP` to raise the setpoint to 0. The locomotive will come to a full stop.
 
 # Development
 
 Install the BepInEx [ScriptEngine plugin](https://github.com/BepInEx/BepInEx.Debug) and run `build.bat`. This builds the solution with `dotnet build` and copies the DLL to `BepInEx\scripts`.
 
-Press `F6` in game to load the plugin.
+In game, press `F6` to load the plugin.
 
 Use `dotnet test` to run the unit tests.
