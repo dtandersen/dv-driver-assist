@@ -36,6 +36,11 @@ namespace DriverAssist.Localization
         public static void Init()
         {
             string language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            Init(language);
+        }
+
+        public static void Init(string language)
+        {
             switch (language)
             {
                 case "en":
