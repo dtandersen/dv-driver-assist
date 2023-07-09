@@ -20,7 +20,7 @@ namespace DriverAssist
 
         private CruiseControl cruiseControl;
         private PlayerLocoController loco;
-        private BepInExDriverAssistConfig config;
+        private BepInExDriverAssistSettings config;
         private float updateAccumulator;
 
         private void Awake()
@@ -28,7 +28,7 @@ namespace DriverAssist
             PluginLoggerSingleton.Instance = new BepInExLogger(Logger);
             Logger.LogInfo($"{PluginInfo.PLUGIN_NAME} ({PluginInfo.PLUGIN_GUID}) is loaded!");
             loco = new PlayerLocoController();
-            config = new BepInExDriverAssistConfig(Config);
+            config = new BepInExDriverAssistSettings(Config);
             cruiseControl = new CruiseControl(loco, config);
             cruiseControl.Accelerator = new PredictiveAcceleration();
             cruiseControl.Decelerator = new PredictiveDeceleration();
@@ -82,13 +82,11 @@ namespace DriverAssist
 
             if (!loco.IsLoco) return;
 
-            float Speed = loco.Speed;
+            float Speed = loco.RelativeSpeedKmh;
             float Throttle = loco.Throttle;
             float Mass = loco.Mass;
-            float Power = Mass * 9.8f / 2f * Speed / 3.6f;
+            float powerkw = Mass * loco.RelativeAccelerationMs * loco.RelativeSpeedKmh / 3.6f / 1000;
             float Force = Mass * 9.8f / 2f;
-            float Hoursepower = Power / 745.7f;
-            float Torque = loco.Torque;
 
             GUILayout.BeginArea(new Rect(0, 0, 300, 500));
 
@@ -114,33 +112,33 @@ namespace DriverAssist
                 GUILayout.TextField($"{(int)(Mass / 1000)}");
                 GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Traction Motors");
-                GUILayout.TextField($"{loco.TractionMotors}");
-                GUILayout.EndHorizontal();
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label("Traction Motors");
+                // GUILayout.TextField($"{loco.TractionMotors}");
+                // GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Throttle");
-                GUILayout.TextField($"{(int)(loco.Throttle * 100)}%");
-                GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Speed (km/h)");
-                GUILayout.TextField($"{(int)loco.Speed}");
-                GUILayout.TextField($"{(int)(loco.Speed + loco.Acceleration * 10)}");
+                GUILayout.TextField($"{(int)loco.RelativeSpeedKmh}");
+                GUILayout.TextField($"{(int)(loco.RelativeSpeedKmh + 10 * loco.RelativeAccelerationMs * 3.6f)}");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Acceleration (m/s^2)");
-                GUILayout.TextField($"{Math.Round(loco.Acceleration, 3)}");
+                GUILayout.TextField($"{Math.Round(loco.RelativeAccelerationMs, 2)}");
                 GUILayout.EndHorizontal();
+
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label("Force");
+                // GUILayout.TextField($"{(int)Force}");
+                // GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Force");
-                GUILayout.TextField($"{(int)Force}");
+                GUILayout.Label("Torque");
+                GUILayout.TextField($"{(int)loco.RelativeTorque}");
                 GUILayout.EndHorizontal();
 
-                float powerkw = Mass * loco.Acceleration * loco.Speed / 3.6f / 1000;
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Power (kW)");
                 GUILayout.TextField($"{(int)powerkw}");
@@ -152,8 +150,8 @@ namespace DriverAssist
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Torque");
-                GUILayout.TextField($"{(int)Torque}");
+                GUILayout.Label("Throttle");
+                GUILayout.TextField($"{(int)(loco.Throttle * 100)}%");
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
@@ -166,15 +164,15 @@ namespace DriverAssist
                 GUILayout.TextField($"{(int)loco.Amps}");
                 GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("ROC Amps");
-                GUILayout.TextField($"{(int)loco.AmpsRoc}");
-                GUILayout.EndHorizontal();
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label("ROC Amps");
+                // GUILayout.TextField($"{(int)loco.AmpsRoc}");
+                // GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Average Amps");
-                GUILayout.TextField($"{(int)loco.AverageAmps}");
-                GUILayout.EndHorizontal();
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label("Average Amps");
+                // GUILayout.TextField($"{(int)loco.AverageAmps}");
+                // GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("RPM");
@@ -284,7 +282,7 @@ namespace DriverAssist
         }
     }
 
-    public interface DriverAssistConfig
+    public interface DriverAssistSettings
     {
         int[] AccelerateKeys { get; }
         int[] DecelerateKeys { get; }

@@ -13,7 +13,7 @@ namespace DriverAssist.Implementation
         private float lastSpeed;
         private float lastAmps;
 
-        public float Speed
+        public float SpeedKmh
         {
             get
             {
@@ -23,14 +23,14 @@ namespace DriverAssist.Implementation
             }
         }
 
-        public float RelativeSpeed
+        public float RelativeSpeedKmh
         {
             get
             {
                 if (IsForward)
-                    return Speed;
+                    return SpeedKmh;
                 else
-                    return -Speed;
+                    return -SpeedKmh;
             }
         }
 
@@ -134,6 +134,15 @@ namespace DriverAssist.Implementation
             }
         }
 
+        public float RelativeTorque
+        {
+            get
+            {
+                if (IsForward) return Torque;
+                else return -Torque;
+            }
+        }
+
         public string TractionMotors
         {
             get
@@ -224,7 +233,7 @@ namespace DriverAssist.Implementation
 
         internal void UpdateAcceleration(float deltaTime)
         {
-            float speed = Speed;
+            float speed = SpeedKmh;
             float a = speed / 3.6f - lastSpeed / 3.6f;
             speedIntegrator.Add(a, deltaTime);
 
@@ -238,7 +247,7 @@ namespace DriverAssist.Implementation
             lastSpeed = speed;
         }
 
-        public float Acceleration
+        public float AccelerationMs
         {
             get
             {
@@ -246,14 +255,14 @@ namespace DriverAssist.Implementation
             }
         }
 
-        public float RelativeAcceleration
+        public float RelativeAccelerationMs
         {
             get
             {
                 if (IsForward)
-                    return Acceleration;
+                    return AccelerationMs;
                 else
-                    return -Acceleration;
+                    return -AccelerationMs;
             }
         }
 

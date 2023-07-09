@@ -3,7 +3,6 @@ namespace DriverAssist.Cruise
     public class PredictiveDeceleration : CruiseControlAlgorithm
     {
         static float STEP = 1f / 11f;
-        float lookAhead = 10;
 
         public PredictiveDeceleration()
         {
@@ -12,7 +11,7 @@ namespace DriverAssist.Cruise
         public void Tick(CruiseControlContext context)
         {
             LocoController loco = context.LocoController;
-            float speed = loco.RelativeSpeed + lookAhead * loco.RelativeAcceleration;
+            float speed = loco.RelativeSpeedKmh + context.Config.BrakingTime * loco.RelativeAccelerationMs * 3.6f;
 
             if (speed > context.DesiredSpeed)
             {

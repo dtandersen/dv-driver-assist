@@ -18,15 +18,15 @@ namespace DriverAssist.Cruise
             LocoController loco = context.LocoController;
 
             float reverser = loco.Reverser;
-            float speed = loco.RelativeSpeed;
+            float speed = loco.RelativeSpeedKmh;
             float desiredSpeed = context.DesiredSpeed;
             float throttle = loco.Throttle;
-            float torque = Math.Abs(loco.Torque);
+            float torque = loco.RelativeTorque;
             float temperature = loco.Temperature;
             float ampDelta = loco.Amps - lastAmps;
             float throttleResult;
             float predictedAmps = loco.Amps + ampDelta * 2f;
-            float acceleration = loco.RelativeAcceleration;
+            float acceleration = loco.RelativeAccelerationMs;
             float maxamps;
             float minTorque;
             float amps = loco.Amps; //.AverageAmps + 0.05f * loco.AmpsRoc;
@@ -34,7 +34,7 @@ namespace DriverAssist.Cruise
             float maxtemp;
             bool overDriveEnabled = context.Config.OverdriveEnabled;
             float minAmps;
-            if (overDriveEnabled && loco.Acceleration < 0)
+            if (overDriveEnabled && loco.AccelerationMs < 0)
             {
                 minTorque = context.Config.MinTorque;
                 maxtemp = context.Config.OverdriveTemperature;

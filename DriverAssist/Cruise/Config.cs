@@ -2,17 +2,17 @@ using System.Collections.Generic;
 
 namespace DriverAssist.Cruise
 {
-    public interface CruiseControlConfig : LocoConfig
+    public interface CruiseControlSettings
     {
         float Offset { get; }
         float Diff { get; }
         float UpdateInterval { get; }
         string Acceleration { get; }
         string Deceleration { get; }
-        Dictionary<string, LocoConfig> LocoSettings { get; }
+        Dictionary<string, LocoSettings> LocoSettings { get; }
     }
 
-    public interface LocoConfig
+    public interface LocoSettings
     {
         int MinTorque { get; }
         int MinAmps { get; }
@@ -20,5 +20,6 @@ namespace DriverAssist.Cruise
         int MaxTemperature { get; }
         int OverdriveTemperature { get; }
         bool OverdriveEnabled { get; }
+        int BrakingTime { get; }
     }
 }

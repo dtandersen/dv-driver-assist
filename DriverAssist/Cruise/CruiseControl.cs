@@ -38,29 +38,28 @@ namespace DriverAssist.Cruise
             set
             {
                 enabled = value;
-                lastThrottle = context.LocoController.Throttle;
-                lastTrainBrake = context.LocoController.TrainBrake;
-                lastIndBrake = context.LocoController.IndBrake;
+                lastThrottle = loco.Throttle;
+                lastTrainBrake = loco.TrainBrake;
+                lastIndBrake = loco.IndBrake;
             }
         }
 
         public string Status { get; internal set; }
 
-        // private LocoController loco;
+        private LocoController loco;
         private float minSpeed;
         private float maxSpeed;
         private float positiveDesiredSpeed;
         private float lastThrottle;
         private float lastTrainBrake;
         private float lastIndBrake;
-        private CruiseControlConfig config;
+        private CruiseControlSettings config;
         private CruiseControlContext context;
 
-        public CruiseControl(LocoController loco, CruiseControlConfig config)
+        public CruiseControl(LocoController loco, CruiseControlSettings config)
         {
-            // this.loco = loco;
+            this.loco = loco;
             this.config = config;
-            this.context = new CruiseControlContext(config, loco);
             Accelerator = CreateAlgo(config.Acceleration);
             Decelerator = CreateAlgo(config.Deceleration);
         }
@@ -74,7 +73,6 @@ namespace DriverAssist.Cruise
 
         public void Tick()
         {
-            LocoController loco = context.LocoController;
             try
             {
                 context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco);
@@ -118,23 +116,23 @@ namespace DriverAssist.Cruise
                 Status = "Direction change";
                 loco.Throttle = 0;
                 loco.TrainBrake = 1;
-                if (loco.Reverser == 0 && DesiredSpeed > 0 && loco.Speed == 0)
+                if (loco.Reverser == 0 && DesiredSpeed > 0 && loco.SpeedKmh == 0)
                 {
                     loco.Reverser = 1f;
                 }
-                if (loco.Reverser == 1 && DesiredSpeed < 0 && loco.Speed == 0)
+                if (loco.Reverser == 1 && DesiredSpeed < 0 && loco.SpeedKmh == 0)
                 {
                     loco.Reverser = 0f;
                 }
             }
-            else if (loco.RelativeSpeed + estspeed < minSpeed)
+            else if (loco.RelativeSpeedKmh + estspeed < minSpeed)
             {
                 context.DesiredSpeed = Math.Abs(DesiredSpeed);
                 Accelerator.Tick(context);
                 minSpeed = positiveDesiredSpeed + config.Offset;
                 Status = $"Accelerating to {minSpeed} km/h";
             }
-            else if (loco.RelativeSpeed + estspeed > maxSpeed)
+            else if (loco.RelativeSpeedKmh + estspeed > maxSpeed)
             {
                 context.DesiredSpeed = maxSpeed;
                 Decelerator.Tick(context);

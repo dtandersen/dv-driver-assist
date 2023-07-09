@@ -9,14 +9,16 @@ namespace DriverAssist
         float TrainBrake { get; set; }
         float IndBrake { get; set; }
         float Reverser { get; set; }
-        float Speed { get; }
+        float SpeedKmh { get; }
         /// Speed relative to the Reverser (1=Speed, 0=-Speed)
-        float RelativeSpeed { get; }
+        float RelativeSpeedKmh { get; }
         float Temperature { get; }
         float Torque { get; }
-        float Acceleration { get; }
+        /// Torque relative to the Reverser (1=Speed, 0=-Speed)
+        float RelativeTorque { get; }
+        float AccelerationMs { get; }
         /// Acceleration relative to the Reverser (1=Speed, 0=-Speed)
-        float RelativeAcceleration { get; }
+        float RelativeAccelerationMs { get; }
         float Amps { get; }
         float Rpm { get; }
         float AmpsRoc { get; }

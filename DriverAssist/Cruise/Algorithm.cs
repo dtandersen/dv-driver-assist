@@ -7,11 +7,11 @@ namespace DriverAssist.Cruise
 
     public class CruiseControlContext
     {
-        public LocoConfig Config { get; }
+        public LocoSettings Config { get; }
         public LocoController LocoController { get; }
         public float DesiredSpeed { get; set; }
 
-        public CruiseControlContext(LocoConfig config, LocoController loco)
+        public CruiseControlContext(LocoSettings config, LocoController loco)
         {
             Config = config;
             LocoController = loco;
@@ -20,12 +20,12 @@ namespace DriverAssist.Cruise
 
     public class FakeAccelerator : CruiseControlAlgorithm
     {
-        public LocoConfig Settings { get; internal set; }
+        public LocoSettings Settings { get; internal set; }
 
         public void Tick(CruiseControlContext context)
         {
             LocoController loco = context.LocoController;
-            if (loco.RelativeSpeed < context.DesiredSpeed)
+            if (loco.RelativeSpeedKmh < context.DesiredSpeed)
             {
                 loco.Throttle += .1f;
 
@@ -36,12 +36,12 @@ namespace DriverAssist.Cruise
 
     public class FakeDecelerator : CruiseControlAlgorithm
     {
-        public LocoConfig Settings { get; internal set; }
+        public LocoSettings Settings { get; internal set; }
 
         public void Tick(CruiseControlContext context)
         {
             LocoController loco = context.LocoController;
-            if (loco.RelativeSpeed > context.DesiredSpeed)
+            if (loco.RelativeSpeedKmh > context.DesiredSpeed)
             {
                 loco.TrainBrake += .1f;
                 loco.IndBrake += .1f;
