@@ -63,7 +63,7 @@ namespace DriverAssist.Implementation
             dh4OverdriveTemperature = config.Bind("DH4", "OverdriveTemperature", 118, "Downshift temperature threshhold during overdrive");
             // dh4OverdriveEnabled = config.Bind("DH4", "Overdrive", true, "Enable overdrive when train is slowing down");
 
-            brakingTime = config.Bind("Braking", "Time", 10, "Time to decelerate");
+            brakingTime = config.Bind("Braking", "DecelerationTime", 10, "Time to decelerate");
 
             // acceleration = config.Bind("CruiseControl", "Acceleration", "DriverAssist.Cruise.PredictiveAcceleration", "Maximum torque");
             // deceleration = config.Bind("CruiseControl", "Deceleration", "DriverAssist.Cruise.PredictiveDeceleration", "Maximum torque");
