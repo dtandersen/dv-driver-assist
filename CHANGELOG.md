@@ -1,3 +1,7 @@
+0.4.0 - 7/8/2023
+
+- Overdrive works again!
+
 0.3.0 - 7/8/2023
 
 - Added support for DE6 and DH4.
