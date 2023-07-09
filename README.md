@@ -55,6 +55,8 @@ The DE2 and DE6 have an electrical traction motor. `MinAmps` forces the locomoti
 ### Braking
 
 * `DecelerationTime` - Cruise control attempts to decelerate in this amount of time. A low time may lead to braking overshoot due to the delay in pressurizing/depressurzing the brake lines (default: 10 seconds).
+* `BrakeReleaseFactor` - Brake = Brake * BrakeReleaseFactor * Brake.
+* `MinBrake` - Minimum braking (0=0%, 1=100%)
 
 ### Key bindings
 
