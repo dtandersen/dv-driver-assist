@@ -60,14 +60,14 @@ namespace DriverAssist.Localization
     {
         public string CC_SETPOINT => "Setpoint";
         public string CC_STATUS => "Status";
-        public string CC_COASTING => "Coast";
+        public string CC_COASTING => "Coasting";
         public string CC_DECELERATING => "Decelerating to {0} km/h";
         public string CC_ACCELERATING => "Accelerating to {0} km/h";
-        public string CC_CHANGING_DIRECTION => "Direction change";
-        public string CC_STOPPING => "Stop";
-        public string CC_WARNING_NEUTRAL => "Idle: Reverser is in neutral";
+        public string CC_CHANGING_DIRECTION => "Changing direction";
+        public string CC_STOPPING => "Stopping";
+        public string CC_WARNING_NEUTRAL => "Idle: Engage reverser to start";
         public string CC_DISABLED => "Disabled";
-        public string CC_UNSUPPORTED => "No settings found for {0}";
+        public string CC_UNSUPPORTED => "Idle: {0} is not supported";
 
         public string STAT_LOCOMOTIVE => "Locomotive";
         public string STAT_MASS => "Mass (t)";
@@ -91,8 +91,8 @@ namespace DriverAssist.Localization
         public string CC_ACCELERATING => "Beschleunigung auf {0} km/h";
         public string CC_CHANGING_DIRECTION => "Richtung ändern";
         public string CC_STOPPING => "Anhalten";
-        public string CC_WARNING_NEUTRAL => "Leerlauf: Reversierer steht im Leerlauf";
-        public string CC_DISABLED => "Behinderte";
+        public string CC_WARNING_NEUTRAL => "Leerlauf: Richtungshebel steht im Leerlauf";
+        public string CC_DISABLED => "Abgeschaltet";
         public string CC_UNSUPPORTED => "Keine Einstellungen für {0} gefunden";
 
         public string STAT_LOCOMOTIVE => "Lokomotive";
