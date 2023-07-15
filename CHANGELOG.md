@@ -1,3 +1,16 @@
+0.6.0 - 7/9/2023
+
+- Restored support for DH4 after 2023-07-15 game patch.
+- Cruise control considers it safe to reverse if speed is less than .01 km/h instead of 0 km/h.
+- Overdrive is now active when acceleration is less than .05 m/s^2 instead of 0.
+- Cruise control adjusts the throttle less frequently.
+- Cruise control may throttle up if temperature is less than 90% of `MaxTemperature`.
+- Cruise control reduces throttle gradually if it's above `MaxTemperature` and acceleration is above 0.1 m/s^2.
+- Cruise control won't try to accelerate faster than 0.25 m/s^2 to reduce chance of wheel slip.
+- Modified the acceleration calculation to hopefully be more accurate.
+- Various internal code refactoring.
+- Updated German localization.
+
 0.5.0 - 7/9/2023
 
 - Added German localization
