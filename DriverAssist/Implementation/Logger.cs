@@ -12,17 +12,21 @@ namespace DriverAssist.Implementation
             this.logger = logger;
         }
 
+        public string Prefix { get; set; }
+
         public void Info(string message)
         {
-            logger.LogInfo(message);
+            logger.LogInfo($"{Prefix}{message}");
         }
     }
 
     class UnityLogger : PluginLogger
     {
+        public string Prefix { get; set; }
+
         public void Info(string message)
         {
-            Debug.Log(message);
+            Debug.Log($"{Prefix}{message}");
         }
     }
 }

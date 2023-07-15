@@ -2,6 +2,8 @@ namespace DriverAssist
 {
     interface PluginLogger
     {
+        string Prefix { get; set; }
+
         public void Info(string message);
     }
 
@@ -12,6 +14,8 @@ namespace DriverAssist
 
     internal class NullLogger : PluginLogger
     {
+        public string Prefix { get; set; }
+
         public void Info(string message) { }
     }
 }
