@@ -7,10 +7,19 @@ namespace DriverAssist.Implementation
     internal class DVTrainCarWrapper : TrainCarWrapper
     {
         private TrainCar loco;
+        private BaseControlsOverrider obj;
+        private LocoIndicatorReader locoIndicatorReader;
+        private SimulationFlow simFlow;
+        private Port torqueGeneratedPort;
 
         public DVTrainCarWrapper(TrainCar car)
         {
             this.loco = car;
+            this.obj = loco.GetComponent<SimController>()?.controlsOverrider;
+            this.locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
+            this.simFlow = loco.GetComponent<SimController>()?.simFlow;
+            string torqueGeneratedPortId = loco.GetComponent<SimController>()?.drivingForce.torqueGeneratedPortId;
+            simFlow.TryGetPort(torqueGeneratedPortId, out torqueGeneratedPort);
         }
 
         public bool IsLoco { get { return true; } }
@@ -37,12 +46,10 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                BaseControlsOverrider obj = loco.GetComponent<SimController>()?.controlsOverrider;
                 return obj.Throttle.Value;
             }
             set
             {
-                BaseControlsOverrider obj = loco.GetComponent<SimController>()?.controlsOverrider;
                 obj.Throttle?.Set(value);
             }
         }
@@ -51,12 +58,10 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                BaseControlsOverrider obj = loco.GetComponent<SimController>()?.controlsOverrider;
                 return obj.Brake.Value;
             }
             set
             {
-                BaseControlsOverrider obj = loco.GetComponent<SimController>()?.controlsOverrider;
                 obj.Brake.Set(value);
             }
         }
@@ -65,12 +70,10 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                BaseControlsOverrider obj = loco.GetComponent<SimController>()?.controlsOverrider;
                 return obj.IndependentBrake.Value;
             }
             set
             {
-                BaseControlsOverrider obj = loco.GetComponent<SimController>()?.controlsOverrider;
                 obj.IndependentBrake.Set(value);
             }
         }
@@ -79,7 +82,6 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                LocoIndicatorReader locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
                 if (!locoIndicatorReader)
                 {
                     return 0;
@@ -98,29 +100,21 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                BaseControlsOverrider obj = loco.GetComponent<SimController>()?.controlsOverrider;
                 return obj.Reverser.Value;
             }
 
             set
             {
-                BaseControlsOverrider obj = loco.GetComponent<SimController>()?.controlsOverrider;
                 obj.Reverser.Set(value);
             }
         }
 
-        private Port torqueGeneratedPort;
 
         public float Torque
         {
             get
             {
-                float torque;
-                SimulationFlow simFlow = loco.GetComponent<SimController>()?.simFlow;
-                string torqueGeneratedPortId = loco.GetComponent<SimController>()?.drivingForce.torqueGeneratedPortId;
-                simFlow.TryGetPort(torqueGeneratedPortId, out torqueGeneratedPort);
-                torque = torqueGeneratedPort.Value;
-                return torque;
+                return torqueGeneratedPort.Value;
             }
         }
 
@@ -161,7 +155,7 @@ namespace DriverAssist.Implementation
             get
             {
                 // int x = locoCar.GetComponent<TractionMotor>().numberOfTractionMotors;
-                SimulationFlow simFlow = loco.GetComponent<SimController>()?.simFlow;
+                // SimulationFlow simFlow = loco.GetComponent<SimController>()?.simFlow;
                 Port port;
                 string maxAmps = "";
                 string motors = "";
@@ -199,7 +193,6 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                LocoIndicatorReader locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
                 return locoIndicatorReader?.amps?.Value ?? 0;
             }
         }
@@ -208,7 +201,6 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                LocoIndicatorReader locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
                 return locoIndicatorReader?.engineRpm?.Value ?? 0;
             }
         }
@@ -236,18 +228,34 @@ namespace DriverAssist.Implementation
             }
         }
 
-        // public bool IsSameTrainCar(TrainCarWrapper newloco)
-        // {
-        //     if (newloco.GetType() != typeof(DVTrainCarWrapper)) return false;
-
-        //     return loco == ((DVTrainCarWrapper)newloco).loco;
-        // }
-
-        public static bool IsSameTrainCar2(TrainCarWrapper currentLoco, TrainCar trainCar)
+        public float LocoMass
         {
-            if (currentLoco.GetType() != typeof(DVTrainCarWrapper)) return false;
+            get
+            {
+                float mass = 0;
 
-            return ((DVTrainCarWrapper)currentLoco).loco == trainCar;
+                foreach (TrainCar car in loco.trainset.cars)
+                {
+                    if (car.IsLoco) mass += car.massController.TotalMass;
+                }
+
+                return mass;
+            }
+        }
+
+        public float CargoMass
+        {
+            get
+            {
+                float mass = 0;
+
+                foreach (TrainCar car in loco.trainset.cars)
+                {
+                    if (!car.IsLoco) mass += car.massController.TotalMass;
+                }
+
+                return mass;
+            }
         }
     }
 }
