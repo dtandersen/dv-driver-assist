@@ -101,15 +101,15 @@ namespace DriverAssist.Cruise
                 throttleResult = throttle - step;
                 lastShift = Time.realtimeSinceStartup;
             }
-            // very low temp
-            else if (
-                readyToShift
-                && projectedTemperature < context.Config.MaxTemperature * .9f
-                && timeSinceShift > 3)
-            {
-                throttleResult = throttle + step;
-                lastShift = Time.realtimeSinceStartup;
-            }
+            // // very low temp
+            // else if (
+            //     readyToShift
+            //     && projectedTemperature < context.Config.MaxTemperature * .9f
+            //     && timeSinceShift > 3)
+            // {
+            //     throttleResult = throttle + step;
+            //     lastShift = Time.realtimeSinceStartup;
+            // }
             // low temp
             else if (
                 readyToShift
