@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Globalization;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
@@ -8,9 +6,8 @@ using CommandTerminal;
 using DriverAssist.Cruise;
 using DriverAssist.Implementation;
 using DriverAssist.Localization;
-using DV.HUD;
-using DV.UI.LocoHUD;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DriverAssist
 {
@@ -21,29 +18,181 @@ namespace DriverAssist
         // private static string CC_CMD = "cc";
 
         private CruiseControl cruiseControl;
-        private PlayerLocoController loco;
+        private LocoController loco;
         private BepInExDriverAssistSettings config;
         private float updateAccumulator;
         private Translation localization;
+        // private TrainCarWrapper trainCarWrapper;
+        bool loaded = false;
 
         private void Awake()
         {
+            PluginLoggerSingleton.Instance = new BepInExLogger(Logger);
+            PluginLoggerSingleton.Instance.Prefix = "--------------------------------------------------> ";
+
             TranslationManager.Init();
             localization = TranslationManager.Current;
-            PluginLoggerSingleton.Instance = new BepInExLogger(Logger);
-            Logger.LogInfo($"{PluginInfo.PLUGIN_NAME} ({PluginInfo.PLUGIN_GUID}) is loaded!");
-            loco = new PlayerLocoController();
+
+            PluginLoggerSingleton.Instance.Info($"{PluginInfo.PLUGIN_NAME} ({PluginInfo.PLUGIN_GUID}) is loaded!");
+            // trainCarWrapper = NullTrainCarWrapper.Instance;
+            // PlayerManager.PlayerChanged += OnPlayerChanged;
+            // initialize event handlers
+            WorldStreamingInit.LoadingFinished += OnLoadingFinished;
+            UnloadWatcher.UnloadRequested += OnUnloadRequested;
+            // SceneManager.activeSceneChanged += ChangedActiveScene;
+            // RegisterCommands1();
+
             config = new BepInExDriverAssistSettings(Config);
+
+            // we might load it with f6 in script engine, so onload would not occur
+            if (PlayerManager.PlayerTransform != null)
+            {
+                PluginLoggerSingleton.Instance.Info($"Player detected");
+                CheckForPlayer();
+            }
+        }
+
+        // private void OnPlayerChanged()
+        // {
+        //     PluginLoggerSingleton.Instance.Info($"OnPlayerChanged");
+        //     ChangePlayer();
+        // }
+
+
+        /// Game has finished loading
+        private void OnLoadingFinished()
+        {
+            PluginLoggerSingleton.Instance.Info($"OnLoadingFinished");
+            // LoadIfNotLoaded();
+            ChangeCar(PlayerManager.Car);
+        }
+
+        /// Player has entered or exited a car
+        void OnCarChanged(TrainCar enteredCar)
+        {
+            PluginLoggerSingleton.Instance.Info($"OnCarChanged");
+            ChangeCar(enteredCar);
+        }
+
+        /// Game is unloading
+        private void OnUnloadRequested()
+        {
+            PluginLoggerSingleton.Instance.Info($"OnUnloadRequested");
+            Unload();
+        }
+
+        void OnDestroy()
+        {
+            PluginLoggerSingleton.Instance.Info($"OnDestroy");
+            Unload();
+            WorldStreamingInit.LoadingFinished -= OnLoadingFinished;
+            UnloadWatcher.UnloadRequested -= OnUnloadRequested;
+            // SceneManager.activeSceneChanged -= ChangedActiveScene;
+            // PlayerManager.PlayerChanged -= PlayerCreated;
+            // WorldStreamingInit.LoadingFinished += OnLoadingFinished;
+        }
+
+        private void LoadIfNotLoaded()
+        {
+            if (!loaded)
+            {
+                Load();
+            }
+        }
+
+        public void Load()
+        {
+            PluginLoggerSingleton.Instance.Info($"OnLoad");
+            PlayerManager.CarChanged += OnCarChanged;
+
+            loco = new LocoController(Time.fixedDeltaTime);
+
             cruiseControl = new CruiseControl(loco, config);
             cruiseControl.Accelerator = new PredictiveAcceleration();
             cruiseControl.Decelerator = new PredictiveDeceleration();
-            // RegisterCommands1();
 
             updateAccumulator = 0;
+            loaded = true;
+        }
+
+        void Unload()
+        {
+            PluginLoggerSingleton.Instance.Info($"OnUnload");
+            PlayerManager.CarChanged -= OnCarChanged;
+
+            // Terminal.Shell.Commands.Remove(CC_CMD);
+            // Terminal.Shell.Variables.Remove(CC_CMD);
+            // Debug.Log($"OnDestroy");
+            cruiseControl = null;
+            loaded = false;
+        }
+
+        private void CheckForPlayer()
+        {
+            LoadIfNotLoaded();
+            ChangeCar(PlayerManager.Car);
+        }
+
+        // private void PlayerCreated()
+        // {
+        //     Load();
+        //     PluginLoggerSingleton.Instance.Info($"PlayerCreated");
+        //     // playerCreated = true;
+        //     // loaded = true;
+        // }
+
+        // private void ChangedActiveScene(Scene current, Scene next)
+        // {
+        //     PluginLoggerSingleton.Instance.Info($"Scene is now {next.name}");
+        //     // if (next.name == "game_w3")
+        //     // {
+        //     Load();
+        //     // }
+
+
+        //     // string currentName = current.name;
+
+        //     // if (currentName == null)
+        //     // {
+        //     //     // Scene1 has been removed
+        //     //     currentName = "Replaced";
+        //     // }
+
+        //     // Debug.Log("Scenes: " + currentName + ", " + next.name);
+        // }
+
+        void ChangeCar(TrainCar enteredCar)
+        {
+            LoadIfNotLoaded();
+            if (enteredCar?.IsLoco ?? false)
+            {
+                DVTrainCarWrapper train = new DVTrainCarWrapper(enteredCar);
+                PluginLoggerSingleton.Instance.Info($"Entered {train.LocoType}");
+                loco.UpdateLocomotive(train);
+            }
+            else
+            {
+                loco.UpdateLocomotive(NullTrainCarWrapper.Instance);
+                PluginLoggerSingleton.Instance.Info($"Exited");
+                cruiseControl.Enabled = false;
+            }
         }
 
         void Update()
         {
+            // if (UnloadWatcher.isUnloading)
+            // {
+            //     // loaded = false;
+            //     // UnityEngine.Object.Destroy(gameObject);
+            //     // return;
+            // }
+
+            if (!loaded) return;
+            // if (!loco.IsLoco)
+            // {
+            //     return;
+            // }
+
             if (IsKeyPressed(config.ToggleKeys))
             {
                 cruiseControl.Enabled = !cruiseControl.Enabled;
@@ -56,11 +205,16 @@ namespace DriverAssist
             {
                 cruiseControl.DesiredSpeed -= CC_SPEED_STEP;
             }
+        }
+
+        void FixedUpdate()
+        {
+            if (!loaded) return;
 
             if (loco.IsLoco)
             {
-                loco.UpdateAcceleration(Time.deltaTime);
-                updateAccumulator += Time.deltaTime;
+                loco.UpdateStats(Time.fixedDeltaTime);
+                updateAccumulator += Time.fixedDeltaTime;
                 if (updateAccumulator > config.UpdateInterval)
                 {
                     cruiseControl.Tick();
@@ -69,19 +223,11 @@ namespace DriverAssist
             }
         }
 
-        bool IsKeyPressed(int[] keys)
-        {
-            foreach (KeyCode key in keys)
-            {
-                if (!Input.GetKeyDown(key))
-                    return false;
-            }
-
-            return true;
-        }
-
         void OnGUI()
         {
+            if (!loaded) return;
+            // if (PlayerManager.PlayerTransform == null || !loaded) return;
+
             if (Event.current.keyCode == KeyCode.Tab || Event.current.character == '\t')
                 Event.current.Use();
 
@@ -165,6 +311,11 @@ namespace DriverAssist
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
+                GUILayout.Label(localization.STAT_TEMPERATURE_CHANGE);
+                GUILayout.TextField($"{Math.Round(loco.TemperatureChange, 2)}");
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
                 GUILayout.Label(localization.STAT_AMPS);
                 GUILayout.TextField($"{(int)loco.Amps}");
                 GUILayout.EndHorizontal();
@@ -196,6 +347,17 @@ namespace DriverAssist
             // GUILayout.EndArea();
         }
 
+        bool IsKeyPressed(int[] keys)
+        {
+            foreach (KeyCode key in keys)
+            {
+                if (!Input.GetKeyDown(key))
+                    return false;
+            }
+
+            return true;
+        }
+
         // private void RegisterCommands1()
         // {
         //     if (Application.isPlaying)
@@ -211,56 +373,65 @@ namespace DriverAssist
         //     CommandInfo command = Terminal.Shell.AddCommand(CC_CMD, Cruise, 1, 1, "");
         // }
 
-        private static void Cruise(CommandArg[] args)
-        {
-            BaseUnityPlugin plugin = null;
-            foreach (var info in Chainloader.PluginInfos)
-            {
-                var metadata = info.Value.Metadata;
-                if (metadata.GUID.Equals(PluginInfo.PLUGIN_GUID))
-                {
-                    Debug.Log($"Found {PluginInfo.PLUGIN_GUID}");
-                }
-            }
+        // private static void Cruise(CommandArg[] args)
+        // {
+        //     BaseUnityPlugin plugin = null;
+        //     foreach (var info in Chainloader.PluginInfos)
+        //     {
+        //         var metadata = info.Value.Metadata;
+        //         if (metadata.GUID.Equals(PluginInfo.PLUGIN_GUID))
+        //         {
+        //             Debug.Log($"Found {PluginInfo.PLUGIN_GUID}");
+        //         }
+        //     }
 
-            foreach (var info in Chainloader.PluginInfos)
-            {
-                var metadata = info.Value.Metadata;
-                if (metadata.GUID.Equals(PluginInfo.PLUGIN_GUID))
-                {
-                    Debug.Log($"Found2 {PluginInfo.PLUGIN_GUID}");
-                    plugin = info.Value.Instance;
-                    break;
-                }
-            }
+        //     foreach (var info in Chainloader.PluginInfos)
+        //     {
+        //         var metadata = info.Value.Metadata;
+        //         if (metadata.GUID.Equals(PluginInfo.PLUGIN_GUID))
+        //         {
+        //             Debug.Log($"Found2 {PluginInfo.PLUGIN_GUID}");
+        //             plugin = info.Value.Instance;
+        //             break;
+        //         }
+        //     }
 
-            Type type = plugin.GetType().BaseType;
+        //     Type type = plugin.GetType().BaseType;
 
-            PropertyInfo prop = type.GetProperty("Speed");
+        //     PropertyInfo prop = type.GetProperty("Speed");
 
-            prop.SetValue(plugin, args[0].Float, null);
-        }
+        //     prop.SetValue(plugin, args[0].Float, null);
+        // }
 
-        void OnDestroy()
-        {
-            // Terminal.Shell.Commands.Remove(CC_CMD);
-            // Terminal.Shell.Variables.Remove(CC_CMD);
-            // Debug.Log($"OnDestroy");
-            cruiseControl = null;
-        }
-
-        private TrainCar GetLocomotive()
+        private TrainCarWrapper GetLocomotive()
         {
             if (!PlayerManager.Car)
             {
-                return null;
+                return NullTrainCarWrapper.Instance;
             }
             if (!PlayerManager.Car.IsLoco)
             {
-                return null;
+                return NullTrainCarWrapper.Instance;
             }
-            return PlayerManager.Car;
+
+            // if (!DVTrainCarWrapper.IsSameTrainCar2(trainCarWrapper, PlayerManager.Car))
+            return new DVTrainCarWrapper(PlayerManager.Car);
+            // else
+            //     return trainCarWrapper;
         }
+
+        // private TrainCar GetLocomotive()
+        // {
+        //     if (!PlayerManager.Car)
+        //     {
+        //         return null;
+        //     }
+        //     if (!PlayerManager.Car.IsLoco)
+        //     {
+        //         return null;
+        //     }
+        //     return PlayerManager.Car;
+        // }
 
         // private void OnHUDChanged(HUDInterfacer.HUDChangeEvent obj)
         // {

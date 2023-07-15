@@ -24,6 +24,7 @@ namespace DriverAssist.Localization
         string STAT_POWER { get; }
         string STAT_THROTTLE { get; }
         string STAT_TEMPERATURE { get; }
+        string STAT_TEMPERATURE_CHANGE { get; }
         string STAT_AMPS { get; }
         string STAT_RPM { get; }
         string STAT_HORSEPOWER { get; }
@@ -78,6 +79,7 @@ namespace DriverAssist.Localization
         public string STAT_HORSEPOWER => "Horsepower";
         public string STAT_THROTTLE => "Throttle";
         public string STAT_TEMPERATURE => "Temperature";
+        public string STAT_TEMPERATURE_CHANGE => "Temperature Change";
         public string STAT_AMPS => "Amps";
         public string STAT_RPM => "RPM";
     }
@@ -104,6 +106,7 @@ namespace DriverAssist.Localization
         public string STAT_HORSEPOWER => "Pferdestärken";
         public string STAT_THROTTLE => "Schubhebel";
         public string STAT_TEMPERATURE => "Temperatur";
+        public string STAT_TEMPERATURE_CHANGE => "Temperaturänderung";
         public string STAT_AMPS => "Amperemeter";
         public string STAT_RPM => "U/min";
     }

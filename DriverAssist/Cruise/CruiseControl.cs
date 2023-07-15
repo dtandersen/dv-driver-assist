@@ -124,11 +124,11 @@ namespace DriverAssist.Cruise
                 // Status = String.Format("Direction change");
                 loco.Throttle = 0;
                 loco.TrainBrake = 1;
-                if (loco.Reverser == 0 && DesiredSpeed > 0 && loco.SpeedKmh == 0)
+                if (loco.Reverser == 0 && DesiredSpeed > 0 && Math.Abs(loco.SpeedKmh) < 0.01f)
                 {
                     loco.Reverser = 1f;
                 }
-                if (loco.Reverser == 1 && DesiredSpeed < 0 && loco.SpeedKmh == 0)
+                if (loco.Reverser == 1 && DesiredSpeed < 0 && Math.Abs(loco.SpeedKmh) < 0.01f)
                 {
                     loco.Reverser = 0f;
                 }

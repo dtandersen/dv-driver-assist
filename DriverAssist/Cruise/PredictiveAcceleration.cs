@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace DriverAssist.Cruise
 {
@@ -6,8 +7,11 @@ namespace DriverAssist.Cruise
     {
         float lastAmps = 0;
         float lastTorque = 0;
+        float lastTemperature = 0;
         float step = 1f / 11f;
         bool cooling = false;
+        // float lastUpshift;
+        float lastShift;
 
         public PredictiveAcceleration()
         {
@@ -34,7 +38,21 @@ namespace DriverAssist.Cruise
             float maxtemp;
             bool overDriveEnabled = true;
             float minAmps;
-            if (overDriveEnabled && loco.AccelerationMs < 0)
+            float OVERDRIVE_ACCELL = 0.05f;
+            bool hillClimbActive = overDriveEnabled && loco.AccelerationMs < OVERDRIVE_ACCELL;
+            float projectedTemperature = loco.Temperature + loco.TemperatureChange;
+            // bool tempDecreasing = loco.TemperatureChange < 0;
+            // float timeSinceUpshift = Time.realtimeSinceStartup - lastUpshift;
+            float timeSinceShift = Time.realtimeSinceStartup - lastShift;
+            bool tempDecreasing = loco.Temperature < lastTemperature;
+            minTorque = context.Config.MinTorque;
+            float operatingTemp = context.Config.MaxTemperature;
+            float dangerTemp = context.Config.OverdriveTemperature;
+            bool readyToShift =
+                torque < minTorque
+                && (torque < 10000 || torque <= lastTorque)
+                && loco.RelativeAccelerationMs < 0.25f;
+            if (hillClimbActive)
             {
                 minTorque = context.Config.MinTorque;
                 maxtemp = context.Config.OverdriveTemperature;
@@ -48,26 +66,81 @@ namespace DriverAssist.Cruise
                 minAmps = context.Config.MinAmps;
                 maxamps = context.Config.MaxAmps;
             }
-
+            float temperatureWeight = 1f;
             if (speed > desiredSpeed)
             {
                 throttleResult = 0;
             }
-            else if (loco.Temperature > maxtemp)
+            else if (projectedTemperature > dangerTemp)
             {
                 throttleResult = throttle - step;
+                lastShift = Time.realtimeSinceStartup;
+            }
+            // else if (overdriveActive)
+            // {
+            //     throttleResult = throttle;
+            //     // lastShift = Time.realtimeSinceStartup;
+            // }
+            else if (
+                !hillClimbActive
+                && loco.RelativeAccelerationMs > 0.1
+                && projectedTemperature > operatingTemp
+                && !tempDecreasing
+                && timeSinceShift > 3)
+            {
+                throttleResult = throttle - step;
+                lastShift = Time.realtimeSinceStartup;
             }
             else if (amps < minAmps && loco.IsElectric)
             {
                 throttleResult = throttle + step;
+                lastShift = Time.realtimeSinceStartup;
             }
             else if (amps > maxamps)
             {
                 throttleResult = throttle - step;
+                lastShift = Time.realtimeSinceStartup;
             }
-            else if (torque <= lastTorque && torque < minTorque)
+            // very low temp
+            else if (
+                readyToShift
+                && projectedTemperature < context.Config.MaxTemperature * .9f
+                && timeSinceShift > 3)
             {
                 throttleResult = throttle + step;
+                lastShift = Time.realtimeSinceStartup;
+            }
+            // low temp
+            else if (
+                readyToShift
+                && projectedTemperature < context.Config.MaxTemperature
+                && timeSinceShift > 3)
+            {
+                throttleResult = throttle + step;
+                lastShift = Time.realtimeSinceStartup;
+            }
+            // mid temp no overdrive
+            else if (
+                readyToShift
+                && loco.RelativeAccelerationMs > .1f
+                && projectedTemperature > context.Config.MaxTemperature
+                && projectedTemperature < context.Config.OverdriveTemperature
+                && loco.TemperatureChange < -0.5f
+                && timeSinceShift > 3
+                )
+            {
+                throttleResult = throttle + step;
+                lastShift = Time.realtimeSinceStartup;
+            }
+            // overdrive
+            else if (
+                readyToShift
+                && hillClimbActive
+                && projectedTemperature < context.Config.OverdriveTemperature
+                && timeSinceShift > 3)
+            {
+                throttleResult = throttle + step;
+                lastShift = Time.realtimeSinceStartup;
             }
             else
             {
@@ -80,6 +153,7 @@ namespace DriverAssist.Cruise
 
             lastAmps = loco.Amps;
             lastTorque = loco.Torque;
+            lastTemperature = loco.Temperature;
         }
     }
 }
