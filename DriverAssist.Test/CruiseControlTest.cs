@@ -6,6 +6,8 @@ using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
+    // [CollectionDefinition(DisableParallelization = true)]
+    [Collection("Sequential")]
     public class CruiseControlTest
     {
         private CruiseControl cruiseControl;
@@ -47,6 +49,11 @@ namespace DriverAssist.Cruise
             cruiseControl.Enabled = true;
             // cruiseControl.Accelerator = accelerator;
             // cruiseControl.Decelerator = decelerator;
+        }
+
+        public void Dispose()
+        {
+            PluginLoggerSingleton.Instance = new NullLogger();
         }
 
         [Fact]
@@ -240,22 +247,52 @@ namespace DriverAssist.Cruise
             // Assert.True(cruiseControl.Enabled);
         }
 
+        /// In this case the train skips the coasting state
         [Fact]
         public void ChangeFromForwardToReverse()
         {
-            cruiseControl.DesiredSpeed = -10;
-            loco.Reverser = 1;
-            // loco.Throttle = 0.5f;
-            // cruiseControl.Enabled = true;
+            config.Offset = 0;
+            train.SpeedKmh = 0;
+            train.Reverser = 0;
+            cruiseControl.DesiredSpeed = -5;
             WhenCruise();
-            // Assert.True(cruiseControl.Enabled);
-            Assert.Equal(0, loco.Reverser);
-            Assert.Equal(0, loco.Throttle);
-            Assert.Equal(1, loco.TrainBrake);
-            Assert.Equal(localization.CC_CHANGING_DIRECTION, cruiseControl.Status);
+            Assert.Equal(String.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
 
-            // WhenCruise();
-            // Assert.True(cruiseControl.Enabled);
+            train.SpeedKmh = -8;
+            WhenCruise();
+            Assert.Equal(String.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
+
+            train.SpeedKmh = -6;
+            WhenCruise();
+            Assert.Equal(String.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
+
+            train.SpeedKmh = -4.9f;
+            WhenCruise();
+            Assert.Equal(localization.CC_COASTING, cruiseControl.Status);
+        }
+
+        /// In this case the train skips the coasting state
+        [Fact]
+        public void ChangeFromForwardToReverse2()
+        {
+            config.Offset = 0;
+            train.SpeedKmh = 10;
+            train.Reverser = 1;
+            cruiseControl.DesiredSpeed = 5;
+            WhenCruise();
+            Assert.Equal(String.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
+
+            train.SpeedKmh = 2;
+            WhenCruise();
+            Assert.Equal(String.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
+
+            train.SpeedKmh = 4;
+            WhenCruise();
+            Assert.Equal(String.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
+
+            train.SpeedKmh = 5.1f;
+            WhenCruise();
+            Assert.Equal(localization.CC_COASTING, cruiseControl.Status);
         }
 
         [Fact]

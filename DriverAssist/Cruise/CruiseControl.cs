@@ -83,6 +83,8 @@ namespace DriverAssist.Cruise
 
         public void Tick()
         {
+            // PluginLoggerSingleton.Instance.Info($"Tick minSpeed={minSpeed} maxSpeed={maxSpeed} loco.RelativeSpeedKmh={loco.RelativeSpeedKmh}");
+
             try
             {
                 context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco);
@@ -143,23 +145,30 @@ namespace DriverAssist.Cruise
             }
             else if (loco.RelativeSpeedKmh + estspeed < minSpeed)
             {
+                // PluginLoggerSingleton.Instance.Info($"Accelerate minSpeed={minSpeed} maxSpeed={maxSpeed} loco.RelativeSpeedKmh={loco.RelativeSpeedKmh}");
                 context.DesiredSpeed = Math.Abs(DesiredSpeed);
                 Accelerator.Tick(context);
                 minSpeed = positiveDesiredSpeed + config.Offset;
+                maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
                 Status = String.Format(localization.CC_ACCELERATING, minSpeed);
                 // Status = String.Format("Accelerating to {0} km/h", minSpeed);
             }
             else if (loco.RelativeSpeedKmh + estspeed > maxSpeed)
             {
+                // PluginLoggerSingleton.Instance.Info($"Decellerate minSpeed={minSpeed} maxSpeed={maxSpeed} loco.RelativeSpeedKmh={loco.RelativeSpeedKmh}");
                 context.DesiredSpeed = maxSpeed;
                 Decelerator.Tick(context);
                 maxSpeed = positiveDesiredSpeed + config.Offset;
+                minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
+                // minSpeed = positiveDesiredSpeed - config.Offset;
                 // Status = String.Format("Decelerating to {0} km/h", maxSpeed);
                 Status = String.Format(localization.CC_DECELERATING, maxSpeed);
             }
             else
             {
                 // Status = String.Format("Coast");
+                // PluginLoggerSingleton.Instance.Info($"Coast minSpeed={minSpeed} maxSpeed={maxSpeed} loco.RelativeSpeedKmh={loco.RelativeSpeedKmh}");
+
                 Status = String.Format(localization.CC_COASTING);
                 loco.Throttle = 0;
                 loco.TrainBrake = 0;
@@ -176,6 +185,7 @@ namespace DriverAssist.Cruise
         {
             get
             {
+                // PluginLoggerSingleton.Instance.Info($"Reverser={context.LocoController.Reverser} DesiredSpeed={DesiredSpeed}");
                 return context.LocoController.Reverser == 1 && DesiredSpeed < 0 || context.LocoController.Reverser == 0 && DesiredSpeed > 0;
             }
         }
