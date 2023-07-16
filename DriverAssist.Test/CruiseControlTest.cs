@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DriverAssist.Localization;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
@@ -15,9 +16,11 @@ namespace DriverAssist.Cruise
         private LocoSettings de2settings;
         private LocoSettings dh4settings;
         private FakeTrainCarWrapper train;
+        private FakeClock clock;
 
-        public CruiseControlTest()
+        public CruiseControlTest(ITestOutputHelper output)
         {
+            PluginLoggerSingleton.Instance = new TestLogger(output);
             TranslationManager.Init();
             localization = TranslationManager.Current;
             config = new FakeCruiseControlConfig();
@@ -39,7 +42,8 @@ namespace DriverAssist.Cruise
             // loco.AccelerationMs = 0;
             // accelerator = new FakeAccelerator();
             // decelerator = new FakeDecelerator();
-            cruiseControl = new CruiseControl(loco, config);
+            clock = new FakeClock();
+            cruiseControl = new CruiseControl(loco, config, clock);
             cruiseControl.Enabled = true;
             // cruiseControl.Accelerator = accelerator;
             // cruiseControl.Decelerator = decelerator;
@@ -359,6 +363,19 @@ namespace DriverAssist.Cruise
             Assert.Equal(String.Format(localization.CC_UNSUPPORTED, LocoType.DE6), cruiseControl.Status);
         }
 
+        [Fact]
+        public void PassTimeToContext()
+        {
+            train.LocoType = LocoType.DH4;
+            cruiseControl.DesiredSpeed = 10;
+            train.SpeedKmh = 0;
+            clock.Time2 = 5;
+
+            WhenCruise();
+
+            Assert.Equal(5, ((FakeAccelerator)cruiseControl.Accelerator).Context.Time);
+        }
+
         void WhenCruise()
         {
             cruiseControl.Tick();
@@ -430,38 +447,47 @@ namespace DriverAssist.Cruise
         //     }
         // }
 
-        public class FakeCruiseControlConfig : CruiseControlSettings
-        {
-            public FakeCruiseControlConfig()
-            {
-                LocoSettings = new Dictionary<string, LocoSettings>();
-            }
+    }
 
-            public int MinTorque { get; set; }
-            public int MinAmps { get; }
-            public int MaxAmps { get; }
-            public int MaxTemperature { get; }
-            public int OverdriveTemperature { get; }
-            public bool OverdriveEnabled { get; }
-            public float Offset { get; set; }
-            public float Diff { get; set; }
-            public float UpdateInterval { get; set; }
-            public string Acceleration { get; set; }
-            public string Deceleration { get; set; }
-            public Dictionary<string, LocoSettings> LocoSettings { get; }
+    public class FakeCruiseControlConfig : CruiseControlSettings
+    {
+        public FakeCruiseControlConfig()
+        {
+            LocoSettings = new Dictionary<string, LocoSettings>();
         }
 
-        public class FakeLocoConfig : LocoSettings
-        {
-            public int MinTorque { get; }
-            public int MinAmps { get; }
-            public int MaxAmps { get; }
-            public int MaxTemperature { get; }
-            public int OverdriveTemperature { get; }
-            public bool OverdriveEnabled { get; }
-            public int BrakingTime { get; }
-            public float BrakeReleaseFactor { get; }
-            public float MinBrake { get; }
-        }
+        public int MinTorque { get; set; }
+        public int MinAmps { get; }
+        public int MaxAmps { get; }
+        public int MaxTemperature { get; }
+        public int OverdriveTemperature { get; }
+        public bool OverdriveEnabled { get; }
+        public float Offset { get; set; }
+        public float Diff { get; set; }
+        public float UpdateInterval { get; set; }
+        public string Acceleration { get; set; }
+        public string Deceleration { get; set; }
+        public Dictionary<string, LocoSettings> LocoSettings { get; }
+    }
+
+    public class FakeLocoConfig : LocoSettings
+    {
+        public int MinTorque { get; set; }
+        public int MinAmps { get; set; }
+        public int MaxAmps { get; set; }
+        public int MaxTemperature { get; set; }
+        public int HillClimbTemp { get; set; }
+        public bool OverdriveEnabled { get; set; }
+        public int BrakingTime { get; set; }
+        public float BrakeReleaseFactor { get; set; }
+        public float MinBrake { get; set; }
+        public float HillClimbAccel { get; set; }
+        public float CruiseAccel { get; set; }
+        public float MaxAccel { get; set; }
+    }
+
+    public class FakeClock : Clock
+    {
+        public float Time2 { get; set; }
     }
 }

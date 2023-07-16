@@ -4,6 +4,11 @@ using DriverAssist.Localization;
 
 namespace DriverAssist.Cruise
 {
+    public interface Clock
+    {
+        public float Time2 { get; }
+    }
+
     public class CruiseControl
     {
         bool forward;
@@ -57,13 +62,15 @@ namespace DriverAssist.Cruise
         private CruiseControlSettings config;
         private CruiseControlContext context;
         private Translation localization;
+        private Clock clock;
 
-        public CruiseControl(LocoController loco, CruiseControlSettings config)
+        public CruiseControl(LocoController loco, CruiseControlSettings config, Clock clock)
         {
             this.loco = loco;
             this.config = config;
             Accelerator = CreateAlgo(config.Acceleration);
             Decelerator = CreateAlgo(config.Deceleration);
+            this.clock = clock;
         }
 
         private CruiseControlAlgorithm CreateAlgo(string name)
@@ -79,6 +86,7 @@ namespace DriverAssist.Cruise
             try
             {
                 context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco);
+                context.Time = clock.Time2;
             }
             catch (KeyNotFoundException)
             {

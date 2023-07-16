@@ -15,9 +15,9 @@ namespace DriverAssist
         float Rpm { get; }
         string LocoType { get; }
         float Mass { get; }
+        float LocoMass { get; }
+        float CargoMass { get; }
         bool IsLoco { get; }
-
-        // bool IsSameTrainCar(TrainCarWrapper newloco);
     }
 
     public class NullTrainCarWrapper : TrainCarWrapper
@@ -66,11 +66,13 @@ namespace DriverAssist
         public string LocoType { get; }
 
         public float Mass { get; }
+        public float LocoMass { get; }
+        public float CargoMass { get; }
 
-        public bool IsSameTrainCar(TrainCarWrapper newloco)
-        {
-            return newloco == instance;
-        }
+        // public bool IsSameTrainCar(TrainCarWrapper newloco)
+        // {
+        //     return newloco == instance;
+        // }
     }
 
     public class FakeTrainCarWrapper : TrainCarWrapper
@@ -85,25 +87,27 @@ namespace DriverAssist
         public float TrainBrake { get; set; }
         public float IndBrake { get; set; }
 
-        public float Temperature { get; }
+        public float Temperature { get; set; }
 
         public float Reverser { get; set; }
 
-        public float Torque { get; }
+        public float Torque { get; set; }
 
         public string TractionMotors { get; }
 
-        public float Amps { get; }
+        public float Amps { get; set; }
 
         public float Rpm { get; }
 
         public string LocoType { get; set; }
 
         public float Mass { get; }
+        public float LocoMass { get; }
+        public float CargoMass { get; }
 
-        public bool IsSameTrainCar(TrainCarWrapper newloco)
-        {
-            return this == newloco;
-        }
+        // public bool IsSameTrainCar(TrainCarWrapper newloco)
+        // {
+        //     return this == newloco;
+        // }
     }
 }

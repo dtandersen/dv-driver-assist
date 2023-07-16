@@ -306,7 +306,7 @@ namespace DriverAssist.Implementation
             }
         }
 
-        public int OverdriveTemperature
+        public int HillClimbTemp
         {
             get
             {
@@ -337,5 +337,11 @@ namespace DriverAssist.Implementation
                 return minBrake?.Value ?? 0;
             }
         }
+
+        public float HillClimbAccel { get { return 0.025f; } }
+
+        public float CruiseAccel { get { return 0.05f; } }
+
+        public float MaxAccel { get { return 0.25f; } }
     }
 }

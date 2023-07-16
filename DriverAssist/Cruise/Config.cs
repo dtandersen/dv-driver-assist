@@ -18,9 +18,12 @@ namespace DriverAssist.Cruise
         int MinAmps { get; }
         int MaxAmps { get; }
         int MaxTemperature { get; }
-        int OverdriveTemperature { get; }
+        int HillClimbTemp { get; }
         int BrakingTime { get; }
         float BrakeReleaseFactor { get; }
         float MinBrake { get; }
+        float HillClimbAccel { get; }
+        float CruiseAccel { get; }
+        float MaxAccel { get; }
     }
 }

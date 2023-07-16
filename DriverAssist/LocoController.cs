@@ -13,7 +13,7 @@ namespace DriverAssist
         private float lastHeat;
         private TrainCarWrapper loco;
         float lookahead = 1f;
-        float temperatureLookAhead = 0.5f;
+        float temperatureLookAhead = 1f;
 
         private float fixedDeltaTime;
 
@@ -26,6 +26,10 @@ namespace DriverAssist
 
             int size2 = (int)(temperatureLookAhead / fixedDeltaTime);
             heatIntegrator = new Integrator(size2);
+
+            int size3 = (int)(lookahead / fixedDeltaTime);
+            ampsIntegrator = new Integrator(size3);
+
             PluginLoggerSingleton.Instance.Info($"{fixedDeltaTime} {size} {size2}");
         }
 
@@ -51,6 +55,15 @@ namespace DriverAssist
             get
             {
                 return loco.SpeedMs;
+            }
+        }
+
+        public float RelativeSpeedMs
+        {
+            get
+            {
+                if (IsForward) return loco.SpeedMs;
+                else return -loco.SpeedMs;
             }
         }
 
@@ -109,12 +122,14 @@ namespace DriverAssist
             }
         }
 
-        public float TemperatureChange
+        public virtual float TemperatureChange
         {
             get
             {
                 return heatIntegrator.Integrate() / temperatureLookAhead;
             }
+
+            set { }
         }
 
         public float Reverser
@@ -186,12 +201,14 @@ namespace DriverAssist
             }
         }
 
-        public float AccelerationMs
+        public virtual float AccelerationMs
         {
             get
             {
                 return speedIntegratorMs.Integrate() / lookahead;
             }
+
+            set { }
         }
 
         public float RelativeAccelerationMs
@@ -250,6 +267,22 @@ namespace DriverAssist
             get
             {
                 return loco.Mass;
+            }
+        }
+
+        public float LocoMass
+        {
+            get
+            {
+                return loco.LocoMass;
+            }
+        }
+
+        public float CargoMass
+        {
+            get
+            {
+                return loco.CargoMass;
             }
         }
 

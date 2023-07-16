@@ -107,7 +107,7 @@ namespace DriverAssist
 
             loco = new LocoController(Time.fixedDeltaTime);
 
-            cruiseControl = new CruiseControl(loco, config);
+            cruiseControl = new CruiseControl(loco, config, new UnityClock());
             cruiseControl.Accelerator = new PredictiveAcceleration();
             cruiseControl.Decelerator = new PredictiveDeceleration();
 
@@ -240,45 +240,95 @@ namespace DriverAssist
             float Force = Mass * 9.8f / 2f;
 
             GUILayout.BeginArea(new Rect(0, 0, 300, 500));
+            int labelwidth = 100;
+            int width = 50;
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(localization.CC_SETPOINT);
-            GUILayout.TextField($"{cruiseControl.DesiredSpeed}");
+            GUILayout.Label(localization.CC_SETPOINT, GUILayout.Width(labelwidth));
+            GUILayout.TextField($"{cruiseControl.DesiredSpeed}", GUILayout.Width(width));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(localization.CC_STATUS);
-            GUILayout.TextField($"{cruiseControl.Status}");
+            GUILayout.Label(localization.CC_STATUS, GUILayout.Width(labelwidth));
+            GUILayout.TextField($"{cruiseControl.Status}", GUILayout.Width(150));
             GUILayout.EndHorizontal();
 
             if (config.ShowStats)
             {
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label(localization.STAT_LOCOMOTIVE, GUILayout.Width(labelwidth));
+                // GUILayout.TextField($"{loco.LocoType}", GUILayout.Width(100));
+                // GUILayout.EndHorizontal();
+
+                int mass = (int)(Mass / 1000);
+                int locoMass = (int)(loco.LocoMass / 1000);
+                int cargoMass = (int)(loco.CargoMass / 1000);
+
+                // GUILayoutOption params[]=[GUILayout.Width(100)];
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_LOCOMOTIVE);
-                GUILayout.TextField($"{loco.LocoType}");
+                GUILayout.Label($"", GUILayout.Width(labelwidth));
+                GUILayout.Label(localization.TRAIN, GUILayout.Width(width));
+                GUILayout.Label(localization.LOCO_ABBV, GUILayout.Width(width));
+                GUILayout.Label(localization.CARGO, GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_MASS);
-                GUILayout.TextField($"{(int)(Mass / 1000)}");
+                GUILayout.Label($"{localization.STAT_MASS}", GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{mass}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoMass}", GUILayout.Width(width));
+                GUILayout.TextField($"{cargoMass}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 // GUILayout.BeginHorizontal();
                 // GUILayout.Label("Traction Motors");
                 // GUILayout.TextField($"{loco.TractionMotors}");
                 // GUILayout.EndHorizontal();
+                float predTime = 5f;
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"", GUILayout.Width(labelwidth));
+                GUILayout.Label(localization.STAT_CURRENT, GUILayout.Width(width));
+                GUILayout.Label($"{localization.STAT_CHANGE}/s", GUILayout.Width(width));
+                GUILayout.Label($"{(int)predTime}s", GUILayout.Width(width));
+                GUILayout.EndHorizontal();
 
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_SPEED);
-                GUILayout.TextField($"{(int)loco.RelativeSpeedKmh}");
-                GUILayout.TextField($"{(int)(loco.RelativeSpeedKmh + 10 * loco.RelativeAccelerationMs * 3.6f)}");
+                GUILayout.Label(localization.STAT_SPEED, GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.RelativeSpeedKmh.ToString("N1")}", GUILayout.Width(width));
+                GUILayout.TextField($"{loco.RelativeAccelerationMs.ToString("N3")}", GUILayout.Width(width));
+                GUILayout.TextField($"{(loco.RelativeSpeedKmh + predTime * loco.RelativeAccelerationMs * 3.6f).ToString("N1")}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_ACCELERATION);
-                GUILayout.TextField($"{Math.Round(loco.RelativeAccelerationMs, 2)}");
+                GUILayout.Label(localization.STAT_TEMPERATURE, GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.Temperature.ToString("N1")}", GUILayout.Width(width));
+                GUILayout.TextField($"{loco.TemperatureChange.ToString("N2")}", GUILayout.Width(width));
+                GUILayout.TextField($"{(loco.Temperature + predTime * loco.TemperatureChange).ToString("N1")}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
+
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label(localization.STAT_TEMPERATURE_CHANGE);
+                // GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(localization.STAT_AMPS, GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.Amps.ToString("N0")}", GUILayout.Width(width));
+                GUILayout.TextField($"{loco.AmpsRoc.ToString("N1")}", GUILayout.Width(width));
+                GUILayout.TextField($"{(loco.Amps + predTime * loco.AmpsRoc).ToString("N0")}", GUILayout.Width(width));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(localization.STAT_RPM, GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{Math.Round(loco.Rpm, 0)}", GUILayout.Width(width));
+                GUILayout.TextField($"", GUILayout.Width(width));
+                GUILayout.TextField($"", GUILayout.Width(width));
+                GUILayout.EndHorizontal();
+
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label(localization.STAT_ACCELERATION);
+                // GUILayout.TextField($"{Math.Round(loco.RelativeAccelerationMs, 2)}");
+                // GUILayout.EndHorizontal();
 
                 // GUILayout.BeginHorizontal();
                 // GUILayout.Label("Force");
@@ -286,39 +336,25 @@ namespace DriverAssist
                 // GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_TORQUE);
-                GUILayout.TextField($"{(int)loco.RelativeTorque}");
+                GUILayout.Label(localization.STAT_TORQUE, GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{(int)loco.RelativeTorque}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_POWER);
-                GUILayout.TextField($"{(int)powerkw}");
-                GUILayout.EndHorizontal();
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label(localization.STAT_POWER);
+                // GUILayout.TextField($"{(int)powerkw}");
+                // GUILayout.EndHorizontal();
+
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label(localization.STAT_HORSEPOWER);
+                // GUILayout.TextField($"{(int)(powerkw * 1.341f)}");
+                // GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_HORSEPOWER);
-                GUILayout.TextField($"{(int)(powerkw * 1.341f)}");
+                GUILayout.Label(localization.STAT_THROTTLE, GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{(int)(loco.Throttle * 100)}%", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_THROTTLE);
-                GUILayout.TextField($"{(int)(loco.Throttle * 100)}%");
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_TEMPERATURE);
-                GUILayout.TextField($"{(int)loco.Temperature}");
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_TEMPERATURE_CHANGE);
-                GUILayout.TextField($"{Math.Round(loco.TemperatureChange, 2)}");
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_AMPS);
-                GUILayout.TextField($"{(int)loco.Amps}");
-                GUILayout.EndHorizontal();
 
                 // GUILayout.BeginHorizontal();
                 // GUILayout.Label("ROC Amps");
@@ -330,10 +366,6 @@ namespace DriverAssist
                 // GUILayout.TextField($"{(int)loco.AverageAmps}");
                 // GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(localization.STAT_RPM);
-                GUILayout.TextField($"{(int)loco.Rpm}");
-                GUILayout.EndHorizontal();
             }
             // GUILayout.BeginHorizontal();
             // GUILayout.Label("Reverser");
@@ -464,5 +496,10 @@ namespace DriverAssist
         int[] DecelerateKeys { get; }
         int[] ToggleKeys { get; }
         bool ShowStats { get; }
+    }
+
+    public class UnityClock : Clock
+    {
+        public float Time2 { get { return Time.realtimeSinceStartup; } }
     }
 }
