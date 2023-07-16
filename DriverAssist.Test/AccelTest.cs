@@ -7,11 +7,10 @@ using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
+    [Collection("Sequential")]
     public class AccelTest
     {
-        // private CruiseControl cruiseControl;
         private FakeLocoController loco;
-        // private FakeLocoController loco;
         private Translation localization;
         private FakeCruiseControlConfig config;
         private FakeLocoConfig de2settings;
@@ -21,19 +20,10 @@ namespace DriverAssist.Cruise
         private CruiseControlContext context;
         float step = 1 / 11f;
 
-        private readonly ITestOutputHelper output;
 
         public AccelTest(ITestOutputHelper output)
         {
-            this.output = output;
             PluginLoggerSingleton.Instance = new TestLogger(output);
-            // TranslationManager.Init();
-            // localization = TranslationManager.Current;
-            // config = new FakeCruiseControlConfig();
-            // config.Offset = -2.5f;
-            // config.Diff = 2.5f;
-            // config.Acceleration = "DriverAssist.Cruise.FakeAccelerator";
-            // config.Deceleration = "DriverAssist.Cruise.FakeDecelerator";
 
             de2settings = new FakeLocoConfig();
             de2settings.CruiseAccel = .05f;
@@ -64,29 +54,15 @@ namespace DriverAssist.Cruise
             dh4settings.MinBrake = 0;
             dh4settings.MinTorque = 35000;
             dh4settings.OverdriveEnabled = true;
-            // config.LocoSettings[LocoType.DE2] = de2settings;
-            // config.LocoSettings[LocoType.DH4] = dh4settings;
             train = new FakeTrainCarWrapper();
             train.LocoType = LocoType.DE2;
             loco = new FakeLocoController(1f / 60f);
             loco.UpdateLocomotive(train);
-            // loco = new FakeLocoController();
             train.LocoType = LocoType.DE2;
             loco.Reverser = 1;
-            // loco.AccelerationMs = 0;
-            // accelerator = new FakeAccelerator();
-            // decelerator = new FakeDecelerator();
-            // cruiseControl = new CruiseControl(loco, config);
-            // cruiseControl.Enabled = true;
             accelerator = new PredictiveAcceleration();
             accelerator.lastShift = -3;
-            // cruiseControl.Decelerator = decelerator;
             context = new CruiseControlContext(de2settings, loco);
-        }
-
-        ~AccelTest()
-        {
-            PluginLoggerSingleton.Instance = new NullLogger();
         }
 
         /// <summary> 
@@ -96,16 +72,12 @@ namespace DriverAssist.Cruise
         [Fact]
         public void AccelerateFromStop()
         {
-            // loco.Throttle = 1;
             context.Time = 5;
 
-            // cruiseControl.DesiredSpeed = 30;
             context.DesiredSpeed = 5;
 
             train.SpeedKmh = 0;
-            // train.acc
             WhenAccel();
-            // Assert.Equal("Coasting", cruiseControl.Status);
             Assert.Equal(step, loco.Throttle);
         }
 
@@ -118,10 +90,8 @@ namespace DriverAssist.Cruise
         public void DontExceedMaxAccel()
         {
             context.DesiredSpeed = 5;
-            // context.Time = 5;
             loco.AccelerationMs = 0.25f;
             train.Throttle = step;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
@@ -155,11 +125,8 @@ namespace DriverAssist.Cruise
         public void SpeedUpIfLowTorque()
         {
             context.DesiredSpeed = 5;
-            // context.Time = 5;
-            // loco.AccelerationMs = 0.25f;
             train.Throttle = step;
             train.Torque = 10000;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
@@ -182,13 +149,11 @@ namespace DriverAssist.Cruise
         public void SlowDownIfHeatIsOverOperatingTemp()
         {
             context.DesiredSpeed = 5;
-            // context.Time = 5;
             loco.AccelerationMs = de2settings.CruiseAccel;
             train.Throttle = 3 * step;
             train.Torque = 10000;
             train.Temperature = 105;
             loco.TemperatureChange = 0;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
             Assert.Equal(2 * step, loco.Throttle);
@@ -235,40 +200,14 @@ namespace DriverAssist.Cruise
         public void SpeedUpWhenAccelerationIsLow()
         {
             context.DesiredSpeed = 5;
-            // context.Time = 5;
             loco.AccelerationMs = de2settings.HillClimbAccel;
-            // loco.TemperatureChange = 0.5f;
             train.Throttle = 3 * step;
-            // train.Torque = 10000;
             train.Temperature = de2settings.MaxTemperature;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
             Assert.Equal(4 * step, loco.Throttle);
         }
-
-        // /// <summary>
-        // /// The train is accelerating slowly,
-        // /// the temperature is dangerously high,
-        // /// It should slow down.
-        // /// </summary>
-        // [Fact]
-        // public void SpeedUpWhenAccelerationIsLow2()
-        // {
-        //     context.DesiredSpeed = 5;
-        //     // context.Time = 5;
-        //     loco.AccelerationMs = de2settings.HillClimbAccel;
-        //     loco.TemperatureChange = 0.5f;
-        //     train.Throttle = 3 * step;
-        //     // train.Torque = 10000;
-        //     train.Temperature = de2settings.MaxTemperature - 0.5f;
-        //     // train.SpeedKmh = 0;
-
-        //     WhenAccel();
-
-        //     Assert.Equal(4 * step, loco.Throttle);
-        // }
 
         /// <summary> 
         /// The train is above operating temperature it should maintain the current throttle position if the temperature is decreasing.
@@ -279,15 +218,11 @@ namespace DriverAssist.Cruise
             context.Time = 5;
             accelerator.lastShift = 0;
             context.DesiredSpeed = 5;
-            // context.Time = 5;
             loco.AccelerationMs = 0.05f;
             loco.TemperatureChange = -.1f;
-            // train.I
             train.Throttle = 2 * step;
             train.Torque = 15000;
             train.Temperature = 106;
-            // train.Amps = 750;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
@@ -302,13 +237,10 @@ namespace DriverAssist.Cruise
         public void SlowDownIfTemperatureIsCritical()
         {
             context.DesiredSpeed = 5;
-            // context.Time = 5;
-            //  loco.AccelerationMs = 0.25f;
             loco.TemperatureChange = 0;
             train.Throttle = 3 * step;
             train.Torque = 10000;
             train.Temperature = 118;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
@@ -323,15 +255,10 @@ namespace DriverAssist.Cruise
         public void SlowDownIfAmpsIsCritical()
         {
             context.DesiredSpeed = 5;
-            // context.Time = 5;
-            //  loco.AccelerationMs = 0.25f;
             loco.TemperatureChange = -.1f;
-            // train.I
             train.Throttle = 3 * step;
             train.Torque = 10000;
-            // train.Temperature = 118;
             train.Amps = 750;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
@@ -347,17 +274,12 @@ namespace DriverAssist.Cruise
         {
             context = new CruiseControlContext(dh4settings, loco);
             context.DesiredSpeed = 5;
-            // context.Time = 5;
-            //  loco.AccelerationMs = 0.25f;
 
             loco.TemperatureChange = -.1f;
-            // train.I
             train.Throttle = 3 * step;
             train.Torque = 10000;
             train.LocoType = LocoType.DH4;
-            // train.Temperature = 118;
             train.Amps = 0;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
@@ -372,15 +294,8 @@ namespace DriverAssist.Cruise
         public void MaintainThrottleIfTorqueHigh()
         {
             context.DesiredSpeed = 5;
-            // context.Time = 5;
-            //  loco.AccelerationMs = 0.25f;
-            // loco.TemperatureChange = -.1f;
-            // train.I
             train.Throttle = 2 * step;
             train.Torque = 25000;
-            // train.Temperature = 118;
-            // train.Amps = 750;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
@@ -397,15 +312,8 @@ namespace DriverAssist.Cruise
             context.Time = 5;
             accelerator.lastShift = 0;
             context.DesiredSpeed = 5;
-            // context.Time = 5;
-            //  loco.AccelerationMs = 0.25f;
-            // loco.TemperatureChange = -.1f;
-            // train.I
             train.Throttle = 2 * step;
             train.Torque = 25000;
-            // train.Temperature = 118;
-            // train.Amps = 750;
-            // train.SpeedKmh = 0;
 
             WhenAccel();
 
@@ -424,7 +332,6 @@ namespace DriverAssist.Cruise
     {
         override public float AccelerationMs { get; set; }
         override public float TemperatureChange { get; set; }
-        // override public float RelativeAccelerationMs { get; set; }
 
         public FakeLocoController(float fixedDeltaTime) : base(fixedDeltaTime)
         {
