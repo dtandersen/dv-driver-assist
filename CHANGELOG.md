@@ -1,3 +1,8 @@
+0.7.0 - 7/9/2023
+
+- Fixed a bug where cruise control became confused during rapid acceleration. This could occur in a DE2 without cars attached.
+- Updated German localization.
+
 0.6.0 - 7/9/2023
 
 - Restored support for DH4 after 2023-07-15 game patch.
