@@ -28,7 +28,7 @@ namespace DriverAssist.Cruise
             float torque = loco.RelativeTorque;
             float temperature = loco.Temperature;
             float ampDelta = loco.Amps - lastAmps;
-            float throttleResult;
+            // float throttleResult;
             float predictedAmps = loco.Amps;
             float acceleration = loco.RelativeAccelerationMs;
             float maxamps = context.Config.MaxAmps;
@@ -38,7 +38,7 @@ namespace DriverAssist.Cruise
             float timeSinceShift = context.Time - lastShift;
             float operatingTemp = context.Config.MaxTemperature;
             float dangerTemp = context.Config.HillClimbTemp;
-            float throttleAdj = 0;
+            // float throttleAdj = 0;
 
             bool ampsdecreased = amps <= lastAmps;
             bool hillClimbActive = loco.AccelerationMs <= context.Config.HillClimbAccel;
@@ -55,15 +55,12 @@ namespace DriverAssist.Cruise
             if (speed > desiredSpeed)
             {
                 log("Reached speed");
-
-                throttleResult = 0;
-                throttleAdj = -loco.Throttle;
+                AdjustThrottle(context, -loco.Throttle);
             }
             else if (projectedTemperature >= dangerTemp)
             {
                 log("dangerous temperature");
-                throttleResult = throttle - step;
-                throttleAdj = -step;
+                AdjustThrottle(context, -step);
             }
             else if (
                 projectedTemperature >= context.Config.MaxTemperature
@@ -72,24 +69,23 @@ namespace DriverAssist.Cruise
                 && timeSinceShift >= 3)
             {
                 log("high temperature");
-                throttleResult = throttle - step;
-                throttleAdj = -step;
+                AdjustThrottle(context, -step);
             }
             else if (
                 predictedAmps >= maxamps
                 && loco.IsElectric)
             {
                 log("dangerous amps");
-                throttleResult = throttle - step;
-                throttleAdj = -step;
+                AdjustThrottle(context, -step);
             }
             else if (
                 acceleration >= context.Config.MaxAccel
                 && loco.Throttle > step)
             {
                 log("accelerating too fast");
-                throttleResult = Math.Max(throttle - step, step);
-                throttleAdj = throttleResult - loco.Throttle;
+                float throttleResult2 = Math.Max(throttle - step, step);
+                float throttleAdj2 = throttleResult2 - loco.Throttle;
+                AdjustThrottle(context, throttleAdj2);
             }
             else if (
                 acceleration < context.Config.MaxAccel
@@ -99,8 +95,7 @@ namespace DriverAssist.Cruise
                 )
             {
                 log($"low accel acceleration={acceleration} context.Config.MaxAccel={context.Config.MaxAccel}");
-                throttleResult = throttle + step;
-                throttleAdj = step;
+                AdjustThrottle(context, step);
             }
             else if (
                 torque < context.Config.MinTorque
@@ -110,9 +105,7 @@ namespace DriverAssist.Cruise
                 )
             {
                 log("torque low");
-
-                throttleResult = throttle + step;
-                throttleAdj = step;
+                AdjustThrottle(context, step);
             }
             else if (
                 readyToShift
@@ -121,17 +114,12 @@ namespace DriverAssist.Cruise
                 )
             {
                 log("hill climb");
-                throttleResult = throttle + step;
-                throttleAdj = step;
+                AdjustThrottle(context, step);
             }
             else
             {
                 log("do nothing");
-                throttleResult = throttle;
-                throttleAdj = 0;
             }
-
-            AdjustThrottle(context, throttleAdj);
 
             loco.IndBrake = 0;
             loco.TrainBrake = 0;
