@@ -28,6 +28,13 @@ namespace DriverAssist.Localization
         string STAT_AMPS { get; }
         string STAT_RPM { get; }
         string STAT_HORSEPOWER { get; }
+        string STAT_CURRENT { get; }
+        string STAT_CHANGE { get; }
+
+        string TRAIN { get; }
+        string LOCO_ABBV { get; }
+        string LOCOMOTIVE { get; }
+        string CARGO { get; }
     }
 
     public class TranslationManager
@@ -71,7 +78,7 @@ namespace DriverAssist.Localization
         public string CC_UNSUPPORTED => "Idle: {0} is not supported";
 
         public string STAT_LOCOMOTIVE => "Locomotive";
-        public string STAT_MASS => "Mass (t)";
+        public string STAT_MASS => "Mass";
         public string STAT_SPEED => "Speed (km/h)";
         public string STAT_ACCELERATION => "Acceleration (m/s^2)";
         public string STAT_TORQUE => "Torque";
@@ -82,15 +89,23 @@ namespace DriverAssist.Localization
         public string STAT_TEMPERATURE_CHANGE => "Temperature Change";
         public string STAT_AMPS => "Amps";
         public string STAT_RPM => "RPM";
+
+        public string LOCOMOTIVE => "Locomotive";
+        public string CARGO => "Cargo";
+
+        public string STAT_CURRENT => "Current";
+        public string STAT_CHANGE => "Δ";
+        public string TRAIN => "Train";
+        public string LOCO_ABBV => "Loco";
     }
 
     public class TranslationDE : Translation
     {
         public string CC_SETPOINT => "Sollwert";
         public string CC_STATUS => "Status";
-        public string CC_COASTING => "Rollt";
-        public string CC_DECELERATING => "Verlangsamung auf {0} km/h";
-        public string CC_ACCELERATING => "Beschleunigung auf {0} km/h";
+        public string CC_COASTING => "Rollen";
+        public string CC_DECELERATING => "Bremsen auf {0} km/h";
+        public string CC_ACCELERATING => "Beschleunigen auf {0} km/h";
         public string CC_CHANGING_DIRECTION => "Richtung ändern";
         public string CC_STOPPING => "Anhalten";
         public string CC_WARNING_NEUTRAL => "Leerlauf: Richtungshebel steht im Leerlauf";
@@ -98,8 +113,8 @@ namespace DriverAssist.Localization
         public string CC_UNSUPPORTED => "Keine Einstellungen für {0} gefunden";
 
         public string STAT_LOCOMOTIVE => "Lokomotive";
-        public string STAT_MASS => "Masse (t)";
-        public string STAT_SPEED => "Geschwindigkeit (km/h)";
+        public string STAT_MASS => "Masse";
+        public string STAT_SPEED => "Geschwindigkeit";
         public string STAT_ACCELERATION => "Beschleunigung (m/s^2)";
         public string STAT_TORQUE => "Drehmoment";
         public string STAT_POWER => "Leistung (kW)";
@@ -109,5 +124,13 @@ namespace DriverAssist.Localization
         public string STAT_TEMPERATURE_CHANGE => "Temperaturänderung";
         public string STAT_AMPS => "Amperemeter";
         public string STAT_RPM => "U/min";
+
+        public string LOCOMOTIVE => "Lokomotive";
+        public string CARGO => "Ladung";
+
+        public string STAT_CURRENT => "Aktueller ";
+        public string STAT_CHANGE => "Δ";
+        public string TRAIN => "Zug";
+        public string LOCO_ABBV => "Loko";
     }
 }
