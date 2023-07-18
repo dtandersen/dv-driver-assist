@@ -7,6 +7,8 @@ namespace DriverAssist
         float Throttle { get; set; }
         float TrainBrake { get; set; }
         float IndBrake { get; set; }
+        float GearboxA { get; set; }
+        float GearboxB { get; set; }
         float Temperature { get; }
         float Reverser { get; set; }
         float Torque { get; }
@@ -50,6 +52,8 @@ namespace DriverAssist
         public float Throttle { get; set; }
         public float TrainBrake { get; set; }
         public float IndBrake { get; set; }
+        public float GearboxA { get; set; }
+        public float GearboxB { get; set; }
 
         public float Temperature { get; }
 
@@ -86,6 +90,8 @@ namespace DriverAssist
         public float Throttle { get; set; }
         public float TrainBrake { get; set; }
         public float IndBrake { get; set; }
+        public float GearboxA { get; set; }
+        public float GearboxB { get; set; }
 
         public float Temperature { get; set; }
 

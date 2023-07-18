@@ -205,6 +205,14 @@ namespace DriverAssist
             {
                 cruiseControl.DesiredSpeed -= CC_SPEED_STEP;
             }
+            if (IsKeyPressed(config.Upshift))
+            {
+                loco.Upshift();
+            }
+            if (IsKeyPressed(config.Downshift))
+            {
+                loco.Downshift();
+            }
         }
 
         void FixedUpdate()
@@ -355,6 +363,21 @@ namespace DriverAssist
                 GUILayout.TextField($"{(int)(loco.Throttle * 100)}%", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Gear", GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.Gear + 1}", GUILayout.Width(width));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("GearA", GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.GearboxA}", GUILayout.Width(width));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Gear B", GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.GearboxB}", GUILayout.Width(width));
+                GUILayout.EndHorizontal();
+
 
                 // GUILayout.BeginHorizontal();
                 // GUILayout.Label("ROC Amps");
@@ -495,6 +518,8 @@ namespace DriverAssist
         int[] AccelerateKeys { get; }
         int[] DecelerateKeys { get; }
         int[] ToggleKeys { get; }
+        int[] Upshift { get; }
+        int[] Downshift { get; }
         bool ShowStats { get; }
     }
 

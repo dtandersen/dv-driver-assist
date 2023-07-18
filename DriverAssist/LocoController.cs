@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace DriverAssist
@@ -12,8 +13,20 @@ namespace DriverAssist
         private float lastAmps;
         private float lastHeat;
         private TrainCarWrapper loco;
-        float lookahead = 1f;
-        float temperatureLookAhead = 1f;
+        private float lookahead = 1f;
+        private float temperatureLookAhead = 1f;
+        // https://discord.com/channels/332511223536943105/332511223536943105/1129517819416018974
+        private List<float[]> gearBox = new List<float[]>() {
+            new float[] {0f,   0f},   // 1 = 1-1
+            new float[] {0,    0.5f}, // 2 = 1-2
+            new float[] {0.5f, 0},    // 3 = 2-1
+            new float[] {0.5f, 0.5f}, // 4 = 2-2
+            new float[] {1,    0},    // 5 = 3-1
+            new float[] {0,    1},    // 6 = 1-3
+            new float[] {1,    0.5f}, // 7 = 3-2
+            new float[] {0.5f, 1},    // 8 = 2-3
+            new float[] {1,    1},    // 9 = 3-3
+        };
 
         private float fixedDeltaTime;
 
@@ -111,6 +124,66 @@ namespace DriverAssist
             set
             {
                 loco.IndBrake = value;
+            }
+        }
+        int requestedGear;
+        public int RequestedGear
+        {
+            get
+            {
+                return requestedGear;
+            }
+            set
+            {
+                if (value < 0) requestedGear = 0;
+                else if (value >= gearBox.Count) requestedGear = gearBox.Count - 1;
+                else requestedGear = value;
+            }
+        }
+        public int Gear
+        {
+            get
+            {
+                // float[] gearPair;
+                for (int i = 0; i < gearBox.Count; i++)
+                {
+                    float[] gear = gearBox[i];
+                    if (gear[0] == loco.GearboxA && gear[1] == loco.GearboxB)
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+            set
+            {
+                float[] gear = gearBox[value];
+                loco.GearboxA = gear[0];
+                loco.GearboxB = gear[1];
+            }
+        }
+
+        public float GearboxA
+        {
+            get
+            {
+                return loco.GearboxA;
+            }
+            set
+            {
+                loco.GearboxA = value;
+            }
+        }
+
+        public float GearboxB
+        {
+            get
+            {
+                return loco.GearboxB;
+            }
+            set
+            {
+                loco.GearboxB = value;
             }
         }
 
@@ -306,6 +379,18 @@ namespace DriverAssist
                 return;
             }
 
+            if (Gear != RequestedGear)
+            {
+                if (Throttle != 0)
+                {
+                    Throttle = 0;
+                }
+                else
+                {
+                    Gear = RequestedGear;
+                }
+            }
+
             float speedMs = SpeedMs;
             float accelerationMs = speedMs - lastSpeedMs;
             speedIntegratorMs.Add(accelerationMs, deltaTime);
@@ -323,6 +408,17 @@ namespace DriverAssist
             lastHeat = heat;
             lastAmps = amps;
             lastSpeedMs = speedMs;
+        }
+
+        internal void Upshift()
+        {
+            RequestedGear++;
+            // loco.GearboxA += 0.5f;
+        }
+
+        internal void Downshift()
+        {
+            RequestedGear--;
         }
 
         // private TrainCarWrapper GetLocomotive()

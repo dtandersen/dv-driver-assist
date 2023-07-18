@@ -8,6 +8,7 @@ namespace DriverAssist.Implementation
     {
         private TrainCar loco;
         private BaseControlsOverrider obj;
+        private BaseControlsOverrider baseControlsOverrider;
         private LocoIndicatorReader locoIndicatorReader;
         private SimulationFlow simFlow;
         private Port torqueGeneratedPort;
@@ -15,6 +16,7 @@ namespace DriverAssist.Implementation
         public DVTrainCarWrapper(TrainCar car)
         {
             this.loco = car;
+            this.baseControlsOverrider = loco.GetComponent<SimController>()?.controlsOverrider;
             this.obj = loco.GetComponent<SimController>()?.controlsOverrider;
             this.locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
             this.simFlow = loco.GetComponent<SimController>()?.simFlow;
@@ -75,6 +77,60 @@ namespace DriverAssist.Implementation
             set
             {
                 obj.IndependentBrake.Set(value);
+            }
+        }
+
+        public float GearboxA
+        {
+            get
+            {
+                BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
+                InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
+                if (!controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference))
+                {
+                    return 0;
+                }
+                return reference.controlImplBase.Value;
+            }
+            // return overrider.bas;
+
+            set
+            {
+                BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
+                InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
+                if (controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference))
+                {
+                    // controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference6)
+                    reference.controlImplBase.SetValue(value);
+                }
+                // return reference.controlImplBase.Value;
+            }
+        }
+
+        public float GearboxB
+        {
+            get
+            {
+                BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
+                InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
+                if (!controls.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference))
+                {
+                    return 0;
+                }
+                return reference.controlImplBase.Value;
+            }
+            // return overrider.bas;
+
+            set
+            {
+                BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
+                InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
+                if (controls.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference))
+                {
+                    // controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference6)
+                    reference.controlImplBase.SetValue(value);
+                }
+                // return reference.controlImplBase.Value;
             }
         }
 

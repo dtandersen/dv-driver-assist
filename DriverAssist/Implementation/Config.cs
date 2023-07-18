@@ -38,6 +38,8 @@ namespace DriverAssist.Implementation
         private ConfigEntry<KeyboardShortcut> faster;
         private ConfigEntry<KeyboardShortcut> slower;
         private ConfigEntry<KeyboardShortcut> toggle;
+        private ConfigEntry<KeyboardShortcut> upshift;
+        private ConfigEntry<KeyboardShortcut> downshift;
         private ConfigEntry<bool> showStats;
         // private Dictionary<string, LocoSettings> locoSettings;
 
@@ -75,8 +77,10 @@ namespace DriverAssist.Implementation
             faster = config.Bind("Hotkeys", "Faster", new KeyboardShortcut(KeyCode.PageUp));
             slower = config.Bind("Hotkeys", "Slower", new KeyboardShortcut(KeyCode.PageDown));
             toggle = config.Bind("Hotkeys", "Toggle", new KeyboardShortcut(KeyCode.RightControl));
+            upshift = config.Bind("Hotkeys", "Upshift", new KeyboardShortcut(KeyCode.Home));
+            downshift = config.Bind("Hotkeys", "Downshift", new KeyboardShortcut(KeyCode.End));
 
-            showStats = config.Bind("UI", "ShowStats", true, "Show stats");
+            showStats = config.Bind("UI", "ShowStats", false, "Show stats");
 
             LocoSettings = new Dictionary<string, LocoSettings>();
             LocoSettings[LocoType.DE2] = new BepInExLocoSettings(
@@ -218,6 +222,22 @@ namespace DriverAssist.Implementation
             get
             {
                 return BindingFor(toggle);
+            }
+        }
+
+        public int[] Upshift
+        {
+            get
+            {
+                return BindingFor(upshift);
+            }
+        }
+
+        public int[] Downshift
+        {
+            get
+            {
+                return BindingFor(downshift);
             }
         }
 
