@@ -191,6 +191,54 @@ namespace DriverAssist.Cruise
             Assert.Equal(3 * step, loco.Throttle);
         }
 
+        /// <summary> 
+        /// The train is below operating temperature,
+        /// it is cruising,
+        /// torque is low,
+        /// and the temperature is increasing.
+        /// It should maintain the current throttle position.
+        /// </summary>
+        [Fact]
+        public void MaintainThrottleIfTemperatureIsFalling2()
+        {
+            context.DesiredSpeed = 5;
+            // context.Time = 5;
+            loco.AccelerationMs = de2settings.CruiseAccel;
+            loco.TemperatureChange = 0.1f;
+            train.Throttle = 3 * step;
+            train.Torque = 10000;
+            train.Temperature = 104;
+            // train.SpeedKmh = 0;
+
+            WhenAccel();
+
+            Assert.Equal(3 * step, loco.Throttle);
+        }
+
+        /// <summary> 
+        /// The train well below operating temperature,
+        /// it is cruising,
+        /// torque is low,
+        /// and the temperature is increasing.
+        /// It should maintain the current throttle position.
+        /// </summary>
+        [Fact]
+        public void MaintainThrottleIfTemperatureIsFalling3()
+        {
+            context.DesiredSpeed = 5;
+            // context.Time = 5;
+            loco.AccelerationMs = de2settings.CruiseAccel;
+            loco.TemperatureChange = 0f;
+            train.Throttle = 3 * step;
+            train.Torque = 10000;
+            train.Temperature = de2settings.MaxTemperature - 5;
+            // train.SpeedKmh = 0;
+
+            WhenAccel();
+
+            Assert.Equal(4 * step, loco.Throttle);
+        }
+
         /// <summary>
         /// The train is accelerating slowly
         /// and it has exceeded operating temperature.
@@ -209,25 +257,25 @@ namespace DriverAssist.Cruise
             Assert.Equal(4 * step, loco.Throttle);
         }
 
-        /// <summary> 
-        /// The train is above operating temperature it should maintain the current throttle position if the temperature is decreasing.
-        /// </summary>
-        [Fact(Skip = "Duplicates MaintainThrottleIfTemperatureIsFalling")]
-        public void DontThrottleUpIfCruising()
-        {
-            context.Time = 5;
-            accelerator.lastShift = 0;
-            context.DesiredSpeed = 5;
-            loco.AccelerationMs = 0.05f;
-            loco.TemperatureChange = -.1f;
-            train.Throttle = 2 * step;
-            train.Torque = 15000;
-            train.Temperature = 106;
+        // /// <summary> 
+        // /// The train is above operating temperature it should maintain the current throttle position if the temperature is decreasing.
+        // /// </summary>
+        // [Fact(Skip = "Duplicates MaintainThrottleIfTemperatureIsFalling")]
+        // public void DontThrottleUpIfCruising()
+        // {
+        //     context.Time = 5;
+        //     accelerator.lastShift = 0;
+        //     context.DesiredSpeed = 5;
+        //     loco.AccelerationMs = 0.05f;
+        //     loco.TemperatureChange = -.1f;
+        //     train.Throttle = 2 * step;
+        //     train.Torque = 15000;
+        //     train.Temperature = 106;
 
-            WhenAccel();
+        //     WhenAccel();
 
-            Assert.Equal(2 * step, train.Throttle);
-        }
+        //     Assert.Equal(2 * step, train.Throttle);
+        // }
 
         /// <summary> 
         /// The traction motor is about to explode.

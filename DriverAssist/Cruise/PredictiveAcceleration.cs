@@ -45,9 +45,8 @@ namespace DriverAssist.Cruise
             bool tempDecreasing = loco.TemperatureChange < 0;
 
             bool readyToShift =
-                torque < minTorque
-                && (torque < 10000 || torque <= lastTorque)
-                && loco.RelativeAccelerationMs < 0.25f;
+                (torque < minTorque || torque <= lastTorque)
+                && loco.RelativeAccelerationMs < context.Config.MaxAccel;
 
             log($"predictedAmps{predictedAmps} maxamps={maxamps} timeSinceShift={timeSinceShift}");
             log($"projectedTemperature={projectedTemperature} dangerTemp={dangerTemp}");
@@ -59,7 +58,7 @@ namespace DriverAssist.Cruise
             }
             else if (projectedTemperature >= dangerTemp)
             {
-                log("dangerous temperature");
+                log("Temperature exceeds danger limit");
                 AdjustThrottle(context, -step);
             }
             else if (
@@ -68,43 +67,45 @@ namespace DriverAssist.Cruise
                 && !hillClimbActive
                 && timeSinceShift >= 3)
             {
-                log("high temperature");
+                log("Temperature exceeds cruising limit");
                 AdjustThrottle(context, -step);
             }
             else if (
                 predictedAmps >= maxamps
                 && loco.IsElectric)
             {
-                log("dangerous amps");
+                log("Amps exceed limit");
                 AdjustThrottle(context, -step);
             }
             else if (
                 acceleration >= context.Config.MaxAccel
                 && loco.Throttle > step)
             {
-                log("accelerating too fast");
-                float throttleResult2 = Math.Max(throttle - step, step);
-                float throttleAdj2 = throttleResult2 - loco.Throttle;
-                AdjustThrottle(context, throttleAdj2);
+                log("Acceleration limit reached");
+                float desiredThrottle = Math.Max(throttle - step, step);
+                AdjustThrottle(context, desiredThrottle - loco.Throttle);
             }
-            else if (
-                acceleration < context.Config.MaxAccel
-                && torque < context.Config.MinTorque
-                && projectedTemperature < context.Config.MaxTemperature
-                && timeSinceShift > 3
-                )
-            {
-                log($"low accel acceleration={acceleration} context.Config.MaxAccel={context.Config.MaxAccel}");
-                AdjustThrottle(context, step);
-            }
+            // else if (
+            //     acceleration < context.Config.MaxAccel
+            //     && torque < context.Config.MinTorque
+            //     && projectedTemperature < context.Config.MaxTemperature
+            //     && tempDecreasing
+            //     && timeSinceShift >= 3
+            //     )
+            // {
+            //     log($"Low acceleration");
+            //     log($"acceleration={acceleration} MaxAccel={context.Config.MaxAccel}");
+            //     AdjustThrottle(context, step);
+            // }
             else if (
                 torque < context.Config.MinTorque
                 && acceleration < context.Config.MaxAccel
                 && projectedTemperature < context.Config.MaxTemperature
+                && (tempDecreasing || projectedTemperature <= context.Config.MaxTemperature - 5)
                 && timeSinceShift >= 3
                 )
             {
-                log("torque low");
+                log("Low torque");
                 AdjustThrottle(context, step);
             }
             else if (
@@ -113,7 +114,7 @@ namespace DriverAssist.Cruise
                 && timeSinceShift >= 3
                 )
             {
-                log("hill climb");
+                log("Hill climbing");
                 AdjustThrottle(context, step);
             }
             else
@@ -140,7 +141,7 @@ namespace DriverAssist.Cruise
 
         private void log(string v)
         {
-            // logger.Info(v);
+            logger.Info(v);
         }
     }
 }
