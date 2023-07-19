@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DriverAssist
 {
     public interface TrainCarWrapper
@@ -20,6 +22,9 @@ namespace DriverAssist
         float LocoMass { get; }
         float CargoMass { get; }
         bool IsLoco { get; }
+        float WheelRadius { get; }
+        float GearRatio { get; }
+        List<string> Ports { get; }
     }
 
     public class NullTrainCarWrapper : TrainCarWrapper
@@ -73,6 +78,10 @@ namespace DriverAssist
         public float LocoMass { get; }
         public float CargoMass { get; }
 
+        public float WheelRadius { get; }
+        public float GearRatio { get; }
+        public List<string> Ports { get; }
+
         // public bool IsSameTrainCar(TrainCarWrapper newloco)
         // {
         //     return newloco == instance;
@@ -110,7 +119,9 @@ namespace DriverAssist
         public float Mass { get; }
         public float LocoMass { get; }
         public float CargoMass { get; }
-
+        public float WheelRadius { get; }
+        public float GearRatio { get; }
+        public List<string> Ports { get; }
         // public bool IsSameTrainCar(TrainCarWrapper newloco)
         // {
         //     return this == newloco;

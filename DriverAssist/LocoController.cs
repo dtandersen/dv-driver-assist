@@ -367,6 +367,12 @@ namespace DriverAssist
             }
         }
 
+        public float GearRatio { get { return loco.GearRatio; } }
+
+        public List<string> Ports { get { return loco.Ports; } }
+
+        public float WheelRadius { get { return loco.WheelRadius; } }
+
         // internal void Update()
         // {
         //     OnLocoChange(GetLocomotive());

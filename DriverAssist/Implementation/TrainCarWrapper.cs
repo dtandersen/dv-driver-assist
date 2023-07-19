@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DV.HUD;
 using DV.Simulation.Cars;
 using LocoSim.Implementations;
@@ -187,23 +188,6 @@ namespace DriverAssist.Implementation
                         return false;
                 }
             }
-
-            // simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port);
-
-            // foreach (SimComponent x in simFlow.orderedSimComps)
-            // {
-            //     List<Port> ports = x.GetAllPorts();
-            //     foreach (Port p in ports)
-            //     {
-            //         PluginLoggerSingleton.Instance.Info($"{x} {p.id}");
-            //     }
-            // }
-            // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.tr;
-
-            // locoCar.def
-            // return "" + port.Value;
-            // return torqueGeneratedPortId;
-            // }
         }
 
         public string TractionMotors
@@ -313,5 +297,57 @@ namespace DriverAssist.Implementation
                 return mass;
             }
         }
+
+        public float WheelRadius
+        {
+            get
+            {
+                return loco.carLivery.parentType.wheelRadius;
+            }
+        }
+
+        public float GearRatio
+        {
+            get
+            {
+                switch (LocoType)
+                {
+                    case DriverAssist.LocoType.DM3:
+                        Port gearRatioPort;
+                        if (!simFlow.TryGetPort("transmissionAB.MECHANICAL_GEAR_RATIO", out gearRatioPort))
+                        {
+                            return 0;
+                        }
+
+                        return gearRatioPort.Value;
+                    default:
+                        return 0;
+                }
+            }
+        }
+
+        public List<string> Ports
+        {
+            get
+            {
+                // simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port);
+                List<string> portstrings = new List<string>();
+                foreach (SimComponent x in simFlow.orderedSimComps)
+                {
+                    List<Port> ports = x.GetAllPorts();
+                    foreach (Port p in ports)
+                    {
+                        portstrings.Add(p.id);
+                        // PluginLoggerSingleton.Instance.Info($"{x} {p.id}");
+                    }
+                }
+                // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.tr;
+                return portstrings;
+                //     locoCar.def
+                // return "" + port.Value;
+                //     return torqueGeneratedPortId;
+            }
+        }
+
     }
 }

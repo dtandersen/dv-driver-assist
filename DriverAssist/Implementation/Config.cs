@@ -29,6 +29,10 @@ namespace DriverAssist.Implementation
         private ConfigEntry<int> dh4OverdriveTemperature;
         // private ConfigEntry<bool> dh4OverdriveEnabled;
 
+        private ConfigEntry<int> dm3MinTorque;
+        private ConfigEntry<int> dm3MaxTemperature;
+        private ConfigEntry<int> dm3OverdriveTemperature;
+
         private ConfigEntry<int> brakingTime;
         private ConfigEntry<float> brakeReleaseFactor;
         private ConfigEntry<float> minBrake;
@@ -40,6 +44,7 @@ namespace DriverAssist.Implementation
         private ConfigEntry<KeyboardShortcut> toggle;
         private ConfigEntry<KeyboardShortcut> upshift;
         private ConfigEntry<KeyboardShortcut> downshift;
+        private ConfigEntry<KeyboardShortcut> dumpPorts;
         private ConfigEntry<bool> showStats;
         // private Dictionary<string, LocoSettings> locoSettings;
 
@@ -67,6 +72,10 @@ namespace DriverAssist.Implementation
             dh4OverdriveTemperature = config.Bind("DH4", "OverdriveTemperature", 118, "Downshift temperature threshhold during overdrive");
             // dh4OverdriveEnabled = config.Bind("DH4", "Overdrive", true, "Enable overdrive when train is slowing down");
 
+            dm3MinTorque = config.Bind("DM3", "MinTorque", 35000, "Upshift torque threshold");
+            dm3MaxTemperature = config.Bind("DM3", "MaxTemperature", 104, "Downshift temperature threshhold");
+            dm3OverdriveTemperature = config.Bind("DM3", "OverdriveTemperature", 118, "Downshift temperature threshhold during overdrive");
+
             brakingTime = config.Bind("Braking", "DecelerationTime", 10, "Time to decelerate");
             brakeReleaseFactor = config.Bind("Braking", "BrakeReleaseFactor", .5f, "Brake = Brake - BrakeReleaseFactor * Brake");
             minBrake = config.Bind("Braking", "MinBrake", .1f, "Minimum braking (0=0%, 1=100%)");
@@ -79,6 +88,7 @@ namespace DriverAssist.Implementation
             toggle = config.Bind("Hotkeys", "Toggle", new KeyboardShortcut(KeyCode.RightControl));
             upshift = config.Bind("Hotkeys", "Upshift", new KeyboardShortcut(KeyCode.Home));
             downshift = config.Bind("Hotkeys", "Downshift", new KeyboardShortcut(KeyCode.End));
+            dumpPorts = config.Bind("Hotkeys", "DumpPorts", new KeyboardShortcut(KeyCode.F9));
 
             showStats = config.Bind("UI", "ShowStats", false, "Show stats");
 
@@ -109,6 +119,16 @@ namespace DriverAssist.Implementation
                 maxAmps: null,
                 maxTemperature: dh4MaxTemperature,
                 overdriveTemperature: dh4OverdriveTemperature,
+                brakingTime: brakingTime,
+                brakeReleaseFactor: brakeReleaseFactor,
+                minBrake: minBrake
+            );
+            LocoSettings[LocoType.DM3] = new BepInExLocoSettings(
+                minTorque: dm3MinTorque,
+                minAmps: null,
+                maxAmps: null,
+                maxTemperature: dm3MaxTemperature,
+                overdriveTemperature: dm3OverdriveTemperature,
                 brakingTime: brakingTime,
                 brakeReleaseFactor: brakeReleaseFactor,
                 minBrake: minBrake
@@ -241,6 +261,14 @@ namespace DriverAssist.Implementation
             }
         }
 
+        public int[] DumpPorts
+        {
+            get
+            {
+                return BindingFor(dumpPorts);
+            }
+        }
+
         public bool ShowStats
         {
             get
@@ -248,6 +276,7 @@ namespace DriverAssist.Implementation
                 return showStats.Value;
             }
         }
+
 
         public int[] BindingFor(ConfigEntry<KeyboardShortcut> shortcut)
         {

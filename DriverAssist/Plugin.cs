@@ -213,6 +213,13 @@ namespace DriverAssist
             {
                 loco.Downshift();
             }
+            if (IsKeyPressed(config.DumpPorts))
+            {
+                foreach (var port in loco.Ports)
+                {
+                    PluginLoggerSingleton.Instance.Info($"{port}");
+                }
+            }
         }
 
         void FixedUpdate()
@@ -369,14 +376,25 @@ namespace DriverAssist
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("GearA", GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{loco.GearboxA}", GUILayout.Width(width));
+                GUILayout.Label("Gear Ratio", GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.GearRatio}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
+                float speed2 = 3f / 25f * (float)Math.PI * loco.WheelRadius * loco.Rpm / loco.GearRatio;
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Gear B", GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{loco.GearboxB}", GUILayout.Width(width));
+                GUILayout.Label("Speed", GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{speed2.ToString("N1")}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
+
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label("GearA", GUILayout.Width(labelwidth));
+                // GUILayout.TextField($"{loco.GearboxA}", GUILayout.Width(width));
+                // GUILayout.EndHorizontal();
+
+                // GUILayout.BeginHorizontal();
+                // GUILayout.Label("Gear B", GUILayout.Width(labelwidth));
+                // GUILayout.TextField($"{loco.GearboxB}", GUILayout.Width(width));
+                // GUILayout.EndHorizontal();
 
 
                 // GUILayout.BeginHorizontal();
