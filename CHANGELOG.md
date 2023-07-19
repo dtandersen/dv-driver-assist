@@ -1,9 +1,11 @@
-0.7.0 - 7/9/2023
+0.7.0 - 7/19/2023
 
+- Added experimental DM3 support.
 - Fixed a bug where cruise control became confused during rapid acceleration. This could occur in a DE2 without cars attached.
 - Updated German localization.
 
-0.6.0 - 7/9/2023
+
+0.6.0 - 7/15/2023
 
 - Restored support for DH4 after 2023-07-15 game patch.
 - Cruise control considers it safe to reverse if speed is less than .01 km/h instead of 0 km/h.
