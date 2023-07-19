@@ -330,7 +330,6 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                // simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port);
                 List<string> portstrings = new List<string>();
                 foreach (SimComponent x in simFlow.orderedSimComps)
                 {
@@ -338,16 +337,11 @@ namespace DriverAssist.Implementation
                     foreach (Port p in ports)
                     {
                         portstrings.Add(p.id);
-                        // PluginLoggerSingleton.Instance.Info($"{x} {p.id}");
                     }
                 }
-                // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.tr;
+
                 return portstrings;
-                //     locoCar.def
-                // return "" + port.Value;
-                //     return torqueGeneratedPortId;
             }
         }
-
     }
 }

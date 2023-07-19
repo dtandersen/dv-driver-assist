@@ -377,7 +377,10 @@ namespace DriverAssist
         // {
         //     OnLocoChange(GetLocomotive());
         // }
-
+        float lastThrottle;
+        bool shiftcomplete;
+        bool shifting;
+        int shiftState = 0;
         internal void UpdateStats(float deltaTime)
         {
             if (!loco.IsLoco)
@@ -385,14 +388,24 @@ namespace DriverAssist
                 return;
             }
 
+            if (shiftState == 2)
+            {
+                Throttle = lastThrottle;
+                shiftState = 0;
+            }
             if (Gear != RequestedGear)
             {
                 if (Throttle != 0)
                 {
+                    // shifting = true;
+                    // shiftcomplete = false;
+                    shiftState = 1;
+                    lastThrottle = Throttle;
                     Throttle = 0;
                 }
                 else
                 {
+                    shiftState = 2;
                     Gear = RequestedGear;
                 }
             }

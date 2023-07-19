@@ -122,6 +122,15 @@ namespace DriverAssist.Cruise
                 log("do nothing");
             }
 
+            if (loco.Rpm > 800)
+            {
+                loco.RequestedGear++;
+            }
+            if (loco.Rpm < 600)
+            {
+                loco.RequestedGear--;
+            }
+
             loco.IndBrake = 0;
             loco.TrainBrake = 0;
 
@@ -141,7 +150,7 @@ namespace DriverAssist.Cruise
 
         private void log(string v)
         {
-            logger.Info(v);
+            // logger.Info(v);
         }
     }
 }

@@ -126,19 +126,25 @@ namespace DriverAssist.Cruise
                 Status = String.Format(localization.CC_STOPPING);
                 // Status = String.Format("Stop");
                 loco.Throttle = 0;
-                loco.TrainBrake = 1;
+                if (!(loco.LocoType == LocoType.DM3))
+                    loco.TrainBrake = 1;
+                else
+                    loco.TrainBrake = .666f;
             }
             else if (IsWrongDirection)
             {
                 Status = String.Format(localization.CC_CHANGING_DIRECTION);
                 // Status = String.Format("Direction change");
                 loco.Throttle = 0;
-                loco.TrainBrake = 1;
-                if (loco.Reverser == 0 && DesiredSpeed > 0 && Math.Abs(loco.SpeedKmh) < 0.01f)
+                if (!(loco.LocoType == LocoType.DM3))
+                    loco.TrainBrake = 1;
+                else
+                    loco.TrainBrake = .666f;
+                if (loco.Reverser == 0 && DesiredSpeed > 0 && Math.Abs(loco.SpeedKmh) < 0.1f)
                 {
                     loco.Reverser = 1f;
                 }
-                if (loco.Reverser == 1 && DesiredSpeed < 0 && Math.Abs(loco.SpeedKmh) < 0.01f)
+                if (loco.Reverser == 1 && DesiredSpeed < 0 && Math.Abs(loco.SpeedKmh) < 0.1f)
                 {
                     loco.Reverser = 0f;
                 }

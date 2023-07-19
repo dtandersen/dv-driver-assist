@@ -19,11 +19,25 @@ namespace DriverAssist.Cruise
 
             if (speedKmh > context.DesiredSpeed)
             {
-                brake = loco.TrainBrake + STEP;
+                if (loco.LocoType != LocoType.DM3)
+                {
+                    brake = loco.TrainBrake + STEP;
+                }
+                else
+                {
+                    brake = 0.666f;
+                }
             }
             else
             {
-                brake = loco.TrainBrake - context.Config.BrakeReleaseFactor * loco.TrainBrake;
+                if (loco.LocoType != LocoType.DM3)
+                {
+                    brake = loco.TrainBrake - context.Config.BrakeReleaseFactor * loco.TrainBrake;
+                }
+                else
+                {
+                    brake = 0;
+                }
             }
 
             brake = Math.Max(brake, context.Config.MinBrake);
