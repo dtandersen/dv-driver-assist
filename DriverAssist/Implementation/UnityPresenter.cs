@@ -9,7 +9,6 @@ namespace DriverAssist.Implementation
     {
         private static int CC_SPEED_STEP = 5;
 
-        public DriverAssistBepInExPlugin driverAssistPlugin;
         public LocoController loco;
         public CruiseControl cruiseControl;
         public UnifiedSettings config;
@@ -17,9 +16,8 @@ namespace DriverAssist.Implementation
         public float updateAccumulator;
         public bool loaded = false;
 
-        public UnityPresenter(DriverAssistBepInExPlugin driverAssistPlugin, UnifiedSettings config)
+        public UnityPresenter(UnifiedSettings config)
         {
-            this.driverAssistPlugin = driverAssistPlugin;
             this.config = config;
         }
 
@@ -28,7 +26,7 @@ namespace DriverAssist.Implementation
             TranslationManager.Init();
             localization = TranslationManager.Current;
 
-            PluginLoggerSingleton.Instance.Info($"{PluginInfo.PLUGIN_NAME} ({PluginInfo.PLUGIN_GUID}) is loaded!");
+            PluginLoggerSingleton.Instance.Info($"Driver Assist is loaded!");
             WorldStreamingInit.LoadingFinished += OnLoadingFinished;
             UnloadWatcher.UnloadRequested += OnUnloadRequested;
 
@@ -296,6 +294,16 @@ namespace DriverAssist.Implementation
         {
             PluginLoggerSingleton.Instance.Info($"OnCarChanged");
             ChangeCar(enteredCar);
+        }
+    }
+
+    class UnityLogger : PluginLogger
+    {
+        public string Prefix { get; set; }
+
+        public void Info(string message)
+        {
+            Debug.Log($"{Prefix}{message}");
         }
     }
 }

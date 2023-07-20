@@ -16,7 +16,7 @@ namespace DriverAssist.Implementation
 
             BepInExDriverAssistSettings config = new BepInExDriverAssistSettings(Config);
 
-            presenter = new UnityPresenter(this, config);
+            presenter = new UnityPresenter(config);
             presenter.Init();
         }
 
@@ -41,21 +41,5 @@ namespace DriverAssist.Implementation
         {
             presenter.OnGui();
         }
-    }
-
-    public interface DriverAssistSettings
-    {
-        int[] AccelerateKeys { get; }
-        int[] DecelerateKeys { get; }
-        int[] ToggleKeys { get; }
-        int[] Upshift { get; }
-        int[] Downshift { get; }
-        int[] DumpPorts { get; }
-        bool ShowStats { get; }
-    }
-
-    public class UnityClock : Clock
-    {
-        public float Time2 { get { return Time.realtimeSinceStartup; } }
     }
 }

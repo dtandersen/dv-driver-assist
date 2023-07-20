@@ -19,14 +19,4 @@ namespace DriverAssist.Implementation
             logger.LogInfo($"{Prefix}{message}");
         }
     }
-
-    class UnityLogger : PluginLogger
-    {
-        public string Prefix { get; set; }
-
-        public void Info(string message)
-        {
-            Debug.Log($"{Prefix}{message}");
-        }
-    }
 }

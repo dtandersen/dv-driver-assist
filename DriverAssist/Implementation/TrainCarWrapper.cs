@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using DriverAssist.Cruise;
 using DV.HUD;
 using DV.Simulation.Cars;
 using LocoSim.Implementations;
+using UnityEngine;
 
 namespace DriverAssist.Implementation
 {
@@ -343,5 +345,10 @@ namespace DriverAssist.Implementation
                 return portstrings;
             }
         }
+    }
+
+    public class UnityClock : Clock
+    {
+        public float Time2 { get { return Time.realtimeSinceStartup; } }
     }
 }
