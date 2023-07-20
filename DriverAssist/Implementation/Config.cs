@@ -5,7 +5,11 @@ using UnityEngine;
 
 namespace DriverAssist.Implementation
 {
-    class BepInExDriverAssistSettings : DriverAssistSettings, CruiseControlSettings
+    public interface UnifiedSettings : DriverAssistSettings, CruiseControlSettings
+    {
+    }
+
+    public class BepInExDriverAssistSettings : UnifiedSettings
     {
         private ConfigEntry<float> offset;
         private ConfigEntry<float> diff;

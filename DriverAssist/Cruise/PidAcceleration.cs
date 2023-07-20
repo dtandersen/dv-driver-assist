@@ -16,7 +16,7 @@ namespace DriverAssist.Cruise
         public float Throttle { get; set; }
         public float Temperature { get; set; }
 
-        CruiseControlTarget target = null;
+        // CruiseControlTarget target = null;
         bool Enabled { get; set; }
         float lastThrottle;
         private Pid throttlePid = new Pid(0, 0, 0, 0);
@@ -37,11 +37,11 @@ namespace DriverAssist.Cruise
             // logger.LogInfo("tick");
             currentTime = 0;
             dt = currentTime - lastThrottle;
-            if (!target.IsLoco())
-            {
-                Enabled = false;
-                return;
-            }
+            // if (!target.IsLoco())
+            // {
+            //     Enabled = false;
+            //     return;
+            // }
 
             if (DesiredSpeed > 0)
             {
@@ -54,14 +54,14 @@ namespace DriverAssist.Cruise
             if (DesiredSpeed <= 0)
             {
                 DesiredSpeed = 0;
-                target.SetThrottle(0f);
+                loco.Throttle = 0;
                 Enabled = false;
                 return;
             }
-            float reverser = target.GetReverser();
+            float reverser = loco.Reverser;
             if (reverser <= 0.5f)
             {
-                target.SetThrottle(0f);
+                loco.Throttle = 0;
                 Enabled = false;
                 return;
             }
@@ -70,16 +70,16 @@ namespace DriverAssist.Cruise
                 return;
             }
             lastThrottle = 0;
-            float currentSpeed = target.GetSpeed();
+            float currentSpeed = loco.RelativeSpeedKmh;
             double accel = (currentSpeed / 3.6f - lastSpeed / 3.6f) * dtMax;
             Speed = currentSpeed;
             Acceleration = (float)Math.Round(accel, 2);
-            Throttle = target.GetThrottle();
-            Mass = target.GetMass();
+            Throttle = loco.Throttle;
+            Mass = loco.Mass;
             Power = Mass * 9.8f / 2f * Speed / 3.6f;
             Force = Mass * 9.8f / 2f;
             Hoursepower = Power / 745.7f;
-            Torque = target.GetTorque();
+            Torque = loco.Torque;
 
             torquePid.SetPoint = DesiredSpeed;
             float torqueResult = torquePid.evaluate(currentSpeed);
@@ -87,7 +87,7 @@ namespace DriverAssist.Cruise
 
             throttlePid.SetPoint = torqueResult;
             float throttleResult = throttlePid.evaluate(Torque) / 100f;
-            Temperature = target.GetTemperature();
+            Temperature = loco.Temperature; ;
             // if (throttleResult > 1 || throttleResult < 0)
             // {
             //     throttlePid.Unwind();
@@ -128,7 +128,7 @@ namespace DriverAssist.Cruise
             //     throttleResult = (float)Math.Min(.1, throttleResult);
             // }
 
-            target.SetThrottle(throttleResult);
+            loco.Throttle = throttleResult;
             lastSpeed = currentSpeed;
             lastTorque = Torque;
 

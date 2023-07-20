@@ -34,7 +34,7 @@
     <Reference Include="DV.WeatherSystem" />
     <Reference Include="UnityEngine.UI" />
     <Reference Include="Unity.TextMeshPro" />
-
+    <PackageReference Include="UnityModManager" version="0.27.0" />
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
