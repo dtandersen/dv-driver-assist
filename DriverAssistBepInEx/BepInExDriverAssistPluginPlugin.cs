@@ -1,10 +1,9 @@
 ﻿using BepInEx;
-using DriverAssist.Cruise;
-using UnityEngine;
+using DriverAssistBepInEx;
 
 namespace DriverAssist.Implementation
 {
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class DriverAssistBepInExPlugin : BaseUnityPlugin
     {
         private UnityPresenter presenter;

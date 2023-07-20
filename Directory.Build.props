@@ -1,0 +1,46 @@
+<!-- <Project>
+    <PropertyGroup>
+        <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepoRoot>
+        <BaseOutputPath>$(RepoRoot)artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
+        <BaseIntermediateOutputPath>$(RepoRoot)artifacts\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    </PropertyGroup>
+
+</Project> -->
+
+<Project>
+
+    <PropertyGroup>
+        <SrcRoot>$(MSBuildThisFileDirectory)</SrcRoot>
+        <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(SrcRoot)\</SolutionDir>
+        <Configuration Condition="$(Configuration) == ''">Debug</Configuration>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <DebugType>embedded</DebugType>
+        <LangVersion>latest</LangVersion>
+        <!--<ProduceReferenceAssembly>True</ProduceReferenceAssembly>-->
+        <SignAssembly Condition="'$(SignAssembly)' == ''">true</SignAssembly>
+        <DefineConstants Condition="'$(SignAssembly)' == 'true'">$(DefineConstants);SIGN;</DefineConstants>
+        <!-- <AssemblyOriginatorKeyFile>$(SrcRoot)\key.snk</AssemblyOriginatorKeyFile> -->
+        <AssemblySearchPaths>{RawFileName};{HintPathFromItem};{TargetFrameworkDirectory}</AssemblySearchPaths>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <_FindDependencies>false</_FindDependencies>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <BinariesFolder>$(SrcRoot)bin</BinariesFolder>
+        <CommonIntermediateOutputRoot>$(SrcRoot)obj\</CommonIntermediateOutputRoot>
+        <BaseIntermediateOutputPath>$(CommonIntermediateOutputRoot)$(Configuration)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+        <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+        <AssemblyInfoPath Condition="'$(AssemblyInfoPath)' == ''">$(BaseIntermediateOutputPath)GlobalAssemblyInfo.cs</AssemblyInfoPath>
+        <CommonOutputDirectory>$(BinariesFolder)\$(Configuration)</CommonOutputDirectory>
+        <BuildToCommonOutputDirectory Condition="'$(BuildToCommonOutputDirectory)' == ''">true</BuildToCommonOutputDirectory>
+        <OutputPath Condition="'$(OutputPath)' == ''">$(BinariesFolder)\$(Configuration)\$(MSBuildProjectName)</OutputPath>
+        <OutputPath Condition="'$(BuildToCommonOutputDirectory)' == 'true'">$(CommonOutputDirectory)\</OutputPath>
+        <OutDir>$(OutputPath)</OutDir>
+        <TargetFrameworkMonikerAssemblyAttributesPath>$(IntermediateOutputPath)AssemblyAttributes.cs</TargetFrameworkMonikerAssemblyAttributesPath>
+    </PropertyGroup>
+
+</Project>

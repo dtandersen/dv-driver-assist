@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using DriverAssist.Cruise;
-using Unity.Entities;
+// using Unity.Entities;
 using UnityEngine;
 using UnityModManagerNet;
 using static UnityModManagerNet.UnityModManager;
 
 // [assembly: RegisterGenericComponentType(typeof(ElementData<ILight>))]
 
-[assembly: RegisterGenericComponentType(typeof(Unity.Entities.IComponentData))]
+// [assembly: RegisterGenericComponentType(typeof(Unity.Entities.IComponentData))]
 
 namespace DriverAssist.Implementation
 {

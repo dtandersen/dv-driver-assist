@@ -1,23 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- <TargetFramework>netframework4.8</TargetFramework> -->
     <TargetFramework>netframework4.8</TargetFramework>
-    <!-- <ImplicitUsings>enable</ImplicitUsings> -->
-    <!-- <Nullable>enable</Nullable> -->
-    <LangVersion>latest</LangVersion>
-
-    <IsPackable>false</IsPackable>
-    <ReferencePath>
-      C:\Program Files (x86)\Steam\steamapps\common\Derail Valley\DerailValley_Data\Managed\;
-    </ReferencePath>
-    <AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath);</AssemblySearchPaths>
-
+    <AssemblyName>DriverAssistUMM</AssemblyName>
+    <Product>DriverAssistBepInEx</Product>
+    <Version>0.7.0</Version>
     <!-- <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepoRoot>
     <BaseOutputPath>$(RepoRoot)artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
     <BaseIntermediateOutputPath>$(RepoRoot)artifacts\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath> -->
   </PropertyGroup>
-
   <ItemGroup>
+    <ProjectReference Include="..\DriverAssist\DriverAssist.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Derail Valley -->
     <!-- <Reference Include="Assembly-CSharp" />
     <Reference Include="CommandTerminal" />
     <Reference Include="DV.Common" />
@@ -35,35 +32,12 @@
     <Reference Include="DV.Utils" />
     <Reference Include="DV.WeatherSystem" />
     <Reference Include="UnityEngine.UI" />
+    <Reference Include="Unity.Entities" />
     <Reference Include="Unity.TextMeshPro" /> -->
-
+    <PackageReference Include="UnityModManager" version="0.27.0" />
     <!-- <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" /> -->
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- <PackageReference Include="UnityEngine.Modules" Version="2019.4.40">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference> -->
     <!-- <PackageReference Include="UnityEngine.Modules" Version="2019.4.40" IncludeAssets="compile" /> -->
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <!-- <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets> -->
-    </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="1.3.0">
-      <!-- <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets> -->
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\DriverAssist\DriverAssist.csproj" />
-  </ItemGroup>
-
 </Project>
