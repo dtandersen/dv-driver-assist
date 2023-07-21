@@ -1,15 +1,8 @@
-<!-- <Project>
-    <PropertyGroup>
-        <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepoRoot>
-        <BaseOutputPath>$(RepoRoot)artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
-        <BaseIntermediateOutputPath>$(RepoRoot)artifacts\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-    </PropertyGroup>
-
-</Project> -->
-
 <Project>
 
     <PropertyGroup>
+        <Version>0.7.1</Version>
+
         <SrcRoot>$(MSBuildThisFileDirectory)</SrcRoot>
         <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(SrcRoot)\</SolutionDir>
         <Configuration Condition="$(Configuration) == ''">Debug</Configuration>

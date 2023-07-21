@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netframework4.8</TargetFramework>
-    <!-- <ImplicitUsings>enable</ImplicitUsings> -->
-    <!-- <Nullable>enable</Nullable> -->
+    <TargetFramework>netframework4.6</TargetFramework>
     <LangVersion>latest</LangVersion>
 
     <IsPackable>false</IsPackable>
@@ -11,54 +9,15 @@
       C:\Program Files (x86)\Steam\steamapps\common\Derail Valley\DerailValley_Data\Managed\;
     </ReferencePath>
     <AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath);</AssemblySearchPaths>
-
-    <!-- <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</RepoRoot>
-    <BaseOutputPath>$(RepoRoot)artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
-    <BaseIntermediateOutputPath>$(RepoRoot)artifacts\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath> -->
   </PropertyGroup>
 
-  <ItemGroup>
-    <!-- <Reference Include="Assembly-CSharp" />
-    <Reference Include="CommandTerminal" />
-    <Reference Include="DV.Common" />
-    <Reference Include="DV.Interaction" />
-    <Reference Include="DV.Inventory" />
-    <Reference Include="DV.Localization" />
-    <Reference Include="DV.PointSet" />
-    <Reference Include="DV.Simulation" />
-    <Reference Include="DV.TerrainSystem" />
-    <Reference Include="DV.TerrainTools" />
-    <Reference Include="DV.ThingTypes" />
-    <Reference Include="DV.UI" />
-    <Reference Include="DV.UIFramework" />
-    <Reference Include="DV.UserManagement" />
-    <Reference Include="DV.Utils" />
-    <Reference Include="DV.WeatherSystem" />
-    <Reference Include="UnityEngine.UI" />
-    <Reference Include="Unity.TextMeshPro" /> -->
-
-    <!-- <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
-    <PackageReference Include="BepInEx.Core" Version="5.*" />
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" /> -->
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- <PackageReference Include="UnityEngine.Modules" Version="2019.4.40">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference> -->
-    <!-- <PackageReference Include="UnityEngine.Modules" Version="2019.4.40" IncludeAssets="compile" /> -->
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <!-- <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets> -->
     </PackageReference>
     <PackageReference Include="coverlet.collector" Version="1.3.0">
-      <!-- <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets> -->
     </PackageReference>
   </ItemGroup>
 
