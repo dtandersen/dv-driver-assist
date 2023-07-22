@@ -1,15 +1,11 @@
 using System.Collections.Generic;
 using DriverAssist.Cruise;
-// using Unity.Entities;
+using DriverAssist.Implementation;
 using UnityEngine;
 using UnityModManagerNet;
 using static UnityModManagerNet.UnityModManager;
 
-// [assembly: RegisterGenericComponentType(typeof(ElementData<ILight>))]
-
-// [assembly: RegisterGenericComponentType(typeof(Unity.Entities.IComponentData))]
-
-namespace DriverAssist.Implementation
+namespace DriverAssist.UMM
 {
     [EnableReloading]
     public static class DriverAssistUmmMod
@@ -20,9 +16,7 @@ namespace DriverAssist.Implementation
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
-            // PluginLoggerSingleton.Instance = new UnityLogger();
             PluginLoggerSingleton.Instance = new UmmLogger(modEntry.Logger);
-            PluginLoggerSingleton.Instance.Prefix = "--------------------------------------------------> ";
 
             settings = Settings.Load<Settings>(modEntry);
             SettingsWrapper config = new SettingsWrapper(settings);
@@ -53,12 +47,10 @@ namespace DriverAssist.Implementation
         static void OnFixedGUI(UnityModManager.ModEntry modEntry)
         {
             presenter.OnGui();
-            // settings.Draw(modEntry);
         }
 
         static void OnGUI(UnityModManager.ModEntry modEntry)
         {
-            // presenter.OnGui();
             settings.Draw(modEntry);
         }
 

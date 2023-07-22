@@ -1,8 +1,7 @@
-﻿using System.Reflection;
-using BepInEx;
-using DriverAssistBepInEx;
+﻿using BepInEx;
+using DriverAssist.Implementation;
 
-namespace DriverAssist.Implementation
+namespace DriverAssist.BepInEx
 {
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class DriverAssistBepInExPlugin : BaseUnityPlugin

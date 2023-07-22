@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>DriverAssistBepInEx</AssemblyName>
+    <AssemblyName>DriverAssist.BepInEx</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
