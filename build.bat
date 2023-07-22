@@ -11,11 +11,11 @@ copy /Y bin\Debug\DriverAssistBepInEx.dll "c:\Program Files (x86)\Steam\steamapp
 
 
 
-del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist\info.json"
-copy /Y info.json "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist
+del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist\Info.json"
+copy /Y Info.json "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist
 
 del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist\DriverAssist.dll"
 copy /Y bin\Debug\DriverAssist.dll "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist
 
-del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist\DriverAssistUMM.dll"
-copy /Y bin\Debug\DriverAssist.dll "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist
+del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist\DriverAssist.UMM.dll"
+copy /Y bin\Debug\DriverAssist.UMM.dll "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist
