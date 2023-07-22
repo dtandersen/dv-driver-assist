@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PlaceholderSoftware.WetStuff.Debugging;
 
 namespace DriverAssist
 {
@@ -144,7 +145,8 @@ namespace DriverAssist
         {
             get
             {
-                // float[] gearPair;
+                if (!IsMechanical) return -1;
+
                 for (int i = 0; i < gearBox.Count; i++)
                 {
                     float[] gear = gearBox[i];
@@ -157,33 +159,12 @@ namespace DriverAssist
             }
             set
             {
-                float[] gear = gearBox[value];
-                loco.GearboxA = gear[0];
-                loco.GearboxB = gear[1];
-            }
-        }
-
-        public float GearboxA
-        {
-            get
-            {
-                return loco.GearboxA;
-            }
-            set
-            {
-                loco.GearboxA = value;
-            }
-        }
-
-        public float GearboxB
-        {
-            get
-            {
-                return loco.GearboxB;
-            }
-            set
-            {
-                loco.GearboxB = value;
+                if (IsMechanical)
+                {
+                    float[] gear = gearBox[value];
+                    loco.GearboxA = gear[0];
+                    loco.GearboxB = gear[1];
+                }
             }
         }
 
@@ -367,46 +348,51 @@ namespace DriverAssist
             }
         }
 
+        public bool IsMechanical
+        {
+            get
+            {
+                return loco.LocoType == DriverAssist.LocoType.DM3;
+            }
+        }
+
         public float GearRatio { get { return loco.GearRatio; } }
 
         public List<string> Ports { get { return loco.Ports; } }
 
         public float WheelRadius { get { return loco.WheelRadius; } }
 
-        // internal void Update()
-        // {
-        //     OnLocoChange(GetLocomotive());
-        // }
         float lastThrottle;
         bool shiftcomplete;
         bool shifting;
         int shiftState = 0;
-        internal void UpdateStats(float deltaTime)
+        public void UpdateStats(float deltaTime)
         {
             if (!loco.IsLoco)
             {
                 return;
             }
 
-            if (shiftState == 2)
+            if (IsMechanical)
             {
-                Throttle = lastThrottle;
-                shiftState = 0;
-            }
-            if (Gear != RequestedGear)
-            {
-                if (Throttle != 0)
+                if (shiftState == 2)
                 {
-                    // shifting = true;
-                    // shiftcomplete = false;
-                    shiftState = 1;
-                    lastThrottle = Throttle;
-                    Throttle = 0;
+                    Throttle = lastThrottle;
+                    shiftState = 0;
                 }
-                else
+                if (Gear != RequestedGear)
                 {
-                    shiftState = 2;
-                    Gear = RequestedGear;
+                    if (Throttle != 0)
+                    {
+                        shiftState = 1;
+                        lastThrottle = Throttle;
+                        Throttle = 0;
+                    }
+                    else
+                    {
+                        shiftState = 2;
+                        Gear = RequestedGear;
+                    }
                 }
             }
 
@@ -429,30 +415,20 @@ namespace DriverAssist
             lastSpeedMs = speedMs;
         }
 
+        private void Log(string v)
+        {
+            PluginLoggerSingleton.Instance.Info(v);
+        }
+
         internal void Upshift()
         {
             RequestedGear++;
-            // loco.GearboxA += 0.5f;
         }
 
         internal void Downshift()
         {
             RequestedGear--;
         }
-
-        // private TrainCarWrapper GetLocomotive()
-        // {
-        //     if (!PlayerManager.Car)
-        //     {
-        //         return new NullTrainCarWrapper();
-        //     }
-        //     if (!PlayerManager.Car.IsLoco)
-        //     {
-        //         return new NullTrainCarWrapper();
-        //     }
-
-        //     return new DVTrainCarWrapper(PlayerManager.Car);
-        // }
     }
 
     public class LocoType
@@ -537,5 +513,4 @@ namespace DriverAssist
             }
         }
     }
-
 }

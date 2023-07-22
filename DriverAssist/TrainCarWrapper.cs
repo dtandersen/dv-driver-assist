@@ -21,10 +21,11 @@ namespace DriverAssist
         float Mass { get; }
         float LocoMass { get; }
         float CargoMass { get; }
-        bool IsLoco { get; }
         float WheelRadius { get; }
         float GearRatio { get; }
         List<string> Ports { get; }
+
+        bool IsLoco { get; }
     }
 
     public class NullTrainCarWrapper : TrainCarWrapper
@@ -90,7 +91,7 @@ namespace DriverAssist
 
     public class FakeTrainCarWrapper : TrainCarWrapper
     {
-        public bool IsLoco { get { return false; } }
+        public bool IsLoco { get { return LocoType != ""; } }
 
         public float SpeedKmh { get; set; }
 
