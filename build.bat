@@ -17,5 +17,5 @@ copy /Y Info.json "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\M
 del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist\DriverAssist.dll"
 copy /Y bin\Debug\DriverAssist.dll "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist
 
-del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist\DriverAssist.UMM.dll"
-copy /Y bin\Debug\DriverAssist.UMM.dll "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist
+@rem del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist\DriverAssist.UMM.dll"
+@rem copy /Y bin\Debug\DriverAssist.UMM.dll "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\DriverAssist

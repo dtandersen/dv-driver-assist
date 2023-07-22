@@ -1,3 +1,5 @@
+#if UMM
+
 using System.Collections.Generic;
 using DriverAssist.Cruise;
 using DriverAssist.Implementation;
@@ -12,7 +14,7 @@ namespace DriverAssist.UMM
     {
         public static Settings settings;
 
-        private static UnityPresenter presenter;
+        private static DriverAssistController presenter;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
@@ -21,10 +23,10 @@ namespace DriverAssist.UMM
             settings = Settings.Load<Settings>(modEntry);
             SettingsWrapper config = new SettingsWrapper(settings);
 
-            presenter = new UnityPresenter(config);
+            presenter = new DriverAssistController(config);
             presenter.Init();
 
-            modEntry.OnFixedGUI = OnFixedGUI;
+            // modEntry.OnFixedGUI = OnFixedGUI;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
             modEntry.OnUnload = OnUnload;
@@ -42,11 +44,6 @@ namespace DriverAssist.UMM
         static void OnFixedUpdate(ModEntry e, float dt)
         {
             presenter.OnFixedUpdate();
-        }
-
-        static void OnFixedGUI(UnityModManager.ModEntry modEntry)
-        {
-            presenter.OnGui();
         }
 
         static void OnGUI(UnityModManager.ModEntry modEntry)
@@ -321,3 +318,5 @@ namespace DriverAssist.UMM
         }
     }
 }
+
+#endif

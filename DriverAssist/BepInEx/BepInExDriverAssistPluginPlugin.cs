@@ -1,4 +1,6 @@
-﻿using BepInEx;
+﻿#if BEPINEX
+
+using BepInEx;
 using DriverAssist.Implementation;
 
 namespace DriverAssist.BepInEx
@@ -42,3 +44,5 @@ namespace DriverAssist.BepInEx
         }
     }
 }
+
+#endif

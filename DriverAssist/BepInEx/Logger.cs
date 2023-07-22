@@ -1,3 +1,5 @@
+#if BEPINEX
+
 using BepInEx.Logging;
 using UnityEngine;
 
@@ -20,3 +22,5 @@ namespace DriverAssist.Implementation
         }
     }
 }
+
+#endif

@@ -3,13 +3,6 @@ using UnityEngine;
 
 namespace DriverAssist
 {
-    public interface Presenter
-    {
-        void OnGui();
-        void OnUpdate();
-        void OnFixedUpdate();
-    }
-
     public interface UnifiedSettings : DriverAssistSettings, CruiseControlSettings
     {
     }

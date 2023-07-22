@@ -1,3 +1,5 @@
+#if BEPINEX
+
 using System.Collections.Generic;
 using BepInEx.Configuration;
 using DriverAssist.Cruise;
@@ -394,3 +396,5 @@ namespace DriverAssist.Implementation
         public float MaxAccel { get { return 0.25f; } }
     }
 }
+
+#endif

@@ -9,6 +9,10 @@
     <AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath);</AssemblySearchPaths>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DefineConstants>UMM</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- Derail Valley -->
     <Reference Include="Assembly-CSharp" />
@@ -31,6 +35,16 @@
     <Reference Include="Unity.Entities" />
     <Reference Include="Unity.TextMeshPro" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.40" IncludeAssets="compile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="UnityModManager" version="0.27.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">

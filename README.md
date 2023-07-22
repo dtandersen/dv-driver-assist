@@ -16,7 +16,7 @@ Please join the [Just Another Snake Cult Discord](https://discord.gg/KNmFpwyzYf)
 
 # Installation
 
-This mod requires [Unity Mod Manager](https://www.nexusmods.com/site/mods/21?tab=files) (UMM). If you need help installint it, please join the [Altfuture Discord](https://discord.gg/altfuture).
+This mod requires [Unity Mod Manager](https://www.nexusmods.com/site/mods/21?tab=files) (UMM). If you need help installing it, please join the [Altfuture Discord](https://discord.gg/altfuture).
 
 Download UMM and unzip it (`Right-click -> Extract all...`). Open the folder where it was unzipped and run the installer `UnityModManager.exe`.
 
