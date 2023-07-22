@@ -1,12 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netframework4.6</TargetFramework>
     <AssemblyName>DriverAssist</AssemblyName>
-    <Description>Driver Assist: A cruise control mod for Derail Valley</Description>
-    <Version>0.7.0</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
 
     <ReferencePath>
       C:\Program Files (x86)\Steam\steamapps\common\Derail Valley\DerailValley_Data\Managed\;

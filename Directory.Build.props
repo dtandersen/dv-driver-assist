@@ -1,17 +1,24 @@
 <Project>
+    <PropertyGroup>
+        <Description>Driver Assist: A cruise control mod for Derail Valley</Description>
+        <Product>Driver Assist</Product>
+        <Version>0.7.1</Version>
+    </PropertyGroup>
 
     <PropertyGroup>
-        <Version>0.7.1</Version>
+        <TargetFramework>netframework4.6</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+        <DebugType>embedded</DebugType>
+    </PropertyGroup>
 
+    <PropertyGroup>
         <SrcRoot>$(MSBuildThisFileDirectory)</SrcRoot>
         <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(SrcRoot)\</SolutionDir>
         <Configuration Condition="$(Configuration) == ''">Debug</Configuration>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
-        <DebugType>embedded</DebugType>
-        <LangVersion>latest</LangVersion>
         <!--<ProduceReferenceAssembly>True</ProduceReferenceAssembly>-->
         <SignAssembly Condition="'$(SignAssembly)' == ''">true</SignAssembly>
         <DefineConstants Condition="'$(SignAssembly)' == 'true'">$(DefineConstants);SIGN;</DefineConstants>
@@ -35,5 +42,4 @@
         <OutDir>$(OutputPath)</OutDir>
         <TargetFrameworkMonikerAssemblyAttributesPath>$(IntermediateOutputPath)AssemblyAttributes.cs</TargetFrameworkMonikerAssemblyAttributesPath>
     </PropertyGroup>
-
 </Project>
