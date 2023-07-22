@@ -16,19 +16,19 @@ Please join the [Just Another Snake Cult Discord](https://discord.gg/KNmFpwyzYf)
 
 # Installation
 
-This mod requires [BepInEx](https://github.com/BepInEx/BepInEx/releases/tag/v5.4.21). Here's some helpful links on how to install it.
+This mod requires [Unity Mod Manager](https://www.nexusmods.com/site/mods/21?tab=files) (UMM). If you need help installint it, please join the [Altfuture Discord](https://discord.gg/altfuture).
 
-* [Installation guide](https://docs.bepinex.dev/articles/user_guide/installation/index.html)
-* [YouTube Tutorial](https://youtu.be/PXwa4WMUie4)
-* [Altfuture Discord](https://discord.gg/altfuture)
+Download UMM and unzip it (`Right-click -> Extract all...`). Open the folder where it was unzipped and run the installer `UnityModManager.exe`.
 
-Once BepInEx is installed, download the [release](https://github.com/dtandersen/dv-driver-assist/releases), unzip it, and copy `DriverAssist.dll` into the `BepInEx\plugins` folder.
+Choose the game Derail Valley and install it into the Derail Valley folder (`C:\Program Files (x86)\Steam\steamapps\common\Derail Valley`). Select Doorstop Proxy as the installation method. Now click the install button to complete the installation of UMM.
 
-An easy way to do this is to download the ZIP, double-click it, copy the DLL to the clipboard, and then paste it into the plugins folder. The standard location of the plugins folder is `c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\BepInEx\plugins`.
+Download the [Driver Assist mod](https://www.nexusmods.com/derailvalley/mods/663?tab=files) from NexusMods. Go back to the UMM installer and open the Mods tab. Drag the downloaded zip file onto `Drop zip files here`.
+
+You can now close the installer and run Derail Valley.
 
 # Configuration
 
-The `DriverAssist.cfg` file is in the `BepInEx\config` folder. However, it's recommended to use the [Configuration Manager plugin](https://github.com/BepInEx/BepInEx.ConfigurationManager) to change the settings. If you install Configuration Manager, change the keyboard shortcut to it to `F10`, as the default `F1` key interfers with the first person camera.
+Press `CTRL+F10` to open the UMM config screen. Select Driver Assist to change the settings.
 
 ## Cruise control
 
@@ -74,9 +74,7 @@ Put the reverser into neutral to avoid speeding away. Press `PAGE UP` to increas
 
 Open the browser to [91X](https://player.listenlive.co/36281).
 
-Install the BepInEx [ScriptEngine plugin](https://github.com/BepInEx/BepInEx.Debug) and run `build.bat`. This builds the solution with `dotnet build` and copies the DLL to `BepInEx\scripts`.
-
-In game, press `F6` to load the plugin.
+Run `build.bat` to build and install the mod. This builds the solution with `dotnet build` and copies the DLL to the `Mods` folder.
 
 Use `dotnet test` to run the unit tests.
 
