@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriverAssist", "DriverAssis
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriverAssist.Test", "DriverAssist.Test\DriverAssist.Test.csproj", "{DCA0F847-EFD8-4AB4-BB16-69314135371E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriverAssist.UMM", "DriverAssistUMM\DriverAssist.UMM.csproj", "{6BBB9A01-3E8D-494A-B6B9-D2A04007F322}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriverAssist.UMM", "DriverAssist.UMM\DriverAssist.UMM.csproj", "{6BBB9A01-3E8D-494A-B6B9-D2A04007F322}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriverAssist.BepInEx", "DriverAssistBepInEx\DriverAssist.BepInEx.csproj", "{0BC6FA6D-ABEF-4A8A-8FD5-FBB4924FBC1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DriverAssist.BepInEx", "DriverAssist.BepInEx\DriverAssist.BepInEx.csproj", "{0BC6FA6D-ABEF-4A8A-8FD5-FBB4924FBC1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
