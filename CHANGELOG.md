@@ -1,9 +1,13 @@
+0.7.1 - 7/21/2023
+
+- Added support for Unity Mod Manager.
+- Cruise control no longer tries to shift gears on trains with no shifter.
+
 0.7.0 - 7/19/2023
 
 - Added experimental DM3 support.
 - Fixed a bug where cruise control became confused during rapid acceleration. This could occur in a DE2 without cars attached.
 - Updated German localization.
-
 
 0.6.0 - 7/15/2023
 
