@@ -7,8 +7,10 @@ namespace DriverAssist.Cruise
         float lastAmps = 0;
         float lastTorque = 0;
         float lastTemperature = 0;
+        float lastRpm = 0;
         float step = 1f / 11f;
         bool cooling = false;
+        public float lastThrottleChange;
         public float lastShift;
         PluginLogger logger;
 
@@ -35,7 +37,7 @@ namespace DriverAssist.Cruise
             float minTorque = context.Config.MinTorque;
             float amps = loco.Amps;
             float projectedTemperature = loco.Temperature + loco.TemperatureChange;
-            float timeSinceShift = context.Time - lastShift;
+            float timeSinceThrottle = context.Time - lastThrottleChange;
             float operatingTemp = context.Config.MaxTemperature;
             float dangerTemp = context.Config.HillClimbTemp;
             // float throttleAdj = 0;
@@ -44,11 +46,11 @@ namespace DriverAssist.Cruise
             bool hillClimbActive = loco.AccelerationMs <= context.Config.HillClimbAccel;
             bool tempDecreasing = loco.TemperatureChange < 0;
 
-            bool readyToShift =
+            bool readyToThrottle =
                 (torque < minTorque || torque <= lastTorque)
                 && loco.RelativeAccelerationMs < context.Config.MaxAccel;
 
-            log($"predictedAmps{predictedAmps} maxamps={maxamps} timeSinceShift={timeSinceShift}");
+            log($"predictedAmps{predictedAmps} maxamps={maxamps} timeSinceShift={timeSinceThrottle}");
             log($"projectedTemperature={projectedTemperature} dangerTemp={dangerTemp}");
 
             if (speed > desiredSpeed)
@@ -65,7 +67,7 @@ namespace DriverAssist.Cruise
                 projectedTemperature >= context.Config.MaxTemperature
                 && !tempDecreasing
                 && !hillClimbActive
-                && timeSinceShift >= 3)
+                && timeSinceThrottle >= 3)
             {
                 log("Temperature exceeds cruising limit");
                 AdjustThrottle(context, -step);
@@ -102,16 +104,16 @@ namespace DriverAssist.Cruise
                 && acceleration < context.Config.MaxAccel
                 && projectedTemperature < context.Config.MaxTemperature
                 && (tempDecreasing || projectedTemperature <= context.Config.MaxTemperature - 5)
-                && timeSinceShift >= 3
+                && timeSinceThrottle >= 3
                 )
             {
                 log("Low torque");
                 AdjustThrottle(context, step);
             }
             else if (
-                readyToShift
+                readyToThrottle
                 && hillClimbActive
-                && timeSinceShift >= 3
+                && timeSinceThrottle >= 3
                 )
             {
                 log("Hill climbing");
@@ -124,11 +126,11 @@ namespace DriverAssist.Cruise
 
             if (loco.Rpm > 800)
             {
-                loco.RequestedGear++;
+                loco.ChangeGear(loco.Gear + 1);
             }
-            if (loco.Rpm < 600)
+            if (loco.Rpm < 600 && !(loco.Rpm > lastRpm))
             {
-                loco.RequestedGear--;
+                loco.ChangeGear(loco.Gear - 1);
             }
 
             loco.IndBrake = 0;
@@ -137,6 +139,7 @@ namespace DriverAssist.Cruise
             lastAmps = loco.Amps;
             lastTorque = loco.Torque;
             lastTemperature = loco.Temperature;
+            lastRpm = loco.Rpm;
         }
 
         void AdjustThrottle(CruiseControlContext context, float throttleAdj)
@@ -145,7 +148,7 @@ namespace DriverAssist.Cruise
 
             LocoController loco = context.LocoController;
             loco.Throttle += throttleAdj;
-            lastShift = context.Time;
+            lastThrottleChange = context.Time;
         }
 
         private void log(string v)

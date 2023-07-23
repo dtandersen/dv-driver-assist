@@ -176,6 +176,30 @@ namespace DriverAssist.Cruise
         }
 
         /// The train is a DM3
+        /// and a gear change is requested for gear 1 and throttle 1.
+        /// Request a gear change to gear 1 and original throttle of 1.
+        [Fact]
+        public void DoesntShiftIfShifting()
+        {
+            train.LocoType = DriverAssist.LocoType.DM3;
+
+            // loco.Gear = 0;
+            train.GearboxA = 0;
+            train.GearboxB = 0;
+            train.Throttle = 0;
+            var request = new GearChangeRequest();
+            request.RequestedGear = 8;
+            request.RestoreThrottle = 1;
+            loco.Components.GearChangeRequest = request;
+            loco.ChangeGear(1);
+
+            // Assert.Equal(1, loco.Components.RequestedGear);
+            Assert.Equal(8, loco.Components.GearChangeRequest.Value.RequestedGear);
+            Assert.Equal(1, loco.Components.GearChangeRequest.Value.RestoreThrottle);
+            // Assert.Null(loco.Components.GearChangeRequest.Value.RestoreThrottle);
+        }
+
+        /// The train is a DM3
         /// and Gear is 0
         /// and the gear -1 is requested.
         /// Ignore it.

@@ -131,20 +131,6 @@ namespace DriverAssist
                 loco.IndBrake = value;
             }
         }
-        int requestedGear;
-        public int RequestedGear
-        {
-            get
-            {
-                return requestedGear;
-            }
-            set
-            {
-                if (value < 0) requestedGear = 0;
-                else if (value >= gearBox.Count) requestedGear = gearBox.Count - 1;
-                else requestedGear = value;
-            }
-        }
 
         public int Gear
         {
@@ -436,12 +422,12 @@ namespace DriverAssist
 
         internal void Upshift()
         {
-            RequestedGear++;
+            ChangeGear(Gear + 1);
         }
 
         internal void Downshift()
         {
-            RequestedGear--;
+            ChangeGear(Gear - 1);
         }
 
         public void ChangeGear(int requestedGear)
@@ -451,19 +437,16 @@ namespace DriverAssist
             if (requestedGear < 0) return;
             if (requestedGear >= gearBox.Count) return;
             if (requestedGear == Gear) return;
-
-            // Components.RequestedGear = requestedGear;
+            if (Components.GearChangeRequest.HasValue) return;
 
             GearChangeRequest gearChangeRequest = new GearChangeRequest();
             gearChangeRequest.RequestedGear = requestedGear;
             if (loco.Throttle > 0)
             {
-                // if (gearChangeRequest.RequestedGear > Gear)
                 gearChangeRequest.RestoreThrottle = loco.Throttle;
-                // else
-                // gearChangeRequest.RestoreThrottle = loco.Throttle;
             }
             Components.GearChangeRequest = gearChangeRequest;
+            PluginLoggerSingleton.Instance.Info($"LocoController: Requesting gear change RequestedGear={gearChangeRequest.RequestedGear} RestoreThrottle={gearChangeRequest.RestoreThrottle ?? -1}");
         }
     }
 
@@ -579,6 +562,6 @@ namespace DriverAssist
         // public float? ThrottleBeforeShift { get; internal set; }
         // // public bool IsShifting { get; internal set; }
         // public int? RequestedGear { get; internal set; }
-        public GearChangeRequest? GearChangeRequest { get; internal set; }
+        public GearChangeRequest? GearChangeRequest { get; set; }
     }
 }

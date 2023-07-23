@@ -61,7 +61,7 @@ namespace DriverAssist.Cruise
             train.LocoType = LocoType.DE2;
             loco.Reverser = 1;
             accelerator = new PredictiveAcceleration();
-            accelerator.lastShift = -3;
+            accelerator.lastThrottleChange = -3;
             context = new CruiseControlContext(de2settings, loco);
         }
 
@@ -358,14 +358,14 @@ namespace DriverAssist.Cruise
         public void DontUpdateShiftTimeIfWeDontShift()
         {
             context.Time = 5;
-            accelerator.lastShift = 0;
+            accelerator.lastThrottleChange = 0;
             context.DesiredSpeed = 5;
             train.Throttle = 2 * step;
             train.Torque = 25000;
 
             WhenAccel();
 
-            Assert.Equal(0, accelerator.lastShift);
+            Assert.Equal(0, accelerator.lastThrottleChange);
         }
 
 
