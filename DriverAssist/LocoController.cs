@@ -366,6 +366,8 @@ namespace DriverAssist
 
         public bool GearShiftInProgress { get { return loco.GearChangeInProgress; } }
 
+        public int Length { get { return loco.Length; } }
+
         float lastThrottle;
         bool shiftcomplete;
         bool shifting;

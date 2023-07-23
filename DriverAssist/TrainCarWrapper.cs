@@ -27,6 +27,7 @@ namespace DriverAssist
         bool GearChangeInProgress { get; }
 
         bool IsLoco { get; }
+        int Length { get; }
     }
 
     public class NullTrainCarWrapper : TrainCarWrapper
@@ -84,6 +85,8 @@ namespace DriverAssist
         public float GearRatio { get; }
         public List<string> Ports { get; }
         public bool GearChangeInProgress { get; }
+
+        public int Length { get; }
     }
 
     public class FakeTrainCarWrapper : TrainCarWrapper
@@ -121,5 +124,6 @@ namespace DriverAssist
         public float GearRatio { get; }
         public List<string> Ports { get; }
         public bool GearChangeInProgress { get; set; }
+        public int Length { get; set; }
     }
 }

@@ -387,6 +387,8 @@ namespace DriverAssist.Implementation
                 return portstrings;
             }
         }
+
+        public int Length { get { return loco.trainset.cars.Count; } }
     }
 
     public class UnityClock : Clock

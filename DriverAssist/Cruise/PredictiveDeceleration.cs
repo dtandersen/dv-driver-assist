@@ -19,11 +19,14 @@ namespace DriverAssist.Cruise
             float speedKmh = loco.RelativeSpeedKmh + predictedSpeedKmh;
             float brake;
 
+            if (loco.Length == 1) brake = loco.IndBrake;
+            else brake = loco.TrainBrake;
+
             if (speedKmh > context.DesiredSpeed)
             {
                 if (loco.LocoType != LocoType.DM3)
                 {
-                    brake = loco.TrainBrake + STEP;
+                    brake = brake + STEP;
                 }
                 else
                 {
@@ -34,18 +37,27 @@ namespace DriverAssist.Cruise
             {
                 if (loco.LocoType != LocoType.DM3)
                 {
-                    brake = loco.TrainBrake - context.Config.BrakeReleaseFactor * loco.TrainBrake;
+                    brake = brake - context.Config.BrakeReleaseFactor * brake;
                     brake = Math.Max(brake, context.Config.MinBrake);
                 }
                 else
                 {
-                    brake = RELEASE;
+                    brake = 0;
                 }
             }
 
-            loco.TrainBrake = brake;
+            if (loco.Length == 1)
+            {
+                loco.TrainBrake = 0;
+                loco.IndBrake = brake;
+            }
+            else
+            {
+                loco.TrainBrake = brake;
+                loco.IndBrake = 0;
+            }
+
             loco.Throttle = 0;
-            loco.IndBrake = 0;
         }
     }
 }
