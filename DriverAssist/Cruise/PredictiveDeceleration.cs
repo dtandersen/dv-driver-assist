@@ -5,6 +5,8 @@ namespace DriverAssist.Cruise
     public class PredictiveDeceleration : CruiseControlAlgorithm
     {
         static float STEP = 1f / 11f;
+        static float LAP = 0.666f;
+        static float RELEASE = 0;
 
         public PredictiveDeceleration()
         {
@@ -25,7 +27,7 @@ namespace DriverAssist.Cruise
                 }
                 else
                 {
-                    brake = 0.666f;
+                    brake = LAP;
                 }
             }
             else
@@ -33,16 +35,15 @@ namespace DriverAssist.Cruise
                 if (loco.LocoType != LocoType.DM3)
                 {
                     brake = loco.TrainBrake - context.Config.BrakeReleaseFactor * loco.TrainBrake;
+                    brake = Math.Max(brake, context.Config.MinBrake);
                 }
                 else
                 {
-                    brake = 0;
+                    brake = RELEASE;
                 }
             }
 
-            brake = Math.Max(brake, context.Config.MinBrake);
             loco.TrainBrake = brake;
-
             loco.Throttle = 0;
             loco.IndBrake = 0;
         }

@@ -447,6 +447,24 @@ namespace DriverAssist
         public const string STEAM = "LocoSteamHeavy";
     }
 
+    public class LocoStats
+    {
+        private static readonly LocoStats DE2 = new LocoStats("LocoShunter", true);
+        private static readonly LocoStats DH4 = new LocoStats("LocoDH4", true);
+        private static readonly LocoStats DE6 = new LocoStats("LocoDiesel", true);
+        private static readonly LocoStats DM3 = new LocoStats("LocoDM3", false);
+        private static readonly LocoStats STEAM = new LocoStats("LocoSteamHeavy", true);
+
+        public string Id { get; }
+        public bool SelfLappingTrainBrake { get; }
+
+        public LocoStats(string id, bool selfLappingTrainBrake)
+        {
+            Id = id;
+            SelfLappingTrainBrake = selfLappingTrainBrake;
+        }
+    }
+
     internal class Integrator
     {
         private List<Node> nodes;
