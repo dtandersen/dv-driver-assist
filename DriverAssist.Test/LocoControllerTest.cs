@@ -29,6 +29,21 @@ namespace DriverAssist.Cruise
         }
 
         /// The train is a DM3
+        /// and a throttle change has been requested,
+        /// but a gear change is in progress.
+        /// Ignore it.
+        [Fact]
+        public void PreventsThrottleChangeDuringShift()
+        {
+            train.LocoType = LocoType.DM3;
+            train.Throttle = 0;
+            train.GearChangeInProgress = true;
+            loco.Throttle = 1;
+
+            Assert.Equal(0, train.Throttle);
+        }
+
+        /// The train is a DM3
         /// and a gear change has been requested.
         /// Proceed.
         [Fact]
@@ -50,6 +65,11 @@ namespace DriverAssist.Cruise
             Assert.Equal(0.5f, train.GearboxB);
             Assert.Equal(0, train.Throttle);
 
+            train.GearChangeInProgress = true;
+            loco.UpdateStats(1 / 60);
+            Assert.Equal(0, train.Throttle);
+
+            train.GearChangeInProgress = false;
             loco.UpdateStats(1 / 60);
             Assert.Equal(1, train.Throttle);
         }

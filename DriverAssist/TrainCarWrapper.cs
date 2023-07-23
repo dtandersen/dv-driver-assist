@@ -24,6 +24,7 @@ namespace DriverAssist
         float WheelRadius { get; }
         float GearRatio { get; }
         List<string> Ports { get; }
+        bool GearChangeInProgress { get; }
 
         bool IsLoco { get; }
     }
@@ -82,11 +83,7 @@ namespace DriverAssist
         public float WheelRadius { get; }
         public float GearRatio { get; }
         public List<string> Ports { get; }
-
-        // public bool IsSameTrainCar(TrainCarWrapper newloco)
-        // {
-        //     return newloco == instance;
-        // }
+        public bool GearChangeInProgress { get; }
     }
 
     public class FakeTrainCarWrapper : TrainCarWrapper
@@ -123,9 +120,6 @@ namespace DriverAssist
         public float WheelRadius { get; }
         public float GearRatio { get; }
         public List<string> Ports { get; }
-        // public bool IsSameTrainCar(TrainCarWrapper newloco)
-        // {
-        //     return this == newloco;
-        // }
+        public bool GearChangeInProgress { get; set; }
     }
 }

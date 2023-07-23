@@ -354,6 +354,16 @@ namespace DriverAssist.Implementation
                 GUILayout.TextField($"{loco.GearRatio}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Shifting", GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.GearShiftInProgress}", GUILayout.Width(width));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Train Brake", GUILayout.Width(labelwidth));
+                GUILayout.TextField($"{loco.TrainBrake.ToString("F2")}", GUILayout.Width(width));
+                GUILayout.EndHorizontal();
+
                 float speed2 = 3f / 25f * (float)Math.PI * loco.WheelRadius * loco.Rpm / loco.GearRatio;
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Speed", GUILayout.Width(labelwidth));

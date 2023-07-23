@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DriverAssist.Cruise;
 using DV.HUD;
@@ -328,6 +329,47 @@ namespace DriverAssist.Implementation
             }
         }
 
+        public bool GearChangeInProgress
+        {
+            get
+            {
+                float gearA;
+                switch (LocoType)
+                {
+                    case DriverAssist.LocoType.DM3:
+                        Port gearRatioPort;
+                        if (!simFlow.TryGetPort("transmissionA.GEAR_CHANGE_IN_PROGRESS", out gearRatioPort))
+                        {
+                            gearA = 0;
+                        }
+
+                        gearA = gearRatioPort.Value;
+                        break;
+                    default:
+                        gearA = 0;
+                        break;
+                }
+
+                float gearB;
+                switch (LocoType)
+                {
+                    case DriverAssist.LocoType.DM3:
+                        Port gearRatioPort;
+                        if (!simFlow.TryGetPort("transmissionB.GEAR_CHANGE_IN_PROGRESS", out gearRatioPort))
+                        {
+                            gearB = 0;
+                        }
+
+                        gearB = gearRatioPort.Value;
+                        break;
+                    default:
+                        gearB = 0;
+                        break;
+                }
+
+                return Math.Max(gearA, gearB) > 0;
+            }
+        }
         public List<string> Ports
         {
             get

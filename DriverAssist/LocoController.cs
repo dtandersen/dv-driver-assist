@@ -100,6 +100,8 @@ namespace DriverAssist
             }
             set
             {
+                if (GearShiftInProgress) return;
+
                 loco.Throttle = value;
             }
         }
@@ -362,6 +364,8 @@ namespace DriverAssist
 
         public float WheelRadius { get { return loco.WheelRadius; } }
 
+        public bool GearShiftInProgress { get { return loco.GearChangeInProgress; } }
+
         float lastThrottle;
         bool shiftcomplete;
         bool shifting;
@@ -377,8 +381,11 @@ namespace DriverAssist
             {
                 if (shiftState == 2)
                 {
-                    Throttle = lastThrottle;
-                    shiftState = 0;
+                    if (!loco.GearChangeInProgress)
+                    {
+                        Throttle = lastThrottle;
+                        shiftState = 0;
+                    }
                 }
                 if (Gear != RequestedGear)
                 {
