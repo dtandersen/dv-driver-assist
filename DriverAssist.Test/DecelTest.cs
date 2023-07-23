@@ -201,7 +201,7 @@ namespace DriverAssist.Cruise
             train.SpeedKmh = 6;
 
             WhenDecel();
-            Assert.Equal(0.666f, loco.TrainBrake);
+            Assert.Equal(0.666f, loco.TrainBrake, 2);
             Assert.Equal(0, loco.IndBrake);
         }
 

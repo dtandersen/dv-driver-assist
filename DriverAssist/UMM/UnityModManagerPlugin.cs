@@ -143,9 +143,9 @@ namespace DriverAssist.UMM
 
         public float UpdateInterval { get { return 1; } }
 
-        public string Acceleration { get { return "DriverAssist.Cruise.PredictiveAcceleration"; } }
+        public string Acceleration { get { return typeof(PredictiveAcceleration).AssemblyQualifiedName; } }
 
-        public string Deceleration { get { return "DriverAssist.Cruise.PredictiveDeceleration"; } }
+        public string Deceleration { get { return typeof(PredictiveDeceleration).AssemblyQualifiedName; } }
 
         public Dictionary<string, LocoSettings> LocoSettings
         {

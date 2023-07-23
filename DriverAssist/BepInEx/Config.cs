@@ -82,9 +82,6 @@ namespace DriverAssist.Implementation
             brakeReleaseFactor = config.Bind("Braking", "BrakeReleaseFactor", .5f, "Brake = Brake - BrakeReleaseFactor * Brake");
             minBrake = config.Bind("Braking", "MinBrake", .1f, "Minimum braking (0=0%, 1=100%)");
 
-            // acceleration = config.Bind("CruiseControl", "Acceleration", "DriverAssist.Cruise.PredictiveAcceleration", "Maximum torque");
-            // deceleration = config.Bind("CruiseControl", "Deceleration", "DriverAssist.Cruise.PredictiveDeceleration", "Maximum torque");
-
             faster = config.Bind("Hotkeys", "Faster", new KeyboardShortcut(KeyCode.PageUp));
             slower = config.Bind("Hotkeys", "Slower", new KeyboardShortcut(KeyCode.PageDown));
             toggle = config.Bind("Hotkeys", "Toggle", new KeyboardShortcut(KeyCode.RightControl));
@@ -139,55 +136,7 @@ namespace DriverAssist.Implementation
 
         public Dictionary<string, LocoSettings> LocoSettings { get; }
 
-        // public int MinTorque
-        // {
-        //     get
-        //     {
-        //         return de2MinTorque.Value;
-        //     }
-        // }
-
-        // public int MinAmps
-        // {
-        //     get
-        //     {
-        //         return de2MinAmps.Value;
-        //     }
-        // }
-
-        // public int MaxAmps
-        // {
-        //     get
-        //     {
-        //         return de2MaxAmps.Value;
-        //     }
-        // }
-
-        // public int MaxTemperature
-        // {
-        //     get
-        //     {
-        //         return de2MaxTemperature.Value;
-        //     }
-        // }
-
-        // public int OverdriveTemperature
-        // {
-        //     get
-        //     {
-        //         return de2OverdriveTemperature.Value;
-        //     }
-        // }
-
-        // public bool OverdriveEnabled
-        // {
-        //     get
-        //     {
-        //         return de2OverdriveEnabled?.Value??true;
-        //     }
-        // }
-
-        public float Offset
+          public float Offset
         {
             get
             {
@@ -209,8 +158,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                // return acceleration.Value;
-                return "DriverAssist.Cruise.PredictiveAcceleration";
+                return typeof(PredictiveAcceleration).AssemblyQualifiedName;
             }
         }
 
@@ -218,8 +166,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                // return deceleration.Value;
-                return "DriverAssist.Cruise.PredictiveDeceleration";
+                return typeof(PredictiveDeceleration).AssemblyQualifiedName;
             }
         }
 
