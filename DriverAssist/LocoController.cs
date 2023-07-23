@@ -6,6 +6,8 @@ namespace DriverAssist
 {
     public class LocoController
     {
+        public LocoComponents Components = new LocoComponents();
+
         private Integrator speedIntegratorMs;
         private Integrator heatIntegrator;
         private Integrator ampsIntegrator = new Integrator(60 * 6);
@@ -143,6 +145,7 @@ namespace DriverAssist
                 else requestedGear = value;
             }
         }
+
         public int Gear
         {
             get
@@ -161,11 +164,13 @@ namespace DriverAssist
             }
             set
             {
+                PluginLoggerSingleton.Instance.Info($"{IsMechanical}");
                 if (IsMechanical)
                 {
                     float[] gear = gearBox[value];
                     loco.GearboxA = gear[0];
                     loco.GearboxB = gear[1];
+                    PluginLoggerSingleton.Instance.Info($"GearboxA={loco.GearboxA} GearboxB={loco.GearboxB}");
                 }
             }
         }
@@ -379,31 +384,31 @@ namespace DriverAssist
                 return;
             }
 
-            if (IsMechanical)
-            {
-                if (shiftState == 2)
-                {
-                    if (!loco.GearChangeInProgress)
-                    {
-                        Throttle = lastThrottle;
-                        shiftState = 0;
-                    }
-                }
-                if (Gear != RequestedGear)
-                {
-                    if (Throttle != 0)
-                    {
-                        shiftState = 1;
-                        lastThrottle = Throttle;
-                        Throttle = 0;
-                    }
-                    else
-                    {
-                        shiftState = 2;
-                        Gear = RequestedGear;
-                    }
-                }
-            }
+            // if (IsMechanical)
+            // {
+            //     if (shiftState == 2)
+            //     {
+            //         if (!loco.GearChangeInProgress)
+            //         {
+            //             Throttle = lastThrottle;
+            //             shiftState = 0;
+            //         }
+            //     }
+            //     if (Gear != RequestedGear)
+            //     {
+            //         if (Throttle != 0)
+            //         {
+            //             shiftState = 1;
+            //             lastThrottle = Throttle;
+            //             Throttle = 0;
+            //         }
+            //         else
+            //         {
+            //             shiftState = 2;
+            //             Gear = RequestedGear;
+            //         }
+            //     }
+            // }
 
             float speedMs = SpeedMs;
             float accelerationMs = speedMs - lastSpeedMs;
@@ -437,6 +442,28 @@ namespace DriverAssist
         internal void Downshift()
         {
             RequestedGear--;
+        }
+
+        public void ChangeGear(int requestedGear)
+        {
+            if (loco.LocoType != DriverAssist.LocoType.DM3) return;
+
+            if (requestedGear < 0) return;
+            if (requestedGear >= gearBox.Count) return;
+            if (requestedGear == Gear) return;
+
+            // Components.RequestedGear = requestedGear;
+
+            GearChangeRequest gearChangeRequest = new GearChangeRequest();
+            gearChangeRequest.RequestedGear = requestedGear;
+            if (loco.Throttle > 0)
+            {
+                // if (gearChangeRequest.RequestedGear > Gear)
+                gearChangeRequest.RestoreThrottle = loco.Throttle;
+                // else
+                // gearChangeRequest.RestoreThrottle = loco.Throttle;
+            }
+            Components.GearChangeRequest = gearChangeRequest;
         }
     }
 
@@ -539,5 +566,19 @@ namespace DriverAssist
                 this.time = time;
             }
         }
+    }
+
+    public struct GearChangeRequest
+    {
+        public int RequestedGear;
+        public float? RestoreThrottle;
+    }
+
+    public class LocoComponents
+    {
+        // public float? ThrottleBeforeShift { get; internal set; }
+        // // public bool IsShifting { get; internal set; }
+        // public int? RequestedGear { get; internal set; }
+        public GearChangeRequest? GearChangeRequest { get; internal set; }
     }
 }

@@ -5,6 +5,13 @@ namespace DriverAssist.Cruise
         void Tick(CruiseControlContext context);
     }
 
+    public interface DASystem
+    {
+        bool Enabled { get; set; }
+
+        void OnUpdate();
+    }
+
     public class CruiseControlContext
     {
         public LocoSettings Config { get; }

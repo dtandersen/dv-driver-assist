@@ -18,6 +18,7 @@ namespace DriverAssist.Implementation
         private bool loaded = false;
         private GameObject gameObject;
         private DriverAssistWindow window;
+        private ShiftSystem shiftSystem;
 
         public DriverAssistController(UnifiedSettings config)
         {
@@ -55,6 +56,7 @@ namespace DriverAssist.Implementation
 
             if (loco.IsLoco)
             {
+                shiftSystem.OnUpdate();
                 loco.UpdateStats(Time.fixedDeltaTime);
                 updateAccumulator += Time.fixedDeltaTime;
                 if (updateAccumulator > config.UpdateInterval)
@@ -115,6 +117,8 @@ namespace DriverAssist.Implementation
             cruiseControl = new CruiseControl(loco, config, new UnityClock());
             cruiseControl.Accelerator = new PredictiveAcceleration();
             cruiseControl.Decelerator = new PredictiveDeceleration();
+
+            shiftSystem = new ShiftSystem(loco);
 
             updateAccumulator = 0;
             loaded = true;
