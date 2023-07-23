@@ -190,7 +190,7 @@ namespace DriverAssist.UMM
                     overdriveTemperature: settings.dm3OverdriveTemperature,
                     brakingTime: settings.brakingTime,
                     brakeReleaseFactor: settings.brakeReleaseFactor,
-                    minBrake: settings.minBrake
+                    minBrake: 0
                 );
 
                 return locoSettings;
