@@ -1,3 +1,5 @@
+#pragma warning disable IDE0090
+
 using System;
 
 namespace DriverAssist.Cruise
@@ -19,11 +21,11 @@ namespace DriverAssist.Cruise
         // CruiseControlTarget target = null;
         bool Enabled { get; set; }
         float lastThrottle;
-        private Pid throttlePid = new Pid(0, 0, 0, 0);
-        private Pid torquePid = new Pid(0, 0, 0, 0);
+        private readonly Pid throttlePid = new Pid(0, 0, 0, 0);
+        private readonly Pid torquePid = new Pid(0, 0, 0, 0);
         float currentTime;
         float dt;
-        float dtMax = 1f;
+        readonly float dtMax = 1f;
         float lastSpeed = 0;
         float lastTorque = 0;
 
@@ -82,11 +84,11 @@ namespace DriverAssist.Cruise
             Torque = loco.Torque;
 
             torquePid.SetPoint = DesiredSpeed;
-            float torqueResult = torquePid.evaluate(currentSpeed);
+            float torqueResult = torquePid.Evaluate(currentSpeed);
             torqueResult = Math.Min(torqueResult, DesiredTorque);
 
             throttlePid.SetPoint = torqueResult;
-            float throttleResult = throttlePid.evaluate(Torque) / 100f;
+            float throttleResult;// = throttlePid.evaluate(Torque) / 100f;
             Temperature = loco.Temperature; ;
             // if (throttleResult > 1 || throttleResult < 0)
             // {

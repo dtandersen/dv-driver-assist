@@ -7,71 +7,76 @@ using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    [Collection("Sequential")]
+    // [Collection("Sequential")]
     public class DecelTest
     {
-        private FakeLocoController loco;
-        private Translation localization;
-        private FakeCruiseControlConfig config;
-        private FakeLocoConfig de2settings;
-        private FakeLocoConfig dh4settings;
-        private FakeLocoConfig dm3settings;
-        private FakeTrainCarWrapper train;
-        private PredictiveDeceleration accelerator;
+        private readonly FakeLocoController loco;
+        // private Translation localization;
+        // private FakeCruiseControlConfig config;
+        private readonly FakeLocoConfig de2settings;
+        // private readonly FakeLocoConfig dh4settings;
+        private readonly FakeLocoConfig dm3settings;
+        private readonly FakeTrainCarWrapper train;
+        private readonly PredictiveDeceleration accelerator;
         private CruiseControlContext context;
-        float step = 1 / 11f;
+        private const float STEP = 1 / 11f;
 
 
         public DecelTest(ITestOutputHelper output)
         {
             PluginLoggerSingleton.Instance = new TestLogger(output);
 
-            de2settings = new FakeLocoConfig();
-            de2settings.CruiseAccel = .05f;
-            de2settings.MaxAccel = .25f;
-            de2settings.BrakeReleaseFactor = .5f;
-            de2settings.BrakingTime = 10;
-            de2settings.CruiseAccel = .05f;
-            de2settings.HillClimbAccel = .025f;
-            de2settings.MaxAmps = 750;
-            de2settings.MaxTemperature = 105;
-            de2settings.HillClimbTemp = 118;
-            de2settings.MinAmps = 400;
-            de2settings.MinBrake = 0.1f;
-            de2settings.MinTorque = 22000;
-            de2settings.OverdriveEnabled = true;
+            de2settings = new FakeLocoConfig
+            {
+                CruiseAccel = .05f,
+                MaxAccel = .25f,
+                BrakeReleaseFactor = .5f,
+                BrakingTime = 10,
+                HillClimbAccel = .025f,
+                MaxAmps = 750,
+                MaxTemperature = 105,
+                HillClimbTemp = 118,
+                MinAmps = 400,
+                MinBrake = 0.1f,
+                MinTorque = 22000,
+                OverdriveEnabled = true
+            };
 
-            dh4settings = new FakeLocoConfig();
-            dh4settings.CruiseAccel = .05f;
-            dh4settings.MaxAccel = .25f;
-            dh4settings.BrakeReleaseFactor = .5f;
-            dh4settings.BrakingTime = 10;
-            dh4settings.CruiseAccel = .05f;
-            dh4settings.HillClimbAccel = .025f;
-            dh4settings.MaxAmps = 0;
-            dh4settings.MaxTemperature = 105;
-            dh4settings.HillClimbTemp = 118;
-            dh4settings.MinAmps = 400;
-            dh4settings.MinBrake = 0;
-            dh4settings.MinTorque = 35000;
-            dh4settings.OverdriveEnabled = true;
+            // dh4settings = new FakeLocoConfig
+            // {
+            //     CruiseAccel = .05f,
+            //     MaxAccel = .25f,
+            //     BrakeReleaseFactor = .5f,
+            //     BrakingTime = 10,
+            //     HillClimbAccel = .025f,
+            //     MaxAmps = 0,
+            //     MaxTemperature = 105,
+            //     HillClimbTemp = 118,
+            //     MinAmps = 400,
+            //     MinBrake = 0,
+            //     MinTorque = 35000,
+            //     OverdriveEnabled = true
+            // };
 
-            dm3settings = new FakeLocoConfig();
-            dm3settings.CruiseAccel = .05f;
-            dm3settings.MaxAccel = .25f;
-            dm3settings.BrakeReleaseFactor = .5f;
-            dm3settings.BrakingTime = 10;
-            dm3settings.CruiseAccel = .05f;
-            dm3settings.HillClimbAccel = .025f;
-            dm3settings.MaxAmps = 0;
-            dm3settings.MaxTemperature = 105;
-            dm3settings.HillClimbTemp = 118;
-            dm3settings.MinAmps = 400;
-            dm3settings.MinBrake = 0;
-            dm3settings.MinTorque = 35000;
-            dm3settings.OverdriveEnabled = true;
-            train = new FakeTrainCarWrapper();
-            train.LocoType = LocoType.DE2;
+            dm3settings = new FakeLocoConfig
+            {
+                CruiseAccel = .05f,
+                MaxAccel = .25f,
+                BrakeReleaseFactor = .5f,
+                BrakingTime = 10,
+                HillClimbAccel = .025f,
+                MaxAmps = 0,
+                MaxTemperature = 105,
+                HillClimbTemp = 118,
+                MinAmps = 400,
+                MinBrake = 0,
+                MinTorque = 35000,
+                OverdriveEnabled = true
+            };
+            train = new FakeTrainCarWrapper
+            {
+                LocoType = LocoType.DE2
+            };
             loco = new FakeLocoController(1f / 60f);
             loco.UpdateLocomotive(train);
             train.LocoType = LocoType.DE2;
@@ -100,7 +105,7 @@ namespace DriverAssist.Cruise
             train.TrainBrake = 0.5f;
 
             WhenDecel();
-            Assert.Equal(0.5f + step, loco.TrainBrake);
+            Assert.Equal(0.5f + STEP, loco.TrainBrake);
             Assert.Equal(0, loco.IndBrake);
         }
 
@@ -214,13 +219,13 @@ namespace DriverAssist.Cruise
         public void SingleCarTrainAppliesIndependantBrake()
         {
             context.DesiredSpeed = 5;
-            train.IndBrake = step;
+            train.IndBrake = STEP;
             train.TrainBrake = 1;
             train.SpeedKmh = 6;
             train.Length = 1;
 
             WhenDecel();
-            Assert.Equal(2 * step, loco.IndBrake);
+            Assert.Equal(2 * STEP, loco.IndBrake);
             Assert.Equal(0, loco.TrainBrake);
         }
 
@@ -235,7 +240,7 @@ namespace DriverAssist.Cruise
             context.DesiredSpeed = 5;
             de2settings.BrakeReleaseFactor = .6f;
             de2settings.MinBrake = .1f;
-            train.IndBrake = 2 * step;
+            train.IndBrake = 2 * STEP;
             train.TrainBrake = 1;
             train.SpeedKmh = 6;
             loco.AccelerationMs = -1;

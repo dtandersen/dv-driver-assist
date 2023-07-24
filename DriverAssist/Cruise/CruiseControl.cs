@@ -4,28 +4,30 @@ using DriverAssist.Localization;
 
 namespace DriverAssist.Cruise
 {
+#pragma warning disable IDE1006
     public interface Clock
+#pragma warning restore IDE1006
     {
         public float Time2 { get; }
     }
 
     public class CruiseControl
     {
-        bool forward;
+        // bool forward;
         private float desiredSpeed = 0;
         public float DesiredSpeed
         {
             get { return desiredSpeed; }
             set
             {
-                if (value >= 0)
-                {
-                    forward = true;
-                }
-                else
-                {
-                    forward = false;
-                }
+                // if (value >= 0)
+                // {
+                //     forward = true;
+                // }
+                // else
+                // {
+                //     forward = false;
+                // }
 
                 desiredSpeed = value;
                 positiveDesiredSpeed = Math.Abs(value);
@@ -52,32 +54,34 @@ namespace DriverAssist.Cruise
 
         public string Status { get; internal set; }
 
-        private LocoController loco;
+        private readonly LocoController loco;
         private float minSpeed;
         private float maxSpeed;
         private float positiveDesiredSpeed;
         private float lastThrottle;
         private float lastTrainBrake;
         private float lastIndBrake;
-        private CruiseControlSettings config;
+        private readonly CruiseControlSettings config;
         private CruiseControlContext context;
-        private Translation localization;
-        private Clock clock;
+        private readonly Translation localization;
+        private readonly Clock clock;
 
         public CruiseControl(LocoController loco, CruiseControlSettings config, Clock clock)
         {
+            localization = TranslationManager.Current;
             this.loco = loco;
             this.config = config;
             Accelerator = CreateAlgo(config.Acceleration);
             Decelerator = CreateAlgo(config.Deceleration);
             this.clock = clock;
+            Status = "";
+            context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco);
         }
 
         private CruiseControlAlgorithm CreateAlgo(string name)
         {
             Type type = Type.GetType(name, true);
             CruiseControlAlgorithm instance = (CruiseControlAlgorithm)Activator.CreateInstance(type);
-            localization = TranslationManager.Current;
             return instance;
         }
 
@@ -87,8 +91,10 @@ namespace DriverAssist.Cruise
 
             try
             {
-                context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco);
-                context.Time = clock.Time2;
+                context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco)
+                {
+                    Time = clock.Time2
+                };
             }
             catch (KeyNotFoundException)
             {
@@ -204,11 +210,11 @@ namespace DriverAssist.Cruise
         private bool IsControlsChanged()
         {
             return
-                changed(lastTrainBrake, context.LocoController.TrainBrake, 1f / 11f) ||
-                changed(lastIndBrake, context.LocoController.IndBrake, 1f / 11f);
+                Changed(lastTrainBrake, context.LocoController.TrainBrake, 1f / 11f) ||
+                Changed(lastIndBrake, context.LocoController.IndBrake, 1f / 11f);
         }
 
-        bool changed(float v1, float v2, float amount)
+        bool Changed(float v1, float v2, float amount)
         {
             return Math.Abs(v1 - v2) > amount;
         }

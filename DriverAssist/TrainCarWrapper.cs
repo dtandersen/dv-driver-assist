@@ -2,7 +2,9 @@ using System.Collections.Generic;
 
 namespace DriverAssist
 {
+#pragma warning disable IDE1006
     public interface TrainCarWrapper
+#pragma warning restore IDE1006
     {
         float SpeedKmh { get; }
         float SpeedMs { get; }
@@ -32,21 +34,17 @@ namespace DriverAssist
 
     public class NullTrainCarWrapper : TrainCarWrapper
     {
-        private static NullTrainCarWrapper instance;
+        private static readonly NullTrainCarWrapper instance;
 
-        private NullTrainCarWrapper()
+        static NullTrainCarWrapper()
         {
+            instance = new NullTrainCarWrapper();
         }
 
         public static TrainCarWrapper Instance
         {
             get
             {
-                if (instance == null)
-                {
-                    instance = new NullTrainCarWrapper();
-                }
-
                 return instance;
             }
         }
@@ -87,6 +85,13 @@ namespace DriverAssist
         public bool GearChangeInProgress { get; }
 
         public int Length { get; }
+
+        NullTrainCarWrapper()
+        {
+            Ports = new();
+            TractionMotors = "";
+            LocoType = DriverAssist.LocoType.DE2;
+        }
     }
 
     public class FakeTrainCarWrapper : TrainCarWrapper
@@ -125,5 +130,12 @@ namespace DriverAssist
         public List<string> Ports { get; }
         public bool GearChangeInProgress { get; set; }
         public int Length { get; set; }
+
+        public FakeTrainCarWrapper()
+        {
+            Ports = new();
+            TractionMotors = "";
+            LocoType = DriverAssist.LocoType.DE2;
+        }
     }
 }

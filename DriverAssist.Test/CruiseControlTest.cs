@@ -1,3 +1,6 @@
+// #pragma warning disable CS8629
+#pragma warning disable CS8602
+
 using System;
 using System.Collections.Generic;
 using DriverAssist.Localization;
@@ -7,29 +10,31 @@ using Xunit.Abstractions;
 namespace DriverAssist.Cruise
 {
     // [CollectionDefinition(DisableParallelization = true)]
-    [Collection("Sequential")]
+    // [Collection("Sequential")]
     public class CruiseControlTest
     {
-        private CruiseControl cruiseControl;
-        private LocoController loco;
+        private readonly CruiseControl cruiseControl;
+        private readonly LocoController loco;
         // private FakeLocoController loco;
-        private Translation localization;
-        private FakeCruiseControlConfig config;
-        private LocoSettings de2settings;
-        private LocoSettings dh4settings;
-        private FakeTrainCarWrapper train;
-        private FakeClock clock;
+        private readonly Translation localization;
+        private readonly FakeCruiseControlConfig config;
+        private readonly LocoSettings de2settings;
+        private readonly LocoSettings dh4settings;
+        private readonly FakeTrainCarWrapper train;
+        private readonly FakeClock clock;
 
         public CruiseControlTest(ITestOutputHelper output)
         {
             PluginLoggerSingleton.Instance = new TestLogger(output);
             TranslationManager.Init();
             localization = TranslationManager.Current;
-            config = new FakeCruiseControlConfig();
-            config.Offset = -2.5f;
-            config.Diff = 2.5f;
-            config.Acceleration = "DriverAssist.Cruise.FakeAccelerator";
-            config.Deceleration = "DriverAssist.Cruise.FakeDecelerator";
+            config = new FakeCruiseControlConfig
+            {
+                Offset = -2.5f,
+                Diff = 2.5f,
+                Acceleration = "DriverAssist.Cruise.FakeAccelerator",
+                Deceleration = "DriverAssist.Cruise.FakeDecelerator"
+            };
 
             de2settings = new FakeLocoConfig();
             dh4settings = new FakeLocoConfig();
@@ -45,16 +50,18 @@ namespace DriverAssist.Cruise
             // accelerator = new FakeAccelerator();
             // decelerator = new FakeDecelerator();
             clock = new FakeClock();
-            cruiseControl = new CruiseControl(loco, config, clock);
-            cruiseControl.Enabled = true;
+            cruiseControl = new CruiseControl(loco, config, clock)
+            {
+                Enabled = true
+            };
             // cruiseControl.Accelerator = accelerator;
             // cruiseControl.Decelerator = decelerator;
         }
 
-        public void Dispose()
-        {
-            PluginLoggerSingleton.Instance = new NullLogger();
-        }
+        // public void Dispose()
+        // {
+        //     PluginLoggerSingleton.Instance = new NullLogger();
+        // }
 
         [Fact]
         public void ShouldAccelerate()
@@ -491,6 +498,8 @@ namespace DriverAssist.Cruise
         public FakeCruiseControlConfig()
         {
             LocoSettings = new Dictionary<string, LocoSettings>();
+            Acceleration = "";
+            Deceleration = "";
         }
 
         public int MinTorque { get; set; }
@@ -502,6 +511,7 @@ namespace DriverAssist.Cruise
         public float Offset { get; set; }
         public float Diff { get; set; }
         public float UpdateInterval { get; set; }
+
         public string Acceleration { get; set; }
         public string Deceleration { get; set; }
         public Dictionary<string, LocoSettings> LocoSettings { get; }

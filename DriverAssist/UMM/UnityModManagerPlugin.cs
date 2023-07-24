@@ -12,16 +12,19 @@ namespace DriverAssist.UMM
     [EnableReloading]
     public static class DriverAssistUmmMod
     {
+#pragma warning disable CS8618
         public static Settings settings;
 
         private static DriverAssistController presenter;
+#pragma warning restore CS8618
+
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
             PluginLoggerSingleton.Instance = new UmmLogger(modEntry.Logger);
 
             settings = Settings.Load<Settings>(modEntry);
-            SettingsWrapper config = new SettingsWrapper(settings);
+            SettingsWrapper config = new(settings);
 
             presenter = new DriverAssistController(config);
             presenter.Init();
@@ -72,12 +75,12 @@ namespace DriverAssist.UMM
         public float Offset = 0;
         public float Diff = 2.5f;
 
-        public KeyBinding Accelerate = new KeyBinding() { keyCode = KeyCode.PageUp };
-        public KeyBinding Decelerate = new KeyBinding() { keyCode = KeyCode.PageDown };
-        public KeyBinding Toggle = new KeyBinding() { keyCode = KeyCode.RightControl };
-        public KeyBinding Upshift = new KeyBinding() { keyCode = KeyCode.Home };
-        public KeyBinding Downshift = new KeyBinding() { keyCode = KeyCode.End };
-        public KeyBinding DumpPorts = new KeyBinding() { keyCode = KeyCode.F9 };
+        public KeyBinding Accelerate = new() { keyCode = KeyCode.PageUp };
+        public KeyBinding Decelerate = new() { keyCode = KeyCode.PageDown };
+        public KeyBinding Toggle = new() { keyCode = KeyCode.RightControl };
+        public KeyBinding Upshift = new() { keyCode = KeyCode.Home };
+        public KeyBinding Downshift = new() { keyCode = KeyCode.End };
+        public KeyBinding DumpPorts = new() { keyCode = KeyCode.F9 };
         public bool ShowStats = false;
 
         public int de2MinTorque = 22000;
@@ -116,7 +119,7 @@ namespace DriverAssist.UMM
 
     public class SettingsWrapper : UnifiedSettings
     {
-        private Settings settings;
+        private readonly Settings settings;
 
         public SettingsWrapper(Settings settings)
         {
@@ -151,8 +154,9 @@ namespace DriverAssist.UMM
         {
             get
             {
-                Dictionary<string, LocoSettings> locoSettings = new Dictionary<string, LocoSettings>();
-                locoSettings[LocoType.DE2] = new UmmLocoSettings(
+                Dictionary<string, LocoSettings> locoSettings = new()
+                {
+                    [LocoType.DE2] = new UmmLocoSettings(
                     minTorque: settings.de2MinTorque,
                     minAmps: settings.de2MinAmps,
                     maxAmps: settings.de2MaxAmps,
@@ -161,8 +165,8 @@ namespace DriverAssist.UMM
                     brakingTime: settings.brakingTime,
                     brakeReleaseFactor: settings.brakeReleaseFactor,
                     minBrake: settings.minBrake
-                );
-                locoSettings[LocoType.DE6] = new UmmLocoSettings(
+                ),
+                    [LocoType.DE6] = new UmmLocoSettings(
                     minTorque: settings.de6MinTorque,
                     minAmps: settings.de6MinAmps,
                     maxAmps: settings.de6MaxAmps,
@@ -171,8 +175,8 @@ namespace DriverAssist.UMM
                     brakingTime: settings.brakingTime,
                     brakeReleaseFactor: settings.brakeReleaseFactor,
                     minBrake: settings.minBrake
-                );
-                locoSettings[LocoType.DH4] = new UmmLocoSettings(
+                ),
+                    [LocoType.DH4] = new UmmLocoSettings(
                     minTorque: settings.dh4MinTorque,
                     minAmps: 0,
                     maxAmps: 1000,
@@ -181,8 +185,8 @@ namespace DriverAssist.UMM
                     brakingTime: settings.brakingTime,
                     brakeReleaseFactor: settings.brakeReleaseFactor,
                     minBrake: settings.minBrake
-                );
-                locoSettings[LocoType.DM3] = new UmmLocoSettings(
+                ),
+                    [LocoType.DM3] = new UmmLocoSettings(
                     minTorque: settings.dm3MinTorque,
                     minAmps: 0,
                     maxAmps: 1000,
@@ -191,7 +195,8 @@ namespace DriverAssist.UMM
                     brakingTime: settings.brakingTime,
                     brakeReleaseFactor: settings.brakeReleaseFactor,
                     minBrake: 0
-                );
+                )
+                };
 
                 return locoSettings;
             }
@@ -200,14 +205,14 @@ namespace DriverAssist.UMM
 
     internal class UmmLocoSettings : LocoSettings
     {
-        private int minTorque;
-        private int minAmps;
-        private int maxAmps;
-        private int maxTemperature;
-        private int overdriveTemperature;
-        private int brakingTime;
-        private float brakeReleaseFactor;
-        private float minBrake;
+        private readonly int minTorque;
+        private readonly int minAmps;
+        private readonly int maxAmps;
+        private readonly int maxTemperature;
+        private readonly int overdriveTemperature;
+        private readonly int brakingTime;
+        private readonly float brakeReleaseFactor;
+        private readonly float minBrake;
 
         public UmmLocoSettings(
          int minTorque,
@@ -303,10 +308,11 @@ namespace DriverAssist.UMM
 
     class UmmLogger : PluginLogger
     {
-        private ModEntry.ModLogger logger;
+        private readonly ModEntry.ModLogger logger;
 
         public UmmLogger(ModEntry.ModLogger logger)
         {
+            Prefix = "";
             this.logger = logger;
         }
 

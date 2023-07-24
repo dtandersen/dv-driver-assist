@@ -18,11 +18,11 @@ namespace DriverAssist.Cruise
 
             if (speedKmh > context.DesiredSpeed)
             {
-                brake = brake + STEP;
+                brake += STEP;
             }
             else
             {
-                brake = brake - context.Config.BrakeReleaseFactor * brake;
+                brake -= context.Config.BrakeReleaseFactor * brake;
                 brake = Math.Max(brake, context.Config.MinBrake);
             }
 

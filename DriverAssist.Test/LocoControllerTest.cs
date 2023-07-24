@@ -1,13 +1,15 @@
+#pragma warning disable CS8629
+
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    [Collection("Sequential")]
+    // [Collection("Sequential")]
     public class LocoControllerTest
     {
-        private LocoController loco;
-        private FakeTrainCarWrapper train;
+        private readonly LocoController loco;
+        private readonly FakeTrainCarWrapper train;
 
         public LocoControllerTest(ITestOutputHelper output)
         {
@@ -15,7 +17,7 @@ namespace DriverAssist.Cruise
 
             train = new FakeTrainCarWrapper
             {
-                LocoType = DriverAssist.LocoType.DE2,
+                LocoType = LocoType.DE2,
                 Reverser = 1
             };
 
@@ -23,10 +25,10 @@ namespace DriverAssist.Cruise
             loco.UpdateLocomotive(train);
         }
 
-        public void Dispose()
-        {
-            PluginLoggerSingleton.Instance = new NullLogger();
-        }
+        // public void Dispose()
+        // {
+        //     PluginLoggerSingleton.Instance = new NullLogger();
+        // }
 
         /// The train is a DM3
         /// and a throttle change has been requested,
@@ -187,9 +189,11 @@ namespace DriverAssist.Cruise
             train.GearboxA = 0;
             train.GearboxB = 0;
             train.Throttle = 0;
-            var request = new GearChangeRequest();
-            request.RequestedGear = 8;
-            request.RestoreThrottle = 1;
+            var request = new GearChangeRequest
+            {
+                RequestedGear = 8,
+                RestoreThrottle = 1
+            };
             loco.Components.GearChangeRequest = request;
             loco.ChangeGear(1);
 

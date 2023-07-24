@@ -1,11 +1,15 @@
 namespace DriverAssist.Cruise
 {
+#pragma warning disable IDE1006
     public interface CruiseControlAlgorithm
+#pragma warning restore IDE1006
     {
         void Tick(CruiseControlContext context);
     }
 
+#pragma warning disable IDE1006
     public interface DASystem
+#pragma warning restore IDE1006
     {
         bool Enabled { get; set; }
 
@@ -28,8 +32,8 @@ namespace DriverAssist.Cruise
 
     public class FakeAccelerator : CruiseControlAlgorithm
     {
-        public LocoSettings Settings { get; internal set; }
-        public CruiseControlContext Context { get; internal set; }
+        public LocoSettings? Settings { get; internal set; }
+        public CruiseControlContext? Context { get; internal set; }
 
         public void Tick(CruiseControlContext context)
         {
@@ -46,7 +50,7 @@ namespace DriverAssist.Cruise
 
     public class FakeDecelerator : CruiseControlAlgorithm
     {
-        public LocoSettings Settings { get; internal set; }
+        public LocoSettings? Settings { get; internal set; }
 
         public void Tick(CruiseControlContext context)
         {

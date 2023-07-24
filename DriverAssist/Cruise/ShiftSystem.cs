@@ -32,7 +32,7 @@ namespace DriverAssist.Cruise
                     loco.Components.GearChangeRequest = null;
                 }
             }
-            else if (!loco.GearShiftInProgress)
+            else if (!loco.GearShiftInProgress && request.RestoreThrottle != null)
             {
                 PluginLoggerSingleton.Instance.Info($"ShiftSystem: Restoring throttle to {request.RestoreThrottle.Value}");
                 loco.Throttle = request.RestoreThrottle.Value;

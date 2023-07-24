@@ -14,8 +14,8 @@ namespace DriverAssist
         public float Bias { get; internal set; }
         // public float MinInt { get; set; }
         // public float MaxInt { get; internal set; }
-        public float iterm { get; internal set; }
-        public float pterm { get; internal set; }
+        public float Iterm { get; internal set; }
+        public float Pterm { get; internal set; }
 
         private float lastError;
         private float sum;
@@ -28,22 +28,22 @@ namespace DriverAssist
             this.Ki = ki;
         }
 
-        public float evaluate(float pv)
+        public float Evaluate(float pv)
         {
             Pv = pv;
             Error = SetPoint - pv;
-            pterm = Kp * Error;
+            Pterm = Kp * Error;
             sum += Error;
-            iterm = Ki * sum;
-            if (Math.Abs(iterm) > Math.Abs(pterm))
+            Iterm = Ki * sum;
+            if (Math.Abs(Iterm) > Math.Abs(Pterm))
             {
-                sum = sum * 0.95f;
+                sum *= 0.95f;
             }
             // if (sum <= 0)
             // {
             //     sum = 0;
             // }
-            Result = pterm + Kd * (Error - lastError) + iterm + Bias;
+            Result = Pterm + Kd * (Error - lastError) + Iterm + Bias;
 
             lastError = Error;
 
@@ -51,7 +51,7 @@ namespace DriverAssist
         }
         public override string ToString()
         {
-            return $"Pid [SetPoint={SetPoint}, Pv={Pv}, Error={Error}, Kp={pterm}, Kd={Kd}, Ki={iterm}, sum={sum} Result={Result}]";
+            return $"Pid [SetPoint={SetPoint}, Pv={Pv}, Error={Error}, Kp={Pterm}, Kd={Kd}, Ki={Iterm}, sum={sum} Result={Result}]";
         }
 
         internal void Unwind()

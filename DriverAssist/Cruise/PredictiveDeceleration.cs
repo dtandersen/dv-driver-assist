@@ -2,8 +2,8 @@ namespace DriverAssist.Cruise
 {
     public class PredictiveDeceleration : CruiseControlAlgorithm
     {
-        TrainBrakeDecel automatic = new TrainBrakeDecel();
-        ManualLapDecel manualLap = new ManualLapDecel();
+        readonly TrainBrakeDecel automatic = new();
+        readonly ManualLapDecel manualLap = new();
 
         public PredictiveDeceleration()
         {

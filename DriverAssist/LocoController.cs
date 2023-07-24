@@ -6,20 +6,20 @@ namespace DriverAssist
 {
     public class LocoController
     {
-        public LocoComponents Components = new LocoComponents();
+        public LocoComponents Components = new();
 
-        private Integrator speedIntegratorMs;
-        private Integrator heatIntegrator;
-        private Integrator ampsIntegrator = new Integrator(60 * 6);
-        private Integrator averageAmps = new Integrator(30);
+        private readonly Integrator speedIntegratorMs;
+        private readonly Integrator heatIntegrator;
+        private readonly Integrator ampsIntegrator = new(60 * 6);
+        private readonly Integrator averageAmps = new(30);
         private float lastSpeedMs;
         private float lastAmps;
         private float lastHeat;
         private TrainCarWrapper loco;
-        private float lookahead = 1f;
-        private float temperatureLookAhead = 1f;
+        private readonly float lookahead = 1f;
+        private readonly float temperatureLookAhead = 1f;
         // https://discord.com/channels/332511223536943105/332511223536943105/1129517819416018974
-        private List<float[]> gearBox = new List<float[]>() {
+        private readonly List<float[]> gearBox = new() {
             new float[] {0f,   0f},   // 1 = 1-1
             new float[] {0,    0.5f}, // 2 = 1-2
             new float[] {0.5f, 0},    // 3 = 2-1
@@ -31,12 +31,12 @@ namespace DriverAssist
             new float[] {1,    1},    // 9 = 3-3
         };
 
-        private float fixedDeltaTime;
+        // private readonly float fixedDeltaTime;
 
         public LocoController(float fixedDeltaTime)
         {
             loco = NullTrainCarWrapper.Instance;
-            this.fixedDeltaTime = fixedDeltaTime;
+            // this.fixedDeltaTime = fixedDeltaTime;
             int size = (int)(lookahead / fixedDeltaTime);
             speedIntegratorMs = new Integrator(size);
 
@@ -221,14 +221,11 @@ namespace DriverAssist
         {
             get
             {
-                switch (LocoType)
+                return LocoType switch
                 {
-                    case DriverAssist.LocoType.DE2:
-                    case DriverAssist.LocoType.DE6:
-                        return true;
-                    default:
-                        return false;
-                }
+                    DriverAssist.LocoType.DE2 or DriverAssist.LocoType.DE6 => true,
+                    _ => false,
+                };
             }
         }
 
@@ -359,10 +356,10 @@ namespace DriverAssist
 
         public int Length { get { return loco.Length; } }
 
-        float lastThrottle;
-        bool shiftcomplete;
-        bool shifting;
-        int shiftState = 0;
+        // float lastThrottle;
+        // bool shiftcomplete;
+        // bool shifting;
+        // int shiftState = 0;
         public void UpdateStats(float deltaTime)
         {
             if (!loco.IsLoco)
@@ -415,7 +412,7 @@ namespace DriverAssist
             lastSpeedMs = speedMs;
         }
 
-        private void Log(string v)
+        internal void Log(string v)
         {
             PluginLoggerSingleton.Instance.Info(v);
         }
@@ -439,8 +436,10 @@ namespace DriverAssist
             if (requestedGear == Gear) return;
             if (Components.GearChangeRequest.HasValue) return;
 
-            GearChangeRequest gearChangeRequest = new GearChangeRequest();
-            gearChangeRequest.RequestedGear = requestedGear;
+            GearChangeRequest gearChangeRequest = new()
+            {
+                RequestedGear = requestedGear
+            };
             if (loco.Throttle > 0)
             {
                 gearChangeRequest.RestoreThrottle = loco.Throttle;
@@ -459,29 +458,29 @@ namespace DriverAssist
         public const string STEAM = "LocoSteamHeavy";
     }
 
-    public class LocoStats
-    {
-        private static readonly LocoStats DE2 = new LocoStats("LocoShunter", true);
-        private static readonly LocoStats DH4 = new LocoStats("LocoDH4", true);
-        private static readonly LocoStats DE6 = new LocoStats("LocoDiesel", true);
-        private static readonly LocoStats DM3 = new LocoStats("LocoDM3", false);
-        private static readonly LocoStats STEAM = new LocoStats("LocoSteamHeavy", true);
+    // public class LocoStats
+    // {
+    //     private static readonly LocoStats DE2 = new LocoStats("LocoShunter", true);
+    //     private static readonly LocoStats DH4 = new LocoStats("LocoDH4", true);
+    //     private static readonly LocoStats DE6 = new LocoStats("LocoDiesel", true);
+    //     private static readonly LocoStats DM3 = new LocoStats("LocoDM3", false);
+    //     private static readonly LocoStats STEAM = new LocoStats("LocoSteamHeavy", true);
 
-        public string Id { get; }
-        public bool SelfLappingTrainBrake { get; }
+    //     public string Id { get; }
+    //     public bool SelfLappingTrainBrake { get; }
 
-        public LocoStats(string id, bool selfLappingTrainBrake)
-        {
-            Id = id;
-            SelfLappingTrainBrake = selfLappingTrainBrake;
-        }
-    }
+    //     public LocoStats(string id, bool selfLappingTrainBrake)
+    //     {
+    //         Id = id;
+    //         SelfLappingTrainBrake = selfLappingTrainBrake;
+    //     }
+    // }
 
     internal class Integrator
     {
-        private List<Node> nodes;
+        private readonly List<Node> nodes;
         private int index;
-        private int size;
+        private readonly int size;
 
         internal Integrator(int size = 60)
         {

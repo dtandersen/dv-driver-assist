@@ -10,22 +10,31 @@ namespace DriverAssist.Implementation
 {
     internal class DVTrainCarWrapper : TrainCarWrapper
     {
-        private TrainCar loco;
-        private BaseControlsOverrider obj;
-        private BaseControlsOverrider baseControlsOverrider;
-        private LocoIndicatorReader locoIndicatorReader;
-        private SimulationFlow simFlow;
-        private Port torqueGeneratedPort;
+        private readonly TrainCar loco;
+        private readonly BaseControlsOverrider obj;
+        // private BaseControlsOverrider baseControlsOverrider;
+        private readonly LocoIndicatorReader locoIndicatorReader;
+        private readonly SimulationFlow simFlow;
+        private readonly Port torqueGeneratedPort;
 
         public DVTrainCarWrapper(TrainCar car)
         {
             this.loco = car;
-            this.baseControlsOverrider = loco.GetComponent<SimController>()?.controlsOverrider;
-            this.obj = loco.GetComponent<SimController>()?.controlsOverrider;
-            this.locoIndicatorReader = loco.loadedInterior?.GetComponent<LocoIndicatorReader>();
-            this.simFlow = loco.GetComponent<SimController>()?.simFlow;
-            string torqueGeneratedPortId = loco.GetComponent<SimController>()?.drivingForce.torqueGeneratedPortId;
-            simFlow.TryGetPort(torqueGeneratedPortId, out torqueGeneratedPort);
+            SimController simc = loco.GetComponent<SimController>();
+            // this.baseControlsOverrider = simc.controlsOverrider;
+            this.obj = simc.controlsOverrider;
+            this.locoIndicatorReader = loco.loadedInterior.GetComponent<LocoIndicatorReader>();
+            this.simFlow = loco.GetComponent<SimController>().simFlow;
+            string torqueGeneratedPortId = "traction.TORQUE_IN";
+
+
+
+            // torqueGeneratedPortId = loco.GetComponent<SimController>().drivingForce.torqueGeneratedPortId;
+            if (simFlow != null && torqueGeneratedPortId != null)
+                simFlow.TryGetPort(torqueGeneratedPortId, out torqueGeneratedPort);
+            // PluginLoggerSingleton.Instance.Info($"{torqueGeneratedPortId ?? ""}");
+            if (simFlow == null || torqueGeneratedPort == null)
+                throw new Exception();
         }
 
         public bool IsLoco { get { return true; } }
@@ -88,7 +97,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
+                // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
                 InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
                 if (!controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference))
                 {
@@ -100,7 +109,7 @@ namespace DriverAssist.Implementation
 
             set
             {
-                BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
+                // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
                 InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
                 if (controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference))
                 {
@@ -115,7 +124,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
+                // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
                 InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
                 if (!controls.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference))
                 {
@@ -127,7 +136,7 @@ namespace DriverAssist.Implementation
 
             set
             {
-                BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
+                // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
                 InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
                 if (controls.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference))
                 {
@@ -182,14 +191,11 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                switch (LocoType)
+                return LocoType switch
                 {
-                    case DriverAssist.LocoType.DE2:
-                    case DriverAssist.LocoType.DE6:
-                        return true;
-                    default:
-                        return false;
-                }
+                    DriverAssist.LocoType.DE2 or DriverAssist.LocoType.DE6 => true,
+                    _ => false,
+                };
             }
         }
 
@@ -199,13 +205,12 @@ namespace DriverAssist.Implementation
             {
                 // int x = locoCar.GetComponent<TractionMotor>().numberOfTractionMotors;
                 // SimulationFlow simFlow = loco.GetComponent<SimController>()?.simFlow;
-                Port port;
                 string maxAmps = "";
                 string motors = "";
                 // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.drivingForce.torqueGeneratedPortId;
                 if (IsElectric)
                 {
-                    if (simFlow.TryGetPort("tm.MAX_AMPS", out port))
+                    if (simFlow.TryGetPort("tm.MAX_AMPS", out Port port))
                         maxAmps = "" + port.Value;
                     if (simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port))
                         motors = "" + port.Value;
@@ -342,8 +347,8 @@ namespace DriverAssist.Implementation
                         {
                             gearA = 0;
                         }
-
-                        gearA = gearRatioPort.Value;
+                        else
+                            gearA = gearRatioPort.Value;
                         break;
                     default:
                         gearA = 0;
@@ -359,8 +364,8 @@ namespace DriverAssist.Implementation
                         {
                             gearB = 0;
                         }
-
-                        gearB = gearRatioPort.Value;
+                        else
+                            gearB = gearRatioPort.Value;
                         break;
                     default:
                         gearB = 0;
@@ -374,7 +379,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                List<string> portstrings = new List<string>();
+                List<string> portstrings = new();
                 foreach (SimComponent x in simFlow.orderedSimComps)
                 {
                     List<Port> ports = x.GetAllPorts();

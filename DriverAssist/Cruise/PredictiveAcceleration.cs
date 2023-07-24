@@ -4,15 +4,15 @@ namespace DriverAssist.Cruise
 {
     public class PredictiveAcceleration : CruiseControlAlgorithm
     {
-        float lastAmps = 0;
+        // float lastAmps = 0;
         float lastTorque = 0;
-        float lastTemperature = 0;
+        // float lastTemperature = 0;
         float lastRpm = 0;
-        float step = 1f / 11f;
-        bool cooling = false;
+        const float STEP = 1f / 11f;
+        // bool cooling = false;
         public float lastThrottleChange;
         public float lastShift;
-        PluginLogger logger;
+        readonly PluginLogger logger;
 
         public PredictiveAcceleration()
         {
@@ -21,28 +21,29 @@ namespace DriverAssist.Cruise
 
         public void Tick(CruiseControlContext context)
         {
+            // PluginLoggerSingleton.ThreadInstance.Value.Info("test");
             LocoController loco = context.LocoController;
 
-            float reverser = loco.Reverser;
+            // float reverser;// = loco.Reverser;
             float speed = loco.RelativeSpeedKmh;
             float desiredSpeed = context.DesiredSpeed;
             float throttle = loco.Throttle;
             float torque = loco.RelativeTorque;
-            float temperature = loco.Temperature;
-            float ampDelta = loco.Amps - lastAmps;
+            // float temperature = loco.Temperature;
+            // float ampDelta = loco.Amps - lastAmps;
             // float throttleResult;
             float predictedAmps = loco.Amps;
             float acceleration = loco.RelativeAccelerationMs;
             float maxamps = context.Config.MaxAmps;
             float minTorque = context.Config.MinTorque;
-            float amps = loco.Amps;
+            // float amps = loco.Amps;
             float projectedTemperature = loco.Temperature + loco.TemperatureChange;
             float timeSinceThrottle = context.Time - lastThrottleChange;
-            float operatingTemp = context.Config.MaxTemperature;
+            // float operatingTemp = context.Config.MaxTemperature;
             float dangerTemp = context.Config.HillClimbTemp;
             // float throttleAdj = 0;
 
-            bool ampsdecreased = amps <= lastAmps;
+            // bool ampsdecreased = amps <= lastAmps;
             bool hillClimbActive = loco.AccelerationMs <= context.Config.HillClimbAccel;
             bool tempDecreasing = loco.TemperatureChange < 0;
 
@@ -50,18 +51,18 @@ namespace DriverAssist.Cruise
                 (torque < minTorque || torque <= lastTorque)
                 && loco.RelativeAccelerationMs < context.Config.MaxAccel;
 
-            log($"predictedAmps{predictedAmps} maxamps={maxamps} timeSinceShift={timeSinceThrottle}");
-            log($"projectedTemperature={projectedTemperature} dangerTemp={dangerTemp}");
+            Log($"predictedAmps{predictedAmps} maxamps={maxamps} timeSinceShift={timeSinceThrottle}");
+            Log($"projectedTemperature={projectedTemperature} dangerTemp={dangerTemp}");
 
             if (speed > desiredSpeed)
             {
-                log("Reached speed");
+                Log("Reached speed");
                 AdjustThrottle(context, -loco.Throttle);
             }
             else if (projectedTemperature >= dangerTemp)
             {
-                log("Temperature exceeds danger limit");
-                AdjustThrottle(context, -step);
+                Log("Temperature exceeds danger limit");
+                AdjustThrottle(context, -STEP);
             }
             else if (
                 projectedTemperature >= context.Config.MaxTemperature
@@ -69,22 +70,22 @@ namespace DriverAssist.Cruise
                 && !hillClimbActive
                 && timeSinceThrottle >= 3)
             {
-                log("Temperature exceeds cruising limit");
-                AdjustThrottle(context, -step);
+                Log("Temperature exceeds cruising limit");
+                AdjustThrottle(context, -STEP);
             }
             else if (
                 predictedAmps >= maxamps
                 && loco.IsElectric)
             {
-                log("Amps exceed limit");
-                AdjustThrottle(context, -step);
+                Log("Amps exceed limit");
+                AdjustThrottle(context, -STEP);
             }
             else if (
                 acceleration >= context.Config.MaxAccel
-                && loco.Throttle > step)
+                && loco.Throttle > STEP)
             {
-                log("Acceleration limit reached");
-                float desiredThrottle = Math.Max(throttle - step, step);
+                Log("Acceleration limit reached");
+                float desiredThrottle = Math.Max(throttle - STEP, STEP);
                 AdjustThrottle(context, desiredThrottle - loco.Throttle);
             }
             // else if (
@@ -107,8 +108,8 @@ namespace DriverAssist.Cruise
                 && timeSinceThrottle >= 3
                 )
             {
-                log("Low torque");
-                AdjustThrottle(context, step);
+                Log("Low torque");
+                AdjustThrottle(context, STEP);
             }
             else if (
                 readyToThrottle
@@ -116,12 +117,12 @@ namespace DriverAssist.Cruise
                 && timeSinceThrottle >= 3
                 )
             {
-                log("Hill climbing");
-                AdjustThrottle(context, step);
+                Log("Hill climbing");
+                AdjustThrottle(context, STEP);
             }
             else
             {
-                log("do nothing");
+                Log("do nothing");
             }
 
             if (loco.Rpm > 800)
@@ -136,9 +137,9 @@ namespace DriverAssist.Cruise
             loco.IndBrake = 0;
             loco.TrainBrake = 0;
 
-            lastAmps = loco.Amps;
+            // lastAmps = loco.Amps;
             lastTorque = loco.Torque;
-            lastTemperature = loco.Temperature;
+            // lastTemperature = loco.Temperature;
             lastRpm = loco.Rpm;
         }
 
@@ -151,9 +152,12 @@ namespace DriverAssist.Cruise
             lastThrottleChange = context.Time;
         }
 
-        private void log(string v)
+        private void Log(string v)
         {
-            // logger.Info(v);
+            if (Math.Sin(0) == 1)
+            {
+                logger.Info(v);
+            }
         }
     }
 }

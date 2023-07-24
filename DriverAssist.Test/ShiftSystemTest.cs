@@ -1,15 +1,17 @@
+#pragma warning disable CS8629
+
 using System;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    [Collection("Sequential")]
+    // [Collection("Sequential")]
     public class ShiftSystemTest
     {
-        private LocoController loco;
-        private FakeTrainCarWrapper train;
-        private ShiftSystem system;
+        private readonly LocoController loco;
+        private readonly FakeTrainCarWrapper train;
+        private readonly ShiftSystem system;
 
         public ShiftSystemTest(ITestOutputHelper output)
         {
@@ -17,7 +19,7 @@ namespace DriverAssist.Cruise
 
             train = new FakeTrainCarWrapper
             {
-                LocoType = DriverAssist.LocoType.DE2,
+                LocoType = LocoType.DE2,
                 Reverser = 1
             };
 
@@ -26,10 +28,10 @@ namespace DriverAssist.Cruise
             system = new ShiftSystem(loco);
         }
 
-        public void Dispose()
-        {
-            PluginLoggerSingleton.Instance = new NullLogger();
-        }
+        // public void Dispose()
+        // {
+        //     PluginLoggerSingleton.Instance = new NullLogger();
+        // }
 
         /// The train is a DM3
         /// and a gear change has been requested.

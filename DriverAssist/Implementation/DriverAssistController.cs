@@ -8,29 +8,31 @@ namespace DriverAssist.Implementation
 {
     public class DriverAssistController
     {
-        private static int CC_SPEED_STEP = 5;
+        private const int CC_SPEED_STEP = 5;
 
         private LocoController loco;
         private CruiseControl cruiseControl;
-        private UnifiedSettings config;
-        private Translation localization;
+        private readonly UnifiedSettings config;
+        // private readonly Translation localization;
         private float updateAccumulator;
         private bool loaded = false;
         private GameObject gameObject;
         private DriverAssistWindow window;
         private ShiftSystem shiftSystem;
 
+#pragma warning disable CS8618
         public DriverAssistController(UnifiedSettings config)
+#pragma warning restore CS8618
         {
             this.config = config;
+            // localization = TranslationManager.Current;
         }
 
         public void Init()
         {
             PluginLoggerSingleton.Instance.Info($"Driver Assist is loaded!");
 
-            TranslationManager.Init();
-            localization = TranslationManager.Current;
+            // TranslationManager.Init();
 
             WorldStreamingInit.LoadingFinished += OnLoadingFinished;
             UnloadWatcher.UnloadRequested += OnUnloadRequested;
@@ -103,9 +105,9 @@ namespace DriverAssist.Implementation
         internal void Load()
         {
             PluginLoggerSingleton.Instance.Info($"Creating game object");
-            GameObject gameObject = new GameObject("DriverAssistWindow");
+            gameObject = new GameObject("DriverAssistWindow");
             window = gameObject.AddComponent<DriverAssistWindow>();
-            window.config = config;
+            window.Config = config;
             Loaded += window.OnLoad;
             Unloaded += window.OnUnload;
 
@@ -114,17 +116,19 @@ namespace DriverAssist.Implementation
 
             loco = new LocoController(Time.fixedDeltaTime);
 
-            cruiseControl = new CruiseControl(loco, config, new UnityClock());
-            cruiseControl.Accelerator = new PredictiveAcceleration();
-            cruiseControl.Decelerator = new PredictiveDeceleration();
+            cruiseControl = new CruiseControl(loco, config, new UnityClock())
+            {
+                Accelerator = new PredictiveAcceleration(),
+                Decelerator = new PredictiveDeceleration()
+            };
 
             shiftSystem = new ShiftSystem(loco);
 
             updateAccumulator = 0;
             loaded = true;
             Loaded?.Invoke(this, null);
-            window.loco = loco;
-            window.cruiseControl = cruiseControl;
+            window.Controller = loco;
+            window.CruiseControl = cruiseControl;
         }
 
         public event EventHandler Loaded = delegate { };
@@ -137,7 +141,7 @@ namespace DriverAssist.Implementation
             // Terminal.Shell.Commands.Remove(CC_CMD);
             // Terminal.Shell.Variables.Remove(CC_CMD);
             // Debug.Log($"OnDestroy");
-            cruiseControl = null;
+            // cruiseControl = null;
             loaded = false;
             Unloaded?.Invoke(this, null);
 
@@ -159,7 +163,7 @@ namespace DriverAssist.Implementation
             LoadIfNotLoaded();
             if (enteredCar?.IsLoco ?? false)
             {
-                DVTrainCarWrapper train = new DVTrainCarWrapper(enteredCar);
+                DVTrainCarWrapper train = new(enteredCar);
                 PluginLoggerSingleton.Instance.Info($"Entered {train.LocoType}");
                 loco.UpdateLocomotive(train);
             }
@@ -192,8 +196,9 @@ namespace DriverAssist.Implementation
 
         bool IsKeyPressed(int[] keys)
         {
-            foreach (KeyCode key in keys)
+            foreach (int intkey in keys)
             {
+                KeyCode key = (KeyCode)intkey;
                 if (!Input.GetKeyDown(key))
                     return false;
             }
@@ -212,6 +217,11 @@ namespace DriverAssist.Implementation
     class UnityLogger : PluginLogger
     {
         public string Prefix { get; set; }
+
+        UnityLogger()
+        {
+            Prefix = "";
+        }
 
         public void Info(string message)
         {
