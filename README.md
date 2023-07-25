@@ -65,6 +65,8 @@ The default key bindings are:
 * `Faster` - Increase speed (default: `PAGE UP`).
 * `Slower` - Decrease speed (default: `PAGE DOWN`).
 * `Toggle` - Toggle cruise control on/off (default: `RIGHT CTRL`)
+* `Upshift` - Shifts up one gear (default: `HOME`)
+* `Downshift` - Shifts down one gear (default: `END`)
 
 # Usage
 
