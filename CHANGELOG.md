@@ -5,7 +5,7 @@
 - DM3 no longer tries to apply MinBrake. This caused it to exit cruise control.
 - DM3 now waits a gear shift to complete before shifting to another gear. This resulted in sluggish acceleration because the previous throttle setting wasn't reapplied.
 - Acceleration is now averaged over 1/2 second instead of 1 second.
-- Single locomotive trains now use the independant brake.
+- Single locomotive trains now use the independent brake.
 
 0.7.1 - 7/22/2023
 
