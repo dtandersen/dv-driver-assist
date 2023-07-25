@@ -100,7 +100,7 @@ namespace DriverAssist
 
         public float SpeedKmh { get; set; }
 
-        public float SpeedMs { get; }
+        public float SpeedMs { get; set; }
 
         public float Throttle { get; set; }
         public float TrainBrake { get; set; }

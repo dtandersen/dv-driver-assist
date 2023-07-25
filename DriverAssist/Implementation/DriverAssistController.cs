@@ -13,26 +13,23 @@ namespace DriverAssist.Implementation
         private LocoController loco;
         private CruiseControl cruiseControl;
         private readonly UnifiedSettings config;
-        // private readonly Translation localization;
         private float updateAccumulator;
         private bool loaded = false;
         private GameObject gameObject;
         private DriverAssistWindow window;
         private ShiftSystem shiftSystem;
+        private LocoStatsSystem locoStatsSystem;
 
 #pragma warning disable CS8618
         public DriverAssistController(UnifiedSettings config)
 #pragma warning restore CS8618
         {
             this.config = config;
-            // localization = TranslationManager.Current;
         }
 
         public void Init()
         {
             PluginLoggerSingleton.Instance.Info($"Driver Assist is loaded!");
-
-            // TranslationManager.Init();
 
             WorldStreamingInit.LoadingFinished += OnLoadingFinished;
             UnloadWatcher.UnloadRequested += OnUnloadRequested;
@@ -58,6 +55,7 @@ namespace DriverAssist.Implementation
 
             if (loco.IsLoco)
             {
+                locoStatsSystem.OnUpdate();
                 shiftSystem.OnUpdate();
                 loco.UpdateStats(Time.fixedDeltaTime);
                 updateAccumulator += Time.fixedDeltaTime;
@@ -123,11 +121,12 @@ namespace DriverAssist.Implementation
             };
 
             shiftSystem = new ShiftSystem(loco);
+            locoStatsSystem = new LocoStatsSystem(loco, 0.5f, Time.fixedDeltaTime);
 
             updateAccumulator = 0;
             loaded = true;
             Loaded?.Invoke(this, null);
-            window.Controller = loco;
+            window.LocoController = loco;
             window.CruiseControl = cruiseControl;
         }
 
@@ -138,10 +137,6 @@ namespace DriverAssist.Implementation
         {
             PlayerManager.CarChanged -= OnCarChanged;
 
-            // Terminal.Shell.Commands.Remove(CC_CMD);
-            // Terminal.Shell.Variables.Remove(CC_CMD);
-            // Debug.Log($"OnDestroy");
-            // cruiseControl = null;
             loaded = false;
             Unloaded?.Invoke(this, null);
 

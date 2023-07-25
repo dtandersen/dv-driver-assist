@@ -6,7 +6,7 @@ namespace DriverAssist
 {
     public class LocoController
     {
-        public LocoComponents Components = new();
+        public readonly LocoComponents Components;
 
         private readonly Integrator speedIntegratorMs;
         private readonly Integrator heatIntegrator;
@@ -35,6 +35,7 @@ namespace DriverAssist
 
         public LocoController(float fixedDeltaTime)
         {
+            Components = new();
             loco = NullTrainCarWrapper.Instance;
             // this.fixedDeltaTime = fixedDeltaTime;
             int size = (int)(lookahead / fixedDeltaTime);
@@ -51,10 +52,6 @@ namespace DriverAssist
 
         public void UpdateLocomotive(TrainCarWrapper newloco)
         {
-            // if (!this.loco.IsSameTrainCar(newloco))
-            // {
-            //     PluginLoggerSingleton.Instance.Info("loco changed");
-            // }
             this.loco = newloco;
         }
 
@@ -249,7 +246,7 @@ namespace DriverAssist
         {
             get
             {
-                return speedIntegratorMs.Integrate() / lookahead;
+                return Components.LocoStats.AccelerationMs2;
             }
 
             set { }
@@ -356,42 +353,12 @@ namespace DriverAssist
 
         public int Length { get { return loco.Length; } }
 
-        // float lastThrottle;
-        // bool shiftcomplete;
-        // bool shifting;
-        // int shiftState = 0;
         public void UpdateStats(float deltaTime)
         {
             if (!loco.IsLoco)
             {
                 return;
             }
-
-            // if (IsMechanical)
-            // {
-            //     if (shiftState == 2)
-            //     {
-            //         if (!loco.GearChangeInProgress)
-            //         {
-            //             Throttle = lastThrottle;
-            //             shiftState = 0;
-            //         }
-            //     }
-            //     if (Gear != RequestedGear)
-            //     {
-            //         if (Throttle != 0)
-            //         {
-            //             shiftState = 1;
-            //             lastThrottle = Throttle;
-            //             Throttle = 0;
-            //         }
-            //         else
-            //         {
-            //             shiftState = 2;
-            //             Gear = RequestedGear;
-            //         }
-            //     }
-            // }
 
             float speedMs = SpeedMs;
             float accelerationMs = speedMs - lastSpeedMs;
@@ -550,6 +517,87 @@ namespace DriverAssist
         }
     }
 
+
+    internal class RollingSample
+    {
+        private readonly List<float> values;
+        private int index;
+        private readonly int size;
+
+        internal RollingSample(int size = 60)
+        {
+            this.size = size;
+            this.values = new List<float>(size);
+            this.index = 0;
+        }
+
+        internal void Add(float value)
+        {
+            if (values.Count < size)
+            {
+                values.Add(value);
+            }
+            else
+            {
+                values[index % size] = value;
+                index++;
+            }
+        }
+
+        // internal float Average()
+        // {
+        //     float sum = 0;
+
+        //     foreach (Node node in nodes)
+        //     {
+        //         sum += node.value;
+        //     }
+
+        //     return sum / (float)nodes.Count;
+        // }
+
+        internal float Sum()
+        {
+            // float v = 0;
+            // float t = 0;
+
+            // foreach (Node node in nodes)
+            // {
+            //     v += node.value;
+            //     t += node.time;
+            // }
+
+            // return v * t;
+            // float v = 0;
+            float sum = 0;
+
+            foreach (float value in values)
+            {
+                sum += value;
+            }
+
+            return sum;
+        }
+
+        // internal class Node
+        // {
+        //     public float value;
+        //     public float time;
+
+        //     public Node(float value, float time)
+        //     {
+        //         this.value = value;
+        //         this.time = time;
+        //     }
+        // }
+    }
+
+    public struct LocoStats
+    {
+        public float AccelerationMs2;
+        public float SpeedMs;
+    }
+
     public struct GearChangeRequest
     {
         public int RequestedGear;
@@ -558,9 +606,8 @@ namespace DriverAssist
 
     public class LocoComponents
     {
-        // public float? ThrottleBeforeShift { get; internal set; }
-        // // public bool IsShifting { get; internal set; }
-        // public int? RequestedGear { get; internal set; }
         public GearChangeRequest? GearChangeRequest { get; set; }
+        public LocoStats LocoStats { get; set; }
+        public float LocoStatsCooldown { get; set; }
     }
 }

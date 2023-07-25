@@ -1,12 +1,10 @@
 #pragma warning disable CS8629
 
-using System;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    // [Collection("Sequential")]
     public class ShiftSystemTest
     {
         private readonly LocoController loco;
@@ -27,11 +25,6 @@ namespace DriverAssist.Cruise
             loco.UpdateLocomotive(train);
             system = new ShiftSystem(loco);
         }
-
-        // public void Dispose()
-        // {
-        //     PluginLoggerSingleton.Instance = new NullLogger();
-        // }
 
         /// The train is a DM3
         /// and a gear change has been requested.
@@ -117,11 +110,7 @@ namespace DriverAssist.Cruise
         {
             train.LocoType = LocoType.DM3;
             train.Throttle = 0;
-            // train.GearboxA = 0;
-            // train.GearboxB = 0;
 
-            // train.GearChangeInProgress = false;
-            // loco.Gear = 0;
             loco.ChangeGear(1);
             train.Throttle = 1;
             Assert.Null(loco.Components.GearChangeRequest.Value.RestoreThrottle);
