@@ -39,7 +39,9 @@ There are many settings to play with for the cruise control. The first group of 
 
 ### Locomotive Profiles
 
-Currently the DE2, DE6, and DH4 are supported. Each locomotive type has its own settings.
+Currently the DE2, DE6, DH4, DM3 (experimental) are supported. Each locomotive type has its own settings.
+
+The DM3 currently upshifts at 800 RPM and downshifts at 600 RPM. This will be configurable in a future update.
 
 All locomotives
 
