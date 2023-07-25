@@ -68,6 +68,8 @@ The default key bindings are:
 * `Upshift` - Shifts up one gear (default: `HOME`)
 * `Downshift` - Shifts down one gear (default: `END`)
 
+The current throttle setting is reapplied after shifting.
+
 # Usage
 
 Put the reverser into neutral to avoid speeding away. Press `PAGE UP` to increase the setpoint to 10 km/h. Press `RIGHT CTRL` to enable cruise control. Now press `PAGE DOWN` and decrease the setpoint to -10 km/h. The train should no come to a halt and reverse. Finally press `PAGE UP` to raise the setpoint to 0. The locomotive will come to a full stop.
