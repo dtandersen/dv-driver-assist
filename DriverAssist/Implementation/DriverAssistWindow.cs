@@ -45,8 +45,14 @@ namespace DriverAssist.Implementation
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
 
+        bool laststats;
         protected void Window()
         {
+            if (laststats != Config.ShowStats)
+            {
+                windowRect = new Rect(20, 20, scale * 120, scale * 50);
+                laststats = Config.ShowStats;
+            }
             // if (LocoController == null) return;
             // float Speed = loco.RelativeSpeedKmh;
             // float Throttle = loco.Throttle;
