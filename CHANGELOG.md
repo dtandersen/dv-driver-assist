@@ -1,3 +1,12 @@
+0.8.0 - 7/24/2023
+
+- Fixed a bug where DM3 gears couldn't be shifted manually.
+- DM3 won't downshift at low RPM as long as RPM is rising. This should prevent some unnecessary gear seeking.
+- DM3 no longer tries to apply MinBrake. This caused it to exit cruise control.
+- DM3 now waits a gear shift to complete before shifting to another gear. This resulted in sluggish acceleration because the previous throttle setting wasn't reapplied.
+- Acceleration is now averaged over 1/2 second instead of 1 second.
+- Single locomotive trains now use the independant brake.
+
 0.7.1 - 7/22/2023
 
 - Added support for Unity Mod Manager.
