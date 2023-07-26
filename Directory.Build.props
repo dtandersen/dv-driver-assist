@@ -1,47 +1,47 @@
 <Project>
-    <PropertyGroup>
-        <Description>Driver Assist: A cruise control mod for Derail Valley</Description>
-        <Product>Driver Assist</Product>
-        <Version>0.8.0</Version>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Description>Driver Assist: A cruise control mod for Derail Valley</Description>
+    <Product>Driver Assist</Product>
+    <Version>0.8.1</Version>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <TargetFramework>netframework4.6</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-        <DebugType>embedded</DebugType>
-        <Nullable>enable</Nullable>
-        <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netframework4.6</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <DebugType>embedded</DebugType>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <SrcRoot>$(MSBuildThisFileDirectory)</SrcRoot>
-        <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(SrcRoot)\</SolutionDir>
-        <Configuration Condition="$(Configuration) == ''">Debug</Configuration>
-    </PropertyGroup>
+  <PropertyGroup>
+    <SrcRoot>$(MSBuildThisFileDirectory)</SrcRoot>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(SrcRoot)\</SolutionDir>
+    <Configuration Condition="$(Configuration) == ''">Debug</Configuration>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <!--<ProduceReferenceAssembly>True</ProduceReferenceAssembly>-->
-        <SignAssembly Condition="'$(SignAssembly)' == ''">true</SignAssembly>
-        <DefineConstants Condition="'$(SignAssembly)' == 'true'">$(DefineConstants);SIGN;</DefineConstants>
-        <!-- <AssemblyOriginatorKeyFile>$(SrcRoot)\key.snk</AssemblyOriginatorKeyFile> -->
-        <AssemblySearchPaths>{RawFileName};{HintPathFromItem};{TargetFrameworkDirectory}</AssemblySearchPaths>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <_FindDependencies>false</_FindDependencies>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    </PropertyGroup>
+  <PropertyGroup>
+    <!--<ProduceReferenceAssembly>True</ProduceReferenceAssembly>-->
+    <SignAssembly Condition="'$(SignAssembly)' == ''">true</SignAssembly>
+    <DefineConstants Condition="'$(SignAssembly)' == 'true'">$(DefineConstants);SIGN;</DefineConstants>
+    <!-- <AssemblyOriginatorKeyFile>$(SrcRoot)\key.snk</AssemblyOriginatorKeyFile> -->
+    <AssemblySearchPaths>{RawFileName};{HintPathFromItem};{TargetFrameworkDirectory}</AssemblySearchPaths>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <_FindDependencies>false</_FindDependencies>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <BinariesFolder>$(SrcRoot)bin</BinariesFolder>
-        <CommonIntermediateOutputRoot>$(SrcRoot)obj\</CommonIntermediateOutputRoot>
-        <BaseIntermediateOutputPath>$(CommonIntermediateOutputRoot)$(Configuration)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-        <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-        <AssemblyInfoPath Condition="'$(AssemblyInfoPath)' == ''">$(BaseIntermediateOutputPath)GlobalAssemblyInfo.cs</AssemblyInfoPath>
-        <CommonOutputDirectory>$(BinariesFolder)\$(Configuration)</CommonOutputDirectory>
-        <BuildToCommonOutputDirectory Condition="'$(BuildToCommonOutputDirectory)' == ''">true</BuildToCommonOutputDirectory>
-        <OutputPath Condition="'$(OutputPath)' == ''">$(BinariesFolder)\$(Configuration)\$(MSBuildProjectName)</OutputPath>
-        <OutputPath Condition="'$(BuildToCommonOutputDirectory)' == 'true'">$(CommonOutputDirectory)\</OutputPath>
-        <OutDir>$(OutputPath)</OutDir>
-        <TargetFrameworkMonikerAssemblyAttributesPath>$(IntermediateOutputPath)AssemblyAttributes.cs</TargetFrameworkMonikerAssemblyAttributesPath>
-    </PropertyGroup>
+  <PropertyGroup>
+    <BinariesFolder>$(SrcRoot)bin</BinariesFolder>
+    <CommonIntermediateOutputRoot>$(SrcRoot)obj\</CommonIntermediateOutputRoot>
+    <BaseIntermediateOutputPath>$(CommonIntermediateOutputRoot)$(Configuration)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <AssemblyInfoPath Condition="'$(AssemblyInfoPath)' == ''">$(BaseIntermediateOutputPath)GlobalAssemblyInfo.cs</AssemblyInfoPath>
+    <CommonOutputDirectory>$(BinariesFolder)\$(Configuration)</CommonOutputDirectory>
+    <BuildToCommonOutputDirectory Condition="'$(BuildToCommonOutputDirectory)' == ''">true</BuildToCommonOutputDirectory>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(BinariesFolder)\$(Configuration)\$(MSBuildProjectName)</OutputPath>
+    <OutputPath Condition="'$(BuildToCommonOutputDirectory)' == 'true'">$(CommonOutputDirectory)\</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+    <TargetFrameworkMonikerAssemblyAttributesPath>$(IntermediateOutputPath)AssemblyAttributes.cs</TargetFrameworkMonikerAssemblyAttributesPath>
+  </PropertyGroup>
 </Project>
