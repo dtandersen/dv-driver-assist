@@ -16,11 +16,11 @@ namespace DriverAssist.Implementation
         private Rect windowRect;
         private bool loaded;
         private const float SCALE = 1.5f;
-        private Logger logger;
+        private readonly Logger logger = LogFactory.GetLogger("DriverAssistWindow");
 
         public void Awake()
         {
-            logger = LogFactory.GetLogger("DriverAssistWindow");
+            // logger = LogFactory.GetLogger("DriverAssistWindow");
             logger.Info("DriverAssistWindow::Awake");
             windowRect = new Rect(20, 20, SCALE * 120, SCALE * 50);
         }

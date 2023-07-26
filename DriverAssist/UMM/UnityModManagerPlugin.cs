@@ -19,31 +19,26 @@ namespace DriverAssist.UMM
         private static Settings settings;
         private static Logger logger;
 
-        private static DriverAssistController presenter;
+        private static DriverAssistController controller;
 #pragma warning restore CS8618
 
         public static bool Load(ModEntry modEntry)
         {
-            // logger = new UmmLogger(modEntry.Logger, "DriverAssistUmmMod");
-            // modEntry.Logger.Log("DriverAssistUmmMod::hi");
             LogFactory.CreateLogger.Value = (scope) =>
             {
-                // logger.Info("DriverAssistUmmMod::CreateLogger");
                 return new UmmLogger(modEntry.Logger, scope);
             };
-            logger = LogFactory.GetLogger("DriverAssistUmmMod");
-            // DriverAssistLogger.Instance = ;
+            logger = LogFactory.GetLogger(typeof(DriverAssistUmmMod));
 
-            logger.Info($"Begin DriverAssistUmmMod::Load");
+            logger.Info($"Begin Load");
 
-            logger.Info($"Detected language {LocalizationManager.CurrentLanguage}");
             TranslationManager.SetLangage(LocalizationManager.CurrentLanguage);
 
             settings = ModSettings.Load<Settings>(modEntry);
             SettingsWrapper config = new(settings);
 
-            presenter = new DriverAssistController(config);
-            presenter.Init();
+            controller = new DriverAssistController(config);
+            controller.Init();
 
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
@@ -51,18 +46,19 @@ namespace DriverAssist.UMM
             modEntry.OnUpdate = OnUpdate;
             modEntry.OnFixedUpdate = OnFixedUpdate;
 
-            logger.Info($"End DriverAssistUmmMod::Load");
+            logger.Info($"End Load");
+
             return true;
         }
 
         static void OnUpdate(ModEntry e, float dt)
         {
-            presenter.OnUpdate();
+            controller.OnUpdate();
         }
 
         static void OnFixedUpdate(ModEntry e, float dt)
         {
-            presenter.OnFixedUpdate();
+            controller.OnFixedUpdate();
         }
 
         static void OnGUI(ModEntry modEntry)
@@ -79,8 +75,8 @@ namespace DriverAssist.UMM
         static bool OnUnload(ModEntry e)
         {
             logger.Info($"UMM:OnUnload");
-            presenter.Unload();
-            presenter.OnDestroy();
+            controller.Unload();
+            controller.OnDestroy();
 
             return true;
         }
@@ -372,12 +368,12 @@ namespace DriverAssist.UMM
 
         public void Info(string message)
         {
-            logger.Log($"[{scope}] INFO {message}");
+            logger.Log($"{scope,-25} INFO  {message}");
         }
 
         public void Warn(string message)
         {
-            logger.Log($"{scope} WARN {message}");
+            logger.Log($"{scope,-25} WARN  {message}");
         }
     }
 }

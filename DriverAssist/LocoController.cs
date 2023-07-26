@@ -30,7 +30,7 @@ namespace DriverAssist
             new float[] {0.5f, 1},    // 8 = 2-3
             new float[] {1,    1},    // 9 = 3-3
         };
-        private Logger logger;
+        private readonly Logger logger;
 
         // private readonly float fixedDeltaTime;
 

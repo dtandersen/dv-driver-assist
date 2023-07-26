@@ -42,6 +42,7 @@ namespace DriverAssist.Localization
     public class TranslationManager
     {
         static Translation instance;
+        private static readonly Logger logger = LogFactory.GetLogger(typeof(TranslationManager));
 
         static TranslationManager()
         {
@@ -52,13 +53,14 @@ namespace DriverAssist.Localization
         {
             get
             {
-                // PluginLoggerSingleton.Instance.Info($"Detected language {CultureInfo.CurrentCulture.DisplayName}");
                 return instance;
             }
         }
 
         public static void SetLangage(string language)
         {
+            logger.Info($"Using language {language}");
+
             instance = Init(language);
         }
 
