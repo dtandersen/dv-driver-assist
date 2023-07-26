@@ -114,7 +114,7 @@ namespace DriverAssist.UMM
         [Draw("Operating Temperature", Min = 0)]
         public int Dh4MaxTemperature = 105;
         [Draw("Maximum Temperature", Min = 0)]
-        public int Dh4OverdriveTemperature = 119;
+        public int Dh4OverdriveTemperature = 118;
 
         [Header("DM3")]
         [Draw("Minimum Torque", Min = 0)]
