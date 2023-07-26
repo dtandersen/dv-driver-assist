@@ -34,8 +34,7 @@ namespace DriverAssist.Implementation
             WorldStreamingInit.LoadingFinished += OnLoadingFinished;
             UnloadWatcher.UnloadRequested += OnUnloadRequested;
 
-
-            // we might load it with f6 in script engine, so onload would not occur
+            // we might already be in a loco (reloaded mod)
             if (PlayerManager.PlayerTransform != null)
             {
                 PluginLoggerSingleton.Instance.Info($"Player detected");
@@ -102,11 +101,10 @@ namespace DriverAssist.Implementation
             }
         }
 
-        internal void Load2()
+        internal void Load()
         {
             loaded = true;
-            PluginLoggerSingleton.Instance.Info("DriverAssistController::Load2");
-            PluginLoggerSingleton.Instance.Info($"Creating game object");
+            PluginLoggerSingleton.Instance.Info("DriverAssistController::Load");
 
             gameObject = new GameObject("DriverAssistWindow");
             window = gameObject.AddComponent<DriverAssistWindow>();
@@ -114,7 +112,6 @@ namespace DriverAssist.Implementation
             Loaded += window.OnLoad;
             Unloaded += window.OnUnload;
 
-            PluginLoggerSingleton.Instance.Info($"OnLoad");
             PlayerManager.CarChanged += OnCarChanged;
 
             loco = new LocoController(Time.fixedDeltaTime);
@@ -161,30 +158,25 @@ namespace DriverAssist.Implementation
         {
             if (!loaded)
             {
-                Load2();
+                Load();
             }
         }
 
         public void ChangeCar(TrainCar? trainCar)
         {
             PluginLoggerSingleton.Instance.Info($"DriverAssistController::ChangeCar {trainCar?.carType.ToString() ?? "null"}");
-            // if (trainCar == null)
-            // {
-            //     PluginLoggerSingleton.Instance.Info($"WARN: DriverAssistController::ChangeCar null");
-            //     return;
-            // }
-            // PluginLoggerSingleton.Instance.Info($"DriverAssistController::ChangeCar {trainCar.carType}");
+
             LoadIfNotLoaded();
             if (trainCar == null || !trainCar.IsLoco)
             {
                 loco.UpdateLocomotive(NullTrainCarWrapper.Instance);
-                PluginLoggerSingleton.Instance.Info($"Exited {trainCar?.carType.ToString() ?? "null"}");
+                PluginLoggerSingleton.Instance.Info($"Exited train car {trainCar?.carType.ToString() ?? "null"}");
                 cruiseControl.Enabled = false;
             }
             else
             {
                 DVTrainCarWrapper train = new(trainCar);
-                PluginLoggerSingleton.Instance.Info($"Entered {trainCar?.carType.ToString() ?? "null"}");
+                PluginLoggerSingleton.Instance.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
                 loco.UpdateLocomotive(train);
             }
         }
@@ -198,7 +190,6 @@ namespace DriverAssist.Implementation
         public void OnLoadingFinished()
         {
             PluginLoggerSingleton.Instance.Info($"DriverAssistController::OnLoadingFinished");
-            // LoadIfNotLoaded();
             ChangeCar(PlayerManager.Car);
         }
 
@@ -242,6 +233,4 @@ namespace DriverAssist.Implementation
             Debug.Log($"{Prefix}{message}");
         }
     }
-
-
 }

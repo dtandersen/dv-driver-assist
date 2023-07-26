@@ -1,7 +1,6 @@
 #if UMM
 
 using System.Collections.Generic;
-using System.Globalization;
 using DriverAssist.Cruise;
 using DriverAssist.Implementation;
 using DriverAssist.Localization;
@@ -21,16 +20,16 @@ namespace DriverAssist.UMM
         private static DriverAssistController presenter;
 #pragma warning restore CS8618
 
-        public static bool Load(UnityModManager.ModEntry modEntry)
+        public static bool Load(ModEntry modEntry)
         {
             PluginLoggerSingleton.Instance = new UmmLogger(modEntry.Logger);
+
+            PluginLoggerSingleton.Instance.Info($"Begin DriverAssistUmmMod::Load");
 
             PluginLoggerSingleton.Instance.Info($"Detected language {LocalizationManager.CurrentLanguage}");
             TranslationManager.SetLangage(LocalizationManager.CurrentLanguage);
 
-            PluginLoggerSingleton.Instance.Info($"Begin DriverAssistUmmMod::Load");
-
-            settings = Settings.Load<Settings>(modEntry);
+            settings = ModSettings.Load<Settings>(modEntry);
             SettingsWrapper config = new(settings);
 
             presenter = new DriverAssistController(config);
@@ -56,12 +55,12 @@ namespace DriverAssist.UMM
             presenter.OnFixedUpdate();
         }
 
-        static void OnGUI(UnityModManager.ModEntry modEntry)
+        static void OnGUI(ModEntry modEntry)
         {
             settings.Draw(modEntry);
         }
 
-        static void OnSaveGUI(UnityModManager.ModEntry modEntry)
+        static void OnSaveGUI(ModEntry modEntry)
         {
             PluginLoggerSingleton.Instance.Info($"UMM:OnSaveGUI");
             settings.Save(modEntry);
@@ -78,7 +77,7 @@ namespace DriverAssist.UMM
     }
 
     [DrawFields(DrawFieldMask.Public)]
-    public class Settings : UnityModManager.ModSettings, IDrawable
+    public class Settings : ModSettings, IDrawable
     {
         public float Offset = 0;
         public float Diff = 2.5f;
@@ -115,7 +114,7 @@ namespace DriverAssist.UMM
         public float BrakeReleaseFactor = 0.5f;
         public float MinBrake = 0.1f;
 
-        public override void Save(UnityModManager.ModEntry modEntry)
+        public override void Save(ModEntry modEntry)
         {
             Save(this, modEntry);
         }
