@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace DriverAssist.Localization
 {
-#pragma warning disable IDE1006
+    // #pragma warning disable IDE1006
     public interface Translation
-#pragma warning restore IDE1006
+    // #pragma warning restore IDE1006
     {
         string CC_SETPOINT { get; }
         string CC_STATUS { get; }
@@ -41,37 +41,39 @@ namespace DriverAssist.Localization
 
     public class TranslationManager
     {
-        static readonly Translation instance;
+        static Translation instance;
 
         static TranslationManager()
         {
-            instance = Init();
+            instance = Init(CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         }
+
         public static Translation Current
         {
             get
             {
+                // PluginLoggerSingleton.Instance.Info($"Detected language {CultureInfo.CurrentCulture.DisplayName}");
                 return instance;
             }
         }
-        // }
 
-        public static Translation Init()
+        public static void SetLangage(string language)
         {
-            string language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-            return Init(language);
+            instance = Init(language);
         }
 
-        public static Translation Init(string language)
+        static Translation Init(string language)
         {
-            Translation x = language switch
+            Translation translation = language switch
             {
                 "en" => new TranslationEN(),
+                "English" => new TranslationEN(),
                 "de" => new TranslationDE(),
+                "German" => new TranslationDE(),
                 _ => new TranslationEN(),
             };
 
-            return x;
+            return translation;
         }
     }
 

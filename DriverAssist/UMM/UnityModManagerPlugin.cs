@@ -1,8 +1,11 @@
 #if UMM
 
 using System.Collections.Generic;
+using System.Globalization;
 using DriverAssist.Cruise;
 using DriverAssist.Implementation;
+using DriverAssist.Localization;
+using I2.Loc;
 using UnityEngine;
 using UnityModManagerNet;
 using static UnityModManagerNet.UnityModManager;
@@ -13,15 +16,19 @@ namespace DriverAssist.UMM
     public static class DriverAssistUmmMod
     {
 #pragma warning disable CS8618
-        public static Settings settings;
+        private static Settings settings;
 
         private static DriverAssistController presenter;
 #pragma warning restore CS8618
 
-
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
             PluginLoggerSingleton.Instance = new UmmLogger(modEntry.Logger);
+
+            PluginLoggerSingleton.Instance.Info($"Detected language {LocalizationManager.CurrentLanguage}");
+            TranslationManager.SetLangage(LocalizationManager.CurrentLanguage);
+
+            PluginLoggerSingleton.Instance.Info($"Begin DriverAssistUmmMod::Load");
 
             settings = Settings.Load<Settings>(modEntry);
             SettingsWrapper config = new(settings);
@@ -29,13 +36,13 @@ namespace DriverAssist.UMM
             presenter = new DriverAssistController(config);
             presenter.Init();
 
-            // modEntry.OnFixedGUI = OnFixedGUI;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
             modEntry.OnUnload = OnUnload;
             modEntry.OnUpdate = OnUpdate;
             modEntry.OnFixedUpdate = OnFixedUpdate;
 
+            PluginLoggerSingleton.Instance.Info($"End DriverAssistUmmMod::Load");
             return true;
         }
 
@@ -56,6 +63,7 @@ namespace DriverAssist.UMM
 
         static void OnSaveGUI(UnityModManager.ModEntry modEntry)
         {
+            PluginLoggerSingleton.Instance.Info($"UMM:OnSaveGUI");
             settings.Save(modEntry);
         }
 
@@ -83,29 +91,29 @@ namespace DriverAssist.UMM
         public KeyBinding DumpPorts = new() { keyCode = KeyCode.F9 };
         public bool ShowStats = false;
 
-        public int de2MinTorque = 22000;
-        public int de2MinAmps = 400;
-        public int de2MaxAmps = 750;
-        public int de2MaxTemperature = 105;
-        public int de2OverdriveTemperature = 118;
+        public int De2MinTorque = 22000;
+        public int De2MinAmps = 400;
+        public int De2MaxAmps = 750;
+        public int De2MaxTemperature = 105;
+        public int De2OverdriveTemperature = 118;
 
-        public int de6MinTorque = 50000;
-        public int de6MinAmps = 200;
-        public int de6MaxAmps = 435;
-        public int de6MaxTemperature = 105;
-        public int de6OverdriveTemperature = 118;
+        public int De6MinTorque = 50000;
+        public int De6MinAmps = 200;
+        public int De6MaxAmps = 435;
+        public int De6MaxTemperature = 105;
+        public int De6OverdriveTemperature = 118;
 
-        public int dh4MinTorque = 35000;
-        public int dh4MaxTemperature = 105;
-        public int dh4OverdriveTemperature = 119;
+        public int Dh4MinTorque = 35000;
+        public int Dh4MaxTemperature = 105;
+        public int Dh4OverdriveTemperature = 119;
 
-        public int dm3MinTorque = 35000;
-        public int dm3MaxTemperature = 105;
-        public int dm3OverdriveTemperature = 118;
+        public int Dm3MinTorque = 35000;
+        public int Dm3MaxTemperature = 105;
+        public int Dm3OverdriveTemperature = 118;
 
-        public int brakingTime = 10;
-        public float brakeReleaseFactor = 0.5f;
-        public float minBrake = 0.1f;
+        public int BrakingTime = 10;
+        public float BrakeReleaseFactor = 0.5f;
+        public float MinBrake = 0.1f;
 
         public override void Save(UnityModManager.ModEntry modEntry)
         {
@@ -157,43 +165,43 @@ namespace DriverAssist.UMM
                 Dictionary<string, LocoSettings> locoSettings = new()
                 {
                     [LocoType.DE2] = new UmmLocoSettings(
-                    minTorque: settings.de2MinTorque,
-                    minAmps: settings.de2MinAmps,
-                    maxAmps: settings.de2MaxAmps,
-                    maxTemperature: settings.de2MaxTemperature,
-                    overdriveTemperature: settings.de2OverdriveTemperature,
-                    brakingTime: settings.brakingTime,
-                    brakeReleaseFactor: settings.brakeReleaseFactor,
-                    minBrake: settings.minBrake
+                    minTorque: settings.De2MinTorque,
+                    minAmps: settings.De2MinAmps,
+                    maxAmps: settings.De2MaxAmps,
+                    maxTemperature: settings.De2MaxTemperature,
+                    overdriveTemperature: settings.De2OverdriveTemperature,
+                    brakingTime: settings.BrakingTime,
+                    brakeReleaseFactor: settings.BrakeReleaseFactor,
+                    minBrake: settings.MinBrake
                 ),
                     [LocoType.DE6] = new UmmLocoSettings(
-                    minTorque: settings.de6MinTorque,
-                    minAmps: settings.de6MinAmps,
-                    maxAmps: settings.de6MaxAmps,
-                    maxTemperature: settings.de6MaxTemperature,
-                    overdriveTemperature: settings.de6OverdriveTemperature,
-                    brakingTime: settings.brakingTime,
-                    brakeReleaseFactor: settings.brakeReleaseFactor,
-                    minBrake: settings.minBrake
+                    minTorque: settings.De6MinTorque,
+                    minAmps: settings.De6MinAmps,
+                    maxAmps: settings.De6MaxAmps,
+                    maxTemperature: settings.De6MaxTemperature,
+                    overdriveTemperature: settings.De6OverdriveTemperature,
+                    brakingTime: settings.BrakingTime,
+                    brakeReleaseFactor: settings.BrakeReleaseFactor,
+                    minBrake: settings.MinBrake
                 ),
                     [LocoType.DH4] = new UmmLocoSettings(
-                    minTorque: settings.dh4MinTorque,
+                    minTorque: settings.Dh4MinTorque,
                     minAmps: 0,
                     maxAmps: 1000,
-                    maxTemperature: settings.dh4MaxTemperature,
-                    overdriveTemperature: settings.dh4OverdriveTemperature,
-                    brakingTime: settings.brakingTime,
-                    brakeReleaseFactor: settings.brakeReleaseFactor,
-                    minBrake: settings.minBrake
+                    maxTemperature: settings.Dh4MaxTemperature,
+                    overdriveTemperature: settings.Dh4OverdriveTemperature,
+                    brakingTime: settings.BrakingTime,
+                    brakeReleaseFactor: settings.BrakeReleaseFactor,
+                    minBrake: settings.MinBrake
                 ),
                     [LocoType.DM3] = new UmmLocoSettings(
-                    minTorque: settings.dm3MinTorque,
+                    minTorque: settings.Dm3MinTorque,
                     minAmps: 0,
                     maxAmps: 1000,
-                    maxTemperature: settings.dm3MaxTemperature,
-                    overdriveTemperature: settings.dm3OverdriveTemperature,
-                    brakingTime: settings.brakingTime,
-                    brakeReleaseFactor: settings.brakeReleaseFactor,
+                    maxTemperature: settings.Dm3MaxTemperature,
+                    overdriveTemperature: settings.Dm3OverdriveTemperature,
+                    brakingTime: settings.BrakingTime,
+                    brakeReleaseFactor: settings.BrakeReleaseFactor,
                     minBrake: 0
                 )
                 };

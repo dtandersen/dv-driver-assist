@@ -34,6 +34,7 @@
     <Reference Include="UnityEngine.UI" />
     <Reference Include="Unity.Entities" />
     <Reference Include="Unity.TextMeshPro" />
+    <Reference Include="I2.Localization" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.40" IncludeAssets="compile" />
   </ItemGroup>
 
