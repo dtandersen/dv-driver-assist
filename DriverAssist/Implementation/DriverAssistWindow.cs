@@ -15,13 +15,12 @@ namespace DriverAssist.Implementation
 
         private Rect windowRect;
         private bool loaded;
-        private readonly Translation localization = TranslationManager.Current;
-        private const float scale = 1.5f;
+        private const float SCALE = 1.5f;
 
         public void Awake()
         {
             PluginLoggerSingleton.Instance.Info("DriverAssistWindow::Awake");
-            windowRect = new Rect(20, 20, scale * 120, scale * 50);
+            windowRect = new Rect(20, 20, SCALE * 120, SCALE * 50);
         }
 
         public void OnGUI()
@@ -48,20 +47,21 @@ namespace DriverAssist.Implementation
         bool laststats;
         protected void Window()
         {
+            Translation localization = TranslationManager.Current;
             if (laststats != Config.ShowStats)
             {
-                windowRect = new Rect(20, 20, scale * 120, scale * 50);
+                windowRect = new Rect(20, 20, SCALE * 120, SCALE * 50);
                 laststats = Config.ShowStats;
             }
             // if (LocoController == null) return;
             // float Speed = loco.RelativeSpeedKmh;
             // float Throttle = loco.Throttle;
-            float Mass = LocoController.Mass;
+            // float mass = LocoController.Mass;
             // float powerkw = Mass * loco.RelativeAccelerationMs * loco.RelativeSpeedKmh / 3.6f / 1000;
             // float Force = Mass * 9.8f / 2f;
 
-            int labelwidth = (int)(scale * 100);
-            int width = (int)(scale * 50);
+            int labelwidth = (int)(SCALE * 100);
+            int width = (int)(SCALE * 50);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(localization.CC_SETPOINT, GUILayout.Width(labelwidth));
@@ -70,12 +70,12 @@ namespace DriverAssist.Implementation
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(localization.CC_STATUS, GUILayout.Width(labelwidth));
-            GUILayout.TextField($"{CruiseControl.Status}", GUILayout.Width(scale * 150));
+            GUILayout.TextField($"{CruiseControl.Status}", GUILayout.Width(SCALE * 150));
             GUILayout.EndHorizontal();
 
             if (Config.ShowStats)
             {
-                int mass = (int)(Mass / 1000);
+                int mass = (int)(LocoController.Mass / 1000);
                 int locoMass = (int)(LocoController.LocoMass / 1000);
                 int cargoMass = (int)(LocoController.CargoMass / 1000);
 

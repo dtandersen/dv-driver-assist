@@ -26,7 +26,6 @@ namespace DriverAssist.Cruise
         public CruiseControlTest(ITestOutputHelper output)
         {
             PluginLoggerSingleton.Instance = new TestLogger(output);
-            TranslationManager.Init();
             localization = TranslationManager.Current;
             config = new FakeCruiseControlConfig
             {
@@ -263,15 +262,15 @@ namespace DriverAssist.Cruise
             train.Reverser = 0;
             cruiseControl.DesiredSpeed = -5;
             WhenCruise();
-            Assert.Equal(String.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
+            Assert.Equal(string.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
 
             train.SpeedKmh = -8;
             WhenCruise();
-            Assert.Equal(String.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
+            Assert.Equal(string.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
 
             train.SpeedKmh = -6;
             WhenCruise();
-            Assert.Equal(String.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
+            Assert.Equal(string.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
 
             train.SpeedKmh = -4.9f;
             WhenCruise();
@@ -287,15 +286,15 @@ namespace DriverAssist.Cruise
             train.Reverser = 1;
             cruiseControl.DesiredSpeed = 5;
             WhenCruise();
-            Assert.Equal(String.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
+            Assert.Equal(string.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
 
             train.SpeedKmh = 2;
             WhenCruise();
-            Assert.Equal(String.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
+            Assert.Equal(string.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
 
             train.SpeedKmh = 4;
             WhenCruise();
-            Assert.Equal(String.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
+            Assert.Equal(string.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
 
             train.SpeedKmh = 5.1f;
             WhenCruise();
@@ -404,7 +403,7 @@ namespace DriverAssist.Cruise
 
             WhenCruise();
 
-            Assert.Equal(String.Format(localization.CC_UNSUPPORTED, LocoType.DE6), cruiseControl.Status);
+            Assert.Equal(string.Format(localization.CC_UNSUPPORTED, LocoType.DE6), cruiseControl.Status);
         }
 
         [Fact]

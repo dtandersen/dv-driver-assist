@@ -98,7 +98,7 @@ namespace DriverAssist.Cruise
             }
             catch (KeyNotFoundException)
             {
-                Status = String.Format(localization.CC_UNSUPPORTED, loco.LocoType);
+                Status = string.Format(localization.CC_UNSUPPORTED, loco.LocoType);
                 // Status = String.Format("No settings found for {0}", loco.LocoType);
                 return;
             }
@@ -111,14 +111,14 @@ namespace DriverAssist.Cruise
 
             if (!Enabled)
             {
-                Status = String.Format(localization.CC_DISABLED);
+                Status = string.Format(localization.CC_DISABLED);
                 // Status = String.Format("Disabled");
                 return;
             }
 
             if (loco.Reverser == 0.5f)
             {
-                Status = String.Format(localization.CC_WARNING_NEUTRAL);
+                Status = string.Format(localization.CC_WARNING_NEUTRAL);
                 // Status = String.Format("Idle: Reverser is in neutral");
                 loco.Throttle = 0;
                 return;
@@ -129,7 +129,7 @@ namespace DriverAssist.Cruise
 
             if (positiveDesiredSpeed == 0)
             {
-                Status = String.Format(localization.CC_STOPPING);
+                Status = string.Format(localization.CC_STOPPING);
                 // Status = String.Format("Stop");
                 loco.Throttle = 0;
                 if (!(loco.LocoType == LocoType.DM3))
@@ -139,7 +139,7 @@ namespace DriverAssist.Cruise
             }
             else if (IsWrongDirection)
             {
-                Status = String.Format(localization.CC_CHANGING_DIRECTION);
+                Status = string.Format(localization.CC_CHANGING_DIRECTION);
                 // Status = String.Format("Direction change");
                 loco.Throttle = 0;
                 if (!(loco.LocoType == LocoType.DM3))
@@ -162,7 +162,7 @@ namespace DriverAssist.Cruise
                 Accelerator.Tick(context);
                 minSpeed = positiveDesiredSpeed + config.Offset;
                 maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
-                Status = String.Format(localization.CC_ACCELERATING, minSpeed);
+                Status = string.Format(localization.CC_ACCELERATING, minSpeed);
                 // Status = String.Format("Accelerating to {0} km/h", minSpeed);
             }
             else if (loco.RelativeSpeedKmh + estspeed > maxSpeed)
@@ -174,14 +174,14 @@ namespace DriverAssist.Cruise
                 minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
                 // minSpeed = positiveDesiredSpeed - config.Offset;
                 // Status = String.Format("Decelerating to {0} km/h", maxSpeed);
-                Status = String.Format(localization.CC_DECELERATING, maxSpeed);
+                Status = string.Format(localization.CC_DECELERATING, maxSpeed);
             }
             else
             {
                 // Status = String.Format("Coast");
                 // PluginLoggerSingleton.Instance.Info($"Coast minSpeed={minSpeed} maxSpeed={maxSpeed} loco.RelativeSpeedKmh={loco.RelativeSpeedKmh}");
 
-                Status = String.Format(localization.CC_COASTING);
+                Status = string.Format(localization.CC_COASTING);
                 loco.Throttle = 0;
                 loco.TrainBrake = 0;
                 minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;

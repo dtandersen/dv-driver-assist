@@ -475,7 +475,7 @@ namespace DriverAssist
 
             foreach (Node node in nodes)
             {
-                sum += node.value;
+                sum += node.Value;
             }
 
             return sum / (float)nodes.Count;
@@ -498,7 +498,7 @@ namespace DriverAssist
 
             foreach (Node node in nodes)
             {
-                sum += node.value;
+                sum += node.Value;
             }
 
             return sum;
@@ -506,13 +506,13 @@ namespace DriverAssist
 
         internal class Node
         {
-            public float value;
-            public float time;
+            public float Value;
+            public float Time;
 
             public Node(float value, float time)
             {
-                this.value = value;
-                this.time = time;
+                this.Value = value;
+                this.Time = time;
             }
         }
     }

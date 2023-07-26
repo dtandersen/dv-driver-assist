@@ -10,8 +10,8 @@ namespace DriverAssist.Cruise
         float lastRpm = 0;
         const float STEP = 1f / 11f;
         // bool cooling = false;
-        public float lastThrottleChange;
-        public float lastShift;
+        public float LastThrottleChange;
+        public float LastShift;
         readonly PluginLogger logger;
 
         public PredictiveAcceleration()
@@ -38,7 +38,7 @@ namespace DriverAssist.Cruise
             float minTorque = context.Config.MinTorque;
             // float amps = loco.Amps;
             float projectedTemperature = loco.Temperature + loco.TemperatureChange;
-            float timeSinceThrottle = context.Time - lastThrottleChange;
+            float timeSinceThrottle = context.Time - LastThrottleChange;
             // float operatingTemp = context.Config.MaxTemperature;
             float dangerTemp = context.Config.HillClimbTemp;
             // float throttleAdj = 0;
@@ -149,7 +149,7 @@ namespace DriverAssist.Cruise
 
             LocoController loco = context.LocoController;
             loco.Throttle += throttleAdj;
-            lastThrottleChange = context.Time;
+            LastThrottleChange = context.Time;
         }
 
         private void Log(string v)
