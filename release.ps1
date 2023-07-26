@@ -1,8 +1,8 @@
 if ($PSScriptRoot -match '.+?\\bin\\?') {
-    $dir = $PSScriptRoot + "\Debug\"
+  $dir = $PSScriptRoot + "\Debug\"
 }
 else {
-    $dir = $PSScriptRoot + "\bin\Debug\"
+  $dir = $PSScriptRoot + "\bin\Debug\"
 }
 
 
@@ -40,10 +40,8 @@ $base = $copy + "DriverAssist\"
 Remove-Item -Force -Path ($copy) -Recurse -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path ($base)
 
-
 Copy-Item -Path ($UMMdir + "DriverAssist.dll") -Destination ($base) -Recurse -Force
 # Copy-Item -Path ($Coredir + "DriverAssistUMM.dll") -Destination ($copy) -Recurse -Force
-
 
 $ver = (Select-String -Pattern '<Version>([0-9]+\.[0-9]+\.[0-9]+)</Version>' -Path Directory.Build.props).Matches.Groups[1]
 # $info = Get-Content ("Info.json") -raw | ConvertFrom-Json
