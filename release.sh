@@ -9,7 +9,7 @@ rm -rf  "./$TMPBASE"
 mkdir -p "$TMPOUT"
 
 cp "$BUILD/DriverAssist.dll" "$TMPOUT"
-cp "Info.json" "$TMPOUT/DriverAssist"
+cp "Info.json" "$TMPOUT"
 
 rm -f "$RELEASE/DriverAssist-v${VERSION}.zip"
 7z a "$RELEASE/DriverAssist-v${VERSION}.zip" "./$TMPBASE/*"
