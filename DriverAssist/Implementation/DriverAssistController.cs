@@ -10,23 +10,22 @@ namespace DriverAssist.Implementation
     {
         private const int CC_SPEED_STEP = 5;
 
-        private LocoController loco;
-        private CruiseControl cruiseControl;
+        private LocoController? loco;
+        private CruiseControl? cruiseControl;
         private readonly UnifiedSettings config;
         private float updateAccumulator;
         private bool loaded = false;
-        private GameObject gameObject;
-        private DriverAssistWindow window;
-        private ShiftSystem shiftSystem;
-        private LocoStatsSystem locoStatsSystem;
-        private Logger logger;
+        private GameObject? gameObject;
+        private DriverAssistWindow? window;
+        private ShiftSystem? shiftSystem;
+        private LocoStatsSystem? locoStatsSystem;
+        private readonly Logger logger = LogFactory.GetLogger(typeof(DriverAssistController));
 
-#pragma warning disable CS8618
         public DriverAssistController(UnifiedSettings config)
+#pragma warning disable CS8618
 #pragma warning restore CS8618
         {
             this.config = config;
-            logger = LogFactory.GetLogger("DriverAssistController");
         }
 
         public void Init()
@@ -56,15 +55,15 @@ namespace DriverAssist.Implementation
         {
             if (!loaded) return;
 
-            if (loco.IsLoco)
+            if (loco?.IsLoco ?? false)
             {
-                locoStatsSystem.OnUpdate();
-                shiftSystem.OnUpdate();
+                locoStatsSystem?.OnUpdate();
+                shiftSystem?.OnUpdate();
                 loco.UpdateStats(Time.fixedDeltaTime);
                 updateAccumulator += Time.fixedDeltaTime;
                 if (updateAccumulator > config.UpdateInterval)
                 {
-                    cruiseControl.Tick();
+                    cruiseControl?.Tick();
                     updateAccumulator = 0;
                 }
             }
@@ -74,31 +73,38 @@ namespace DriverAssist.Implementation
         {
             if (!loaded) return;
 
-            if (IsKeyPressed(config.ToggleKeys))
+            if (cruiseControl != null)
             {
-                cruiseControl.Enabled = !cruiseControl.Enabled;
-            }
-            if (IsKeyPressed(config.AccelerateKeys))
-            {
-                cruiseControl.DesiredSpeed += CC_SPEED_STEP;
-            }
-            if (IsKeyPressed(config.DecelerateKeys))
-            {
-                cruiseControl.DesiredSpeed -= CC_SPEED_STEP;
-            }
-            if (IsKeyPressed(config.Upshift))
-            {
-                loco.Upshift();
-            }
-            if (IsKeyPressed(config.Downshift))
-            {
-                loco.Downshift();
-            }
-            if (IsKeyPressed(config.DumpPorts))
-            {
-                foreach (var port in loco.Ports)
+                if (IsKeyPressed(config.ToggleKeys))
                 {
-                    logger.Info($"{port}");
+                    cruiseControl.Enabled = !cruiseControl.Enabled;
+                }
+                if (IsKeyPressed(config.AccelerateKeys))
+                {
+                    cruiseControl.DesiredSpeed += CC_SPEED_STEP;
+                }
+                if (IsKeyPressed(config.DecelerateKeys))
+                {
+                    cruiseControl.DesiredSpeed -= CC_SPEED_STEP;
+                }
+            }
+
+            if (loco != null)
+            {
+                if (IsKeyPressed(config.Upshift))
+                {
+                    loco.Upshift();
+                }
+                if (IsKeyPressed(config.Downshift))
+                {
+                    loco.Downshift();
+                }
+                if (IsKeyPressed(config.DumpPorts))
+                {
+                    foreach (var port in loco.Ports)
+                    {
+                        logger.Info($"{port}");
+                    }
                 }
             }
         }
@@ -150,8 +156,12 @@ namespace DriverAssist.Implementation
             loaded = false;
             Unloaded?.Invoke(this, null);
 
-            Loaded -= window.OnLoad;
-            Unloaded -= window.OnUnload;
+            if (window != null)
+            {
+                Loaded -= window.OnLoad;
+                Unloaded -= window.OnUnload;
+            }
+
             UnityEngine.Object.Destroy(window);
             UnityEngine.Object.Destroy(gameObject);
         }
@@ -171,15 +181,18 @@ namespace DriverAssist.Implementation
             LoadIfNotLoaded();
             if (trainCar == null || !trainCar.IsLoco)
             {
-                loco.UpdateLocomotive(NullTrainCarWrapper.Instance);
+                loco?.UpdateLocomotive(NullTrainCarWrapper.Instance);
                 logger.Info($"Exited train car");
-                cruiseControl.Enabled = false;
+                if (cruiseControl != null)
+                {
+                    cruiseControl.Enabled = false;
+                }
             }
             else
             {
                 DVTrainCarWrapper train = new(trainCar);
                 logger.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
-                loco.UpdateLocomotive(train);
+                loco?.UpdateLocomotive(train);
             }
         }
 
