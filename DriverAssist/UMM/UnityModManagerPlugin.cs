@@ -79,75 +79,75 @@ namespace DriverAssist.UMM
     public class Settings : ModSettings, IDrawable
     {
         [Header("Cruise Control")]
-        [Draw("Offset", Precision = 1), Space(1)]
+        [Draw("Offset", Precision = 1)]
         public float Offset = 0;
-        [Draw("Diff", Precision = 1, Min = 0), Space(5)]
+        [Draw("Diff", Precision = 1, Min = 0)]
         public float Diff = 2.5f;
 
         [Header("DE2")]
-        [Draw("Minimum Torque", Min = 0), Space(5)]
+        [Draw("Minimum Torque", Min = 0)]
         public int De2MinTorque = 22000;
-        [Draw("Minimum Amps", Min = 0), Space(5)]
+        [Draw("Minimum Amps", Min = 0)]
         public int De2MinAmps = 400;
-        [Draw("Maximum Amps", Min = 0), Space(5)]
+        [Draw("Maximum Amps", Min = 0)]
         public int De2MaxAmps = 750;
-        [Draw("Operating Temperature", Min = 0), Space(5)]
+        [Draw("Operating Temperature", Min = 0)]
         public int De2MaxTemperature = 105;
-        [Draw("Maximum Temperature", Min = 0), Space(5)]
+        [Draw("Maximum Temperature", Min = 0)]
         public int De2OverdriveTemperature = 118;
 
         [Header("DE6")]
-        [Draw("Minimum Torque", Min = 0), Space(5)]
+        [Draw("Minimum Torque", Min = 0)]
         public int De6MinTorque = 50000;
-        [Draw("Minimum Amps", Min = 0), Space(5)]
+        [Draw("Minimum Amps", Min = 0)]
         public int De6MinAmps = 200;
-        [Draw("Maximum Amps", Min = 0), Space(5)]
+        [Draw("Maximum Amps", Min = 0)]
         public int De6MaxAmps = 435;
-        [Draw("Operating Temperature", Min = 0), Space(5)]
+        [Draw("Operating Temperature", Min = 0)]
         public int De6MaxTemperature = 105;
-        [Draw("Maximum Temperature", Min = 0), Space(5)]
+        [Draw("Maximum Temperature", Min = 0)]
         public int De6OverdriveTemperature = 118;
 
         [Header("DH4")]
-        [Draw("Minimum Torque", Min = 0), Space(5)]
+        [Draw("Minimum Torque", Min = 0)]
         public int Dh4MinTorque = 35000;
-        [Draw("Operating Temperature", Min = 0), Space(5)]
+        [Draw("Operating Temperature", Min = 0)]
         public int Dh4MaxTemperature = 105;
-        [Draw("Maximum Temperature", Min = 0), Space(5)]
+        [Draw("Maximum Temperature", Min = 0)]
         public int Dh4OverdriveTemperature = 119;
 
         [Header("DM3")]
-        [Draw("Minimum Torque", Min = 0), Space(5)]
+        [Draw("Minimum Torque", Min = 0)]
         public int Dm3MinTorque = 35000;
-        [Draw("Operating Temperature", Min = 0), Space(5)]
+        [Draw("Operating Temperature", Min = 0)]
         public int Dm3MaxTemperature = 105;
-        [Draw("Maximum Temperature", Min = 0), Space(5)]
+        [Draw("Maximum Temperature", Min = 0)]
         public int Dm3OverdriveTemperature = 118;
 
         [Header("Brakes")]
-        [Draw("Braking Time", Min = 0), Space(5)]
+        [Draw("Braking Time", Min = 0)]
         public int BrakingTime = 10;
-        [Draw("Release Factor", Precision = 1, Min = 0), Space(5)]
+        [Draw("Release Factor", Precision = 1, Min = 0)]
         public float BrakeReleaseFactor = 0.5f;
-        [Draw("Minimum Brake", Precision = 1, Min = 0), Space(5)]
+        [Draw("Minimum Brake", Precision = 1, Min = 0)]
         public float MinBrake = 0.1f;
 
         [Header("Key Bindings")]
-        [Draw("Increase cruise control setpoint"), Space(5)]
+        [Draw("Increase cruise control setpoint")]
         public KeyBinding Accelerate = new() { keyCode = KeyCode.PageUp };
-        [Draw("Decrease cruise control setpoint"), Space(5)]
+        [Draw("Decrease cruise control setpoint")]
         public KeyBinding Decelerate = new() { keyCode = KeyCode.PageDown };
-        [Draw("Toggle cruise control"), Space(5)]
+        [Draw("Toggle cruise control")]
         public KeyBinding Toggle = new() { keyCode = KeyCode.RightControl };
-        [Draw("Upshift"), Space(5)]
+        [Draw("Upshift")]
         public KeyBinding Upshift = new() { keyCode = KeyCode.Home };
-        [Draw("Downshift"), Space(5)]
+        [Draw("Downshift")]
         public KeyBinding Downshift = new() { keyCode = KeyCode.End };
 
         [Header("Developer Settings")]
-        [Draw("Show stats"), Space(5)]
+        [Draw("Show stats")]
         public bool ShowStats = false;
-        [Draw("Dump ports"), Space(5)]
+        [Draw("Dump ports")]
         public KeyBinding DumpPorts = new() { keyCode = KeyCode.F9 };
 
         public override void Save(ModEntry modEntry)
