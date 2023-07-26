@@ -13,22 +13,13 @@ namespace DriverAssist.Cruise
 
     public class CruiseControl
     {
-        // bool forward;
+        private readonly Logger logger;
         private float desiredSpeed = 0;
         public float DesiredSpeed
         {
             get { return desiredSpeed; }
             set
             {
-                // if (value >= 0)
-                // {
-                //     forward = true;
-                // }
-                // else
-                // {
-                //     forward = false;
-                // }
-
                 desiredSpeed = value;
                 positiveDesiredSpeed = Math.Abs(value);
                 minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
@@ -68,6 +59,7 @@ namespace DriverAssist.Cruise
 
         public CruiseControl(LocoController loco, CruiseControlSettings config, Clock clock)
         {
+            logger = LogFactory.GetLogger("CruiseControl");
             localization = TranslationManager.Current;
             this.loco = loco;
             this.config = config;
@@ -105,7 +97,7 @@ namespace DriverAssist.Cruise
 
             if (IsControlsChanged())
             {
-                Log($"Disabled cruise control lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
+                logger.Info($"Disabled cruise control lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
                 Enabled = false;
             }
 
@@ -202,10 +194,10 @@ namespace DriverAssist.Cruise
             }
         }
 
-        private void Log(string message)
-        {
-            PluginLoggerSingleton.Instance.Info(message);
-        }
+        // private void Log(string message)
+        // {
+        //     DriverAssistLogger.Instance.Info(message);
+        // }
 
         private bool IsControlsChanged()
         {

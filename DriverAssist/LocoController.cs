@@ -30,11 +30,13 @@ namespace DriverAssist
             new float[] {0.5f, 1},    // 8 = 2-3
             new float[] {1,    1},    // 9 = 3-3
         };
+        private Logger logger;
 
         // private readonly float fixedDeltaTime;
 
         public LocoController(float fixedDeltaTime)
         {
+            logger = LogFactory.GetLogger("LocoController");
             Components = new();
             loco = NullTrainCarWrapper.Instance;
             // this.fixedDeltaTime = fixedDeltaTime;
@@ -47,7 +49,7 @@ namespace DriverAssist
             int size3 = (int)(lookahead / fixedDeltaTime);
             ampsIntegrator = new Integrator(size3);
 
-            PluginLoggerSingleton.Instance.Info($"{fixedDeltaTime} {size} {size2}");
+            logger.Info($"{fixedDeltaTime} {size} {size2}");
         }
 
         public void UpdateLocomotive(TrainCarWrapper newloco)
@@ -147,13 +149,13 @@ namespace DriverAssist
             }
             set
             {
-                PluginLoggerSingleton.Instance.Info($"{IsMechanical}");
+                logger.Info($"{IsMechanical}");
                 if (IsMechanical)
                 {
                     float[] gear = gearBox[value];
                     loco.GearboxA = gear[0];
                     loco.GearboxB = gear[1];
-                    PluginLoggerSingleton.Instance.Info($"GearboxA={loco.GearboxA} GearboxB={loco.GearboxB}");
+                    logger.Info($"GearboxA={loco.GearboxA} GearboxB={loco.GearboxB}");
                 }
             }
         }
@@ -381,7 +383,7 @@ namespace DriverAssist
 
         internal void Log(string v)
         {
-            PluginLoggerSingleton.Instance.Info(v);
+            logger.Info(v);
         }
 
         internal void Upshift()
@@ -412,7 +414,7 @@ namespace DriverAssist
                 gearChangeRequest.RestoreThrottle = loco.Throttle;
             }
             Components.GearChangeRequest = gearChangeRequest;
-            PluginLoggerSingleton.Instance.Info($"LocoController: Requesting gear change RequestedGear={gearChangeRequest.RequestedGear} RestoreThrottle={gearChangeRequest.RestoreThrottle ?? -1}");
+            logger.Info($"LocoController: Requesting gear change RequestedGear={gearChangeRequest.RequestedGear} RestoreThrottle={gearChangeRequest.RestoreThrottle ?? -1}");
         }
     }
 

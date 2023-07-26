@@ -25,7 +25,9 @@ namespace DriverAssist.Cruise
 
         public CruiseControlTest(ITestOutputHelper output)
         {
-            PluginLoggerSingleton.Instance = new TestLogger(output);
+            // DriverAssistLogger.Instance = new TestLogger(output);
+            LogFactory.CreateLogger.Value = (scope) => new TestLogger(output);
+
             localization = TranslationManager.Current;
             config = new FakeCruiseControlConfig
             {

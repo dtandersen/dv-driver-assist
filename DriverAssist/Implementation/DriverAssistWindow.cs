@@ -16,10 +16,12 @@ namespace DriverAssist.Implementation
         private Rect windowRect;
         private bool loaded;
         private const float SCALE = 1.5f;
+        private Logger logger;
 
         public void Awake()
         {
-            PluginLoggerSingleton.Instance.Info("DriverAssistWindow::Awake");
+            logger = LogFactory.GetLogger("DriverAssistWindow");
+            logger.Info("DriverAssistWindow::Awake");
             windowRect = new Rect(20, 20, SCALE * 120, SCALE * 50);
         }
 
@@ -189,18 +191,18 @@ namespace DriverAssist.Implementation
 
         public void OnDestroy()
         {
-            PluginLoggerSingleton.Instance.Info("DriverAssistWindow::OnDestroy");
+            logger.Info("DriverAssistWindow::OnDestroy");
         }
 
         public void OnLoad(object sender, EventArgs e)
         {
-            PluginLoggerSingleton.Instance.Info("DriverAssistWindow::OnLoad");
+            logger.Info("DriverAssistWindow::OnLoad");
             loaded = true;
         }
 
         public void OnUnload(object sender, EventArgs e)
         {
-            PluginLoggerSingleton.Instance.Info("DriverAssistWindow::OnUnload");
+            logger.Info("DriverAssistWindow::OnUnload");
             loaded = false;
         }
     }

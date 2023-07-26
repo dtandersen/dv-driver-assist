@@ -8,6 +8,7 @@ using I2.Loc;
 using UnityEngine;
 using UnityModManagerNet;
 using static UnityModManagerNet.UnityModManager;
+using static UnityModManagerNet.UnityModManager.ModEntry;
 
 namespace DriverAssist.UMM
 {
@@ -16,17 +17,26 @@ namespace DriverAssist.UMM
     {
 #pragma warning disable CS8618
         private static Settings settings;
+        private static Logger logger;
 
         private static DriverAssistController presenter;
 #pragma warning restore CS8618
 
         public static bool Load(ModEntry modEntry)
         {
-            PluginLoggerSingleton.Instance = new UmmLogger(modEntry.Logger);
+            // logger = new UmmLogger(modEntry.Logger, "DriverAssistUmmMod");
+            // modEntry.Logger.Log("DriverAssistUmmMod::hi");
+            LogFactory.CreateLogger.Value = (scope) =>
+            {
+                // logger.Info("DriverAssistUmmMod::CreateLogger");
+                return new UmmLogger(modEntry.Logger, scope);
+            };
+            logger = LogFactory.GetLogger("DriverAssistUmmMod");
+            // DriverAssistLogger.Instance = ;
 
-            PluginLoggerSingleton.Instance.Info($"Begin DriverAssistUmmMod::Load");
+            logger.Info($"Begin DriverAssistUmmMod::Load");
 
-            PluginLoggerSingleton.Instance.Info($"Detected language {LocalizationManager.CurrentLanguage}");
+            logger.Info($"Detected language {LocalizationManager.CurrentLanguage}");
             TranslationManager.SetLangage(LocalizationManager.CurrentLanguage);
 
             settings = ModSettings.Load<Settings>(modEntry);
@@ -41,7 +51,7 @@ namespace DriverAssist.UMM
             modEntry.OnUpdate = OnUpdate;
             modEntry.OnFixedUpdate = OnFixedUpdate;
 
-            PluginLoggerSingleton.Instance.Info($"End DriverAssistUmmMod::Load");
+            logger.Info($"End DriverAssistUmmMod::Load");
             return true;
         }
 
@@ -62,13 +72,13 @@ namespace DriverAssist.UMM
 
         static void OnSaveGUI(ModEntry modEntry)
         {
-            PluginLoggerSingleton.Instance.Info($"UMM:OnSaveGUI");
+            logger.Info($"UMM:OnSaveGUI");
             settings.Save(modEntry);
         }
 
         static bool OnUnload(ModEntry e)
         {
-            PluginLoggerSingleton.Instance.Info($"UMM:OnUnload");
+            logger.Info($"UMM:OnUnload");
             presenter.Unload();
             presenter.OnDestroy();
 
@@ -349,21 +359,25 @@ namespace DriverAssist.UMM
         public float MaxAccel { get { return 0.25f; } }
     }
 
-    class UmmLogger : PluginLogger
+    class UmmLogger : Logger
     {
-        private readonly ModEntry.ModLogger logger;
+        private readonly ModLogger logger;
+        private readonly string scope;
 
-        public UmmLogger(ModEntry.ModLogger logger)
+        public UmmLogger(ModLogger logger, string scope)
         {
-            Prefix = "";
             this.logger = logger;
+            this.scope = scope;
         }
-
-        public string Prefix { get; set; }
 
         public void Info(string message)
         {
-            logger.Log($"{Prefix}{message}");
+            logger.Log($"[{scope}] INFO {message}");
+        }
+
+        public void Warn(string message)
+        {
+            logger.Log($"{scope} WARN {message}");
         }
     }
 }

@@ -23,7 +23,8 @@ namespace DriverAssist.Cruise
 
         public AccelTest(ITestOutputHelper output)
         {
-            PluginLoggerSingleton.Instance = new TestLogger(output);
+            LogFactory.CreateLogger.Value = (scope) => new TestLogger(output);
+            // DriverAssistLogger.Instance = new TestLogger(output);
 
             de2settings = new FakeLocoConfig
             {
@@ -394,11 +395,19 @@ namespace DriverAssist.Cruise
         }
     }
 
-    public class TestLogger : PluginLogger
+    public class TestLogger : Logger
     {
         public string Prefix { get; set; }
 
-        public void Info(string message) { output.WriteLine(message); }
+        public void Info(string message)
+        {
+            output.WriteLine(message);
+        }
+
+        public void Warn(string message)
+        {
+            output.WriteLine(message);
+        }
 
         private readonly ITestOutputHelper output;
 

@@ -1,31 +1,44 @@
 using System;
+using System.Diagnostics;
+using System.Threading;
 
 namespace DriverAssist
 {
-#pragma warning disable IDE1006
-    public interface PluginLogger
-#pragma warning restore IDE1006
-    {
-        string Prefix { get; set; }
+    public delegate Logger CreateLogger(string scope);
 
+    public interface Logger
+    {
         public void Info(string message);
+        public void Warn(string message);
     }
 
-    public class PluginLoggerSingleton
+    public class LogFactory
     {
-        [ThreadStatic]
-        public static PluginLogger Instance = new NullLogger();
+        // [ThreadStatic]
+        public static ThreadLocal<CreateLogger> CreateLogger;
+
+        static LogFactory()
+        {
+            UnityEngine.Debug.Log("LogFactory::LogFactory");
+            CreateLogger = new ThreadLocal<CreateLogger>
+            {
+                Value = (scope) => new NullLogger()
+            };
+        }
+
+        public static Logger GetLogger(string scope)
+        {
+            UnityEngine.Debug.Log("LogFactory::GetLogger scope");
+            Logger logger = CreateLogger.Value.Invoke(scope);
+            UnityEngine.Debug.Log($"LogFactory::GetLogger scope {logger.GetType().Name}");
+            return logger;
+        }
     }
 
-    public class NullLogger : PluginLogger
+    public class NullLogger : Logger
     {
-        public string Prefix { get; set; }
-
         public void Info(string message) { }
 
-        public NullLogger()
-        {
-            Prefix = "";
-        }
+        public void Warn(string message) { }
     }
 }

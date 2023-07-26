@@ -24,7 +24,7 @@ namespace DriverAssist.Cruise
 
         public DecelTest(ITestOutputHelper output)
         {
-            PluginLoggerSingleton.Instance = new TestLogger(output);
+            LogFactory.CreateLogger.Value = (scope) => new TestLogger(output);
 
             de2settings = new FakeLocoConfig
             {

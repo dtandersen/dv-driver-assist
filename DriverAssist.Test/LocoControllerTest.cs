@@ -13,7 +13,7 @@ namespace DriverAssist.Cruise
 
         public LocoControllerTest(ITestOutputHelper output)
         {
-            PluginLoggerSingleton.Instance = new TestLogger(output);
+            LogFactory.CreateLogger.Value = (scope) => new TestLogger(output);
 
             train = new FakeTrainCarWrapper
             {

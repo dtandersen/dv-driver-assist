@@ -12,11 +12,11 @@ namespace DriverAssist.Cruise
         // bool cooling = false;
         public float LastThrottleChange;
         public float LastShift;
-        readonly PluginLogger logger;
+        readonly Logger logger;
 
         public PredictiveAcceleration()
         {
-            logger = PluginLoggerSingleton.Instance;
+            logger = LogFactory.GetLogger("PredictiveAcceleration");
         }
 
         public void Tick(CruiseControlContext context)

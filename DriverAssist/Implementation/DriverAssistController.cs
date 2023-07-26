@@ -19,17 +19,19 @@ namespace DriverAssist.Implementation
         private DriverAssistWindow window;
         private ShiftSystem shiftSystem;
         private LocoStatsSystem locoStatsSystem;
+        private Logger logger;
 
 #pragma warning disable CS8618
         public DriverAssistController(UnifiedSettings config)
 #pragma warning restore CS8618
         {
             this.config = config;
+            logger = LogFactory.GetLogger("DriverAssistController");
         }
 
         public void Init()
         {
-            PluginLoggerSingleton.Instance.Info($"DriverAssistController::Init");
+            logger.Info($"Init");
 
             WorldStreamingInit.LoadingFinished += OnLoadingFinished;
             UnloadWatcher.UnloadRequested += OnUnloadRequested;
@@ -37,14 +39,14 @@ namespace DriverAssist.Implementation
             // we might already be in a loco (reloaded mod)
             if (PlayerManager.PlayerTransform != null)
             {
-                PluginLoggerSingleton.Instance.Info($"Player detected");
+                logger.Info($"Player detected");
                 CheckForPlayer();
             }
         }
 
         public void OnDestroy()
         {
-            PluginLoggerSingleton.Instance.Info("DriverAssistController::OnDestroy");
+            logger.Info("OnDestroy");
 
             WorldStreamingInit.LoadingFinished -= OnLoadingFinished;
             UnloadWatcher.UnloadRequested -= OnUnloadRequested;
@@ -96,7 +98,7 @@ namespace DriverAssist.Implementation
             {
                 foreach (var port in loco.Ports)
                 {
-                    PluginLoggerSingleton.Instance.Info($"{port}");
+                    logger.Info($"{port}");
                 }
             }
         }
@@ -104,7 +106,7 @@ namespace DriverAssist.Implementation
         internal void Load()
         {
             loaded = true;
-            PluginLoggerSingleton.Instance.Info("DriverAssistController::Load");
+            logger.Info("Load");
 
             gameObject = new GameObject("DriverAssistWindow");
             window = gameObject.AddComponent<DriverAssistWindow>();
@@ -136,10 +138,10 @@ namespace DriverAssist.Implementation
 
         public void Unload()
         {
-            PluginLoggerSingleton.Instance.Info("DriverAssistController::Unload");
+            logger.Info("Unload");
             if (!loaded)
             {
-                PluginLoggerSingleton.Instance.Info("WARN: Tried to unload DriverAssist when it is not loaded");
+                logger.Warn("Tried to unload DriverAssist when it is not loaded");
                 return;
             }
 
@@ -164,19 +166,19 @@ namespace DriverAssist.Implementation
 
         public void ChangeCar(TrainCar? trainCar)
         {
-            PluginLoggerSingleton.Instance.Info($"DriverAssistController::ChangeCar {trainCar?.carType.ToString() ?? "null"}");
+            logger.Info($"ChangeCar {trainCar?.carType.ToString() ?? "null"}");
 
             LoadIfNotLoaded();
             if (trainCar == null || !trainCar.IsLoco)
             {
                 loco.UpdateLocomotive(NullTrainCarWrapper.Instance);
-                PluginLoggerSingleton.Instance.Info($"Exited train car {trainCar?.carType.ToString() ?? "null"}");
+                logger.Info($"Exited train car");
                 cruiseControl.Enabled = false;
             }
             else
             {
                 DVTrainCarWrapper train = new(trainCar);
-                PluginLoggerSingleton.Instance.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
+                logger.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
                 loco.UpdateLocomotive(train);
             }
         }
@@ -189,13 +191,13 @@ namespace DriverAssist.Implementation
 
         public void OnLoadingFinished()
         {
-            PluginLoggerSingleton.Instance.Info($"DriverAssistController::OnLoadingFinished");
+            logger.Info($"OnLoadingFinished");
             ChangeCar(PlayerManager.Car);
         }
 
         public void OnUnloadRequested()
         {
-            PluginLoggerSingleton.Instance.Info($"DriverAssistController::OnUnloadRequested");
+            logger.Info($"OnUnloadRequested");
             Unload();
         }
 
@@ -214,23 +216,28 @@ namespace DriverAssist.Implementation
         /// Player has entered or exited a car
         public void OnCarChanged(TrainCar? enteredCar)
         {
-            PluginLoggerSingleton.Instance.Info($"DriverAssistController::OnCarChanged {enteredCar?.carType.ToString() ?? "null"}");
+            logger.Info($"OnCarChanged {enteredCar?.carType.ToString() ?? "null"}");
             ChangeCar(enteredCar);
         }
     }
 
-    class UnityLogger : PluginLogger
+    class UnityLogger : Logger
     {
-        public string Prefix { get; set; }
+        private readonly string prefix;
 
         UnityLogger()
         {
-            Prefix = "";
+            prefix = "";
         }
 
         public void Info(string message)
         {
-            Debug.Log($"{Prefix}{message}");
+            Debug.Log($"{prefix}{message}");
+        }
+
+        public void Warn(string message)
+        {
+            Debug.Log($"{prefix}{message}");
         }
     }
 }
