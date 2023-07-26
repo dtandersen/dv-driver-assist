@@ -146,23 +146,15 @@ namespace DriverAssist.Implementation
                 return;
             }
 
-            PluginLoggerSingleton.Instance.Info("1");
             PlayerManager.CarChanged -= OnCarChanged;
-            PluginLoggerSingleton.Instance.Info("2");
 
             loaded = false;
-            PluginLoggerSingleton.Instance.Info("3");
             Unloaded?.Invoke(this, null);
-            PluginLoggerSingleton.Instance.Info("4");
 
             Loaded -= window.OnLoad;
-            PluginLoggerSingleton.Instance.Info("5");
             Unloaded -= window.OnUnload;
-            PluginLoggerSingleton.Instance.Info("6");
             UnityEngine.Object.Destroy(window);
-            PluginLoggerSingleton.Instance.Info("7");
             UnityEngine.Object.Destroy(gameObject);
-            PluginLoggerSingleton.Instance.Info("8");
         }
 
         public void LoadIfNotLoaded()
