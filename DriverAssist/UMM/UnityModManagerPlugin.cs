@@ -76,7 +76,6 @@ namespace DriverAssist.UMM
         }
     }
 
-    // [DrawFields(DrawFieldMask.Public)]
     public class Settings : ModSettings, IDrawable
     {
         [Header("Cruise Control")]
