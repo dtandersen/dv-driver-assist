@@ -11,30 +11,56 @@ namespace DriverAssist.Implementation
     internal class DVTrainCarWrapper : TrainCarWrapper
     {
         private readonly TrainCar loco;
-        private readonly BaseControlsOverrider obj;
-        // private BaseControlsOverrider baseControlsOverrider;
-        private readonly LocoIndicatorReader locoIndicatorReader;
-        private readonly SimulationFlow simFlow;
-        private readonly Port torqueGeneratedPort;
+
+        private BaseControlsOverrider? BaseControls
+        {
+            get
+            {
+                return SimController?.controlsOverrider;
+            }
+        }
+
+        private LocoIndicatorReader? IndicatorReader
+        {
+            get
+            {
+                return loco?.loadedInterior?.GetComponent<LocoIndicatorReader>();
+            }
+        }
+
+        private SimulationFlow? SimFlow
+        {
+            get
+            {
+                return loco.GetComponent<SimController>()?.simFlow;
+            }
+        }
+
+        private Port? TorqueGeneratedPort
+        {
+            get
+            {
+                string torqueGeneratedPortId = "traction.TORQUE_IN";
+                if (SimFlow != null && torqueGeneratedPortId != null)
+                {
+                    SimFlow.TryGetPort(torqueGeneratedPortId, out var torqueGeneratedPort);
+                    return torqueGeneratedPort;
+                }
+                return null;
+            }
+        }
+
+        private SimController? SimController
+        {
+            get
+            {
+                return loco.GetComponent<SimController>();
+            }
+        }
 
         public DVTrainCarWrapper(TrainCar car)
         {
             this.loco = car;
-            SimController simc = loco.GetComponent<SimController>();
-            // this.baseControlsOverrider = simc.controlsOverrider;
-            this.obj = simc.controlsOverrider;
-            this.locoIndicatorReader = loco.loadedInterior.GetComponent<LocoIndicatorReader>();
-            this.simFlow = loco.GetComponent<SimController>().simFlow;
-            string torqueGeneratedPortId = "traction.TORQUE_IN";
-
-
-
-            // torqueGeneratedPortId = loco.GetComponent<SimController>().drivingForce.torqueGeneratedPortId;
-            if (simFlow != null && torqueGeneratedPortId != null)
-                simFlow.TryGetPort(torqueGeneratedPortId, out torqueGeneratedPort);
-            // PluginLoggerSingleton.Instance.Info($"{torqueGeneratedPortId ?? ""}");
-            if (simFlow == null || torqueGeneratedPort == null)
-                throw new Exception();
         }
 
         public bool IsLoco { get { return true; } }
@@ -61,11 +87,11 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return obj.Throttle.Value;
+                return BaseControls?.Throttle.Value ?? 0;
             }
             set
             {
-                obj.Throttle?.Set(value);
+                BaseControls?.Throttle?.Set(value);
             }
         }
 
@@ -73,11 +99,11 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return obj.Brake.Value;
+                return BaseControls?.Brake.Value ?? 0;
             }
             set
             {
-                obj.Brake.Set(value);
+                BaseControls?.Brake.Set(value);
             }
         }
 
@@ -85,11 +111,11 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return obj.IndependentBrake.Value;
+                return BaseControls?.IndependentBrake.Value ?? 0;
             }
             set
             {
-                obj.IndependentBrake.Set(value);
+                BaseControls?.IndependentBrake.Set(value);
             }
         }
 
@@ -151,15 +177,15 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                if (!locoIndicatorReader)
+                if (!IndicatorReader)
                 {
                     return 0;
                 }
 
-                if (locoIndicatorReader?.tmTemp)
-                    return locoIndicatorReader?.tmTemp?.Value ?? 0;
-                if (locoIndicatorReader?.oilTemp)
-                    return locoIndicatorReader?.oilTemp?.Value ?? 0;
+                if (IndicatorReader?.tmTemp)
+                    return IndicatorReader?.tmTemp?.Value ?? 0;
+                if (IndicatorReader?.oilTemp)
+                    return IndicatorReader?.oilTemp?.Value ?? 0;
 
                 return 0;
             }
@@ -169,12 +195,12 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return obj.Reverser.Value;
+                return BaseControls?.Reverser.Value ?? 0;
             }
 
             set
             {
-                obj.Reverser.Set(value);
+                BaseControls?.Reverser.Set(value);
             }
         }
 
@@ -183,7 +209,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return torqueGeneratedPort.Value;
+                return TorqueGeneratedPort?.Value ?? 0f;
             }
         }
 
@@ -210,9 +236,9 @@ namespace DriverAssist.Implementation
                 // string torqueGeneratedPortId = locoCar.GetComponent<SimController>()?.drivingForce.torqueGeneratedPortId;
                 if (IsElectric)
                 {
-                    if (simFlow.TryGetPort("tm.MAX_AMPS", out Port port))
+                    if (SimFlow != null && SimFlow.TryGetPort("tm.MAX_AMPS", out Port port))
                         maxAmps = "" + port.Value;
-                    if (simFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port))
+                    if (SimFlow != null && SimFlow.TryGetPort("tm.WORKING_TRACTION_MOTORS", out port))
                         motors = "" + port.Value;
                     return $"{motors} / {maxAmps}";
                 }
@@ -241,7 +267,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return locoIndicatorReader?.amps?.Value ?? 0;
+                return IndicatorReader?.amps?.Value ?? 0;
             }
         }
 
@@ -249,7 +275,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return locoIndicatorReader?.engineRpm?.Value ?? 0;
+                return IndicatorReader?.engineRpm?.Value ?? 0;
             }
         }
 
@@ -321,13 +347,11 @@ namespace DriverAssist.Implementation
                 switch (LocoType)
                 {
                     case DriverAssist.LocoType.DM3:
-                        Port gearRatioPort;
-                        if (!simFlow.TryGetPort("transmissionAB.MECHANICAL_GEAR_RATIO", out gearRatioPort))
+                        if (SimFlow != null && SimFlow.TryGetPort("transmissionAB.MECHANICAL_GEAR_RATIO", out Port gearRatioPort))
                         {
-                            return 0;
+                            return gearRatioPort.Value;
                         }
-
-                        return gearRatioPort.Value;
+                        return 0;
                     default:
                         return 0;
                 }
@@ -342,13 +366,12 @@ namespace DriverAssist.Implementation
                 switch (LocoType)
                 {
                     case DriverAssist.LocoType.DM3:
-                        Port gearRatioPort;
-                        if (!simFlow.TryGetPort("transmissionA.GEAR_CHANGE_IN_PROGRESS", out gearRatioPort))
+                        if (SimFlow != null && SimFlow.TryGetPort("transmissionA.GEAR_CHANGE_IN_PROGRESS", out Port gearRatioPort))
                         {
-                            gearA = 0;
+                            gearA = gearRatioPort.Value;
                         }
                         else
-                            gearA = gearRatioPort.Value;
+                            gearA = 0;
                         break;
                     default:
                         gearA = 0;
@@ -359,13 +382,12 @@ namespace DriverAssist.Implementation
                 switch (LocoType)
                 {
                     case DriverAssist.LocoType.DM3:
-                        Port gearRatioPort;
-                        if (!simFlow.TryGetPort("transmissionB.GEAR_CHANGE_IN_PROGRESS", out gearRatioPort))
+                        if (SimFlow != null && SimFlow.TryGetPort("transmissionB.GEAR_CHANGE_IN_PROGRESS", out Port gearRatioPort))
                         {
-                            gearB = 0;
+                            gearB = gearRatioPort.Value;
                         }
                         else
-                            gearB = gearRatioPort.Value;
+                            gearB = 0;
                         break;
                     default:
                         gearB = 0;
@@ -379,8 +401,10 @@ namespace DriverAssist.Implementation
         {
             get
             {
+                if (SimFlow == null) return new();
+
                 List<string> portstrings = new();
-                foreach (SimComponent x in simFlow.orderedSimComps)
+                foreach (SimComponent x in SimFlow.orderedSimComps)
                 {
                     List<Port> ports = x.GetAllPorts();
                     foreach (Port p in ports)
