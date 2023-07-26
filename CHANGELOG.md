@@ -1,3 +1,8 @@
+0.8.1 - 7/25/2023
+
+- Fixed a bug entering cloned cars when the interior was not loaded.
+- Fixed a bug choosing the correct localization.
+
 0.8.0 - 7/24/2023
 
 - Fixed a bug where DM3 gears couldn't be shifted manually.
