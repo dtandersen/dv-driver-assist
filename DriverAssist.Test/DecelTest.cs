@@ -1,20 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.Remoting.Contexts;
-using DriverAssist.Localization;
+using DriverAssist.Extension;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    // [Collection("Sequential")]
     public class DecelTest
     {
         private readonly FakeLocoController loco;
-        // private Translation localization;
-        // private FakeCruiseControlConfig config;
         private readonly FakeLocoConfig de2settings;
-        // private readonly FakeLocoConfig dh4settings;
         private readonly FakeLocoConfig dm3settings;
         private readonly FakeTrainCarWrapper train;
         private readonly PredictiveDeceleration accelerator;
@@ -24,7 +17,7 @@ namespace DriverAssist.Cruise
 
         public DecelTest(ITestOutputHelper output)
         {
-            LogFactory.CreateLogger.Value = (scope) => new TestLogger(output);
+            XunitLogger.Init(output);
 
             de2settings = new FakeLocoConfig
             {
@@ -41,22 +34,6 @@ namespace DriverAssist.Cruise
                 MinTorque = 22000,
                 OverdriveEnabled = true
             };
-
-            // dh4settings = new FakeLocoConfig
-            // {
-            //     CruiseAccel = .05f,
-            //     MaxAccel = .25f,
-            //     BrakeReleaseFactor = .5f,
-            //     BrakingTime = 10,
-            //     HillClimbAccel = .025f,
-            //     MaxAmps = 0,
-            //     MaxTemperature = 105,
-            //     HillClimbTemp = 118,
-            //     MinAmps = 400,
-            //     MinBrake = 0,
-            //     MinTorque = 35000,
-            //     OverdriveEnabled = true
-            // };
 
             dm3settings = new FakeLocoConfig
             {
@@ -84,7 +61,6 @@ namespace DriverAssist.Cruise
             train.IndBrake = 1;
             loco.Reverser = 1;
             accelerator = new PredictiveDeceleration();
-            // accelerator.lastShift = -3;
             context = new CruiseControlContext(de2settings, loco);
         }
 
@@ -96,11 +72,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void AccelerateFromStop4()
         {
-            // dm3settings.MinBrake = 0.1f;
-            // context = new CruiseControlContext(dm3settings, loco);
-            // train.LocoType = DriverAssist.LocoType.DM3;
             context.DesiredSpeed = 5;
-            // loco.AccelerationMs = -1;
             train.SpeedKmh = 6;
             train.TrainBrake = 0.5f;
 
@@ -118,9 +90,6 @@ namespace DriverAssist.Cruise
         public void AccelerateFromStop2()
         {
             de2settings.MinBrake = 0.1f;
-            // dm3settings.MinBrake = 0.1f;
-            // context = new CruiseControlContext(dm3settings, loco);
-            // train.LocoType = DriverAssist.LocoType.DM3;
             context.DesiredSpeed = 5;
             loco.AccelerationMs = -1;
             train.TrainBrake = 0;

@@ -1,21 +1,16 @@
-// #pragma warning disable CS8629
-#pragma warning disable CS8602
+//#pragma warning disable CS8602 // disable Dereference of a possibly null reference
 
-using System;
-using System.Collections.Generic;
+using DriverAssist.Extension;
 using DriverAssist.Localization;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    // [CollectionDefinition(DisableParallelization = true)]
-    // [Collection("Sequential")]
     public class CruiseControlTest
     {
         private readonly CruiseControl cruiseControl;
         private readonly LocoController loco;
-        // private FakeLocoController loco;
         private readonly Translation localization;
         private readonly FakeCruiseControlConfig config;
         private readonly LocoSettings de2settings;
@@ -25,8 +20,7 @@ namespace DriverAssist.Cruise
 
         public CruiseControlTest(ITestOutputHelper output)
         {
-            // DriverAssistLogger.Instance = new TestLogger(output);
-            LogFactory.CreateLogger.Value = (scope) => new TestLogger(output);
+            XunitLogger.Init(output);
 
             localization = TranslationManager.Current;
             config = new FakeCruiseControlConfig
@@ -44,25 +38,14 @@ namespace DriverAssist.Cruise
             train = new FakeTrainCarWrapper();
             loco = new LocoController(1f / 60f);
             loco.UpdateLocomotive(train);
-            // loco = new FakeLocoController();
             train.LocoType = LocoType.DE2;
             loco.Reverser = 1;
-            // loco.AccelerationMs = 0;
-            // accelerator = new FakeAccelerator();
-            // decelerator = new FakeDecelerator();
             clock = new FakeClock();
             cruiseControl = new CruiseControl(loco, config, clock)
             {
                 Enabled = true
             };
-            // cruiseControl.Accelerator = accelerator;
-            // cruiseControl.Decelerator = decelerator;
         }
-
-        // public void Dispose()
-        // {
-        //     PluginLoggerSingleton.Instance = new NullLogger();
-        // }
 
         [Fact]
         public void ShouldAccelerate()
@@ -494,48 +477,4 @@ namespace DriverAssist.Cruise
 
     }
 
-    public class FakeCruiseControlConfig : CruiseControlSettings
-    {
-        public FakeCruiseControlConfig()
-        {
-            LocoSettings = new Dictionary<string, LocoSettings>();
-            Acceleration = "";
-            Deceleration = "";
-        }
-
-        public int MinTorque { get; set; }
-        public int MinAmps { get; }
-        public int MaxAmps { get; }
-        public int MaxTemperature { get; }
-        public int OverdriveTemperature { get; }
-        public bool OverdriveEnabled { get; }
-        public float Offset { get; set; }
-        public float Diff { get; set; }
-        public float UpdateInterval { get; set; }
-
-        public string Acceleration { get; set; }
-        public string Deceleration { get; set; }
-        public Dictionary<string, LocoSettings> LocoSettings { get; }
-    }
-
-    public class FakeLocoConfig : LocoSettings
-    {
-        public int MinTorque { get; set; }
-        public int MinAmps { get; set; }
-        public int MaxAmps { get; set; }
-        public int MaxTemperature { get; set; }
-        public int HillClimbTemp { get; set; }
-        public bool OverdriveEnabled { get; set; }
-        public int BrakingTime { get; set; }
-        public float BrakeReleaseFactor { get; set; }
-        public float MinBrake { get; set; }
-        public float HillClimbAccel { get; set; }
-        public float CruiseAccel { get; set; }
-        public float MaxAccel { get; set; }
-    }
-
-    public class FakeClock : Clock
-    {
-        public float Time2 { get; set; }
-    }
 }

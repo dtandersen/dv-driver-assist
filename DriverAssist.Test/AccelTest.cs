@@ -1,14 +1,12 @@
+using DriverAssist.Extension;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    // [Collection("Sequential")]
     public class AccelTest
     {
         private readonly FakeLocoController loco;
-        // private Translation localization;
-        // private FakeCruiseControlConfig config;
         private readonly FakeLocoConfig de2settings;
         private readonly FakeLocoConfig dh4settings;
         private readonly FakeTrainCarWrapper train;
@@ -16,11 +14,9 @@ namespace DriverAssist.Cruise
         private CruiseControlContext context;
         private const float STEP = 1 / 11f;
 
-
         public AccelTest(ITestOutputHelper output)
         {
-            LogFactory.CreateLogger.Value = (scope) => new TestLogger(output);
-            // DriverAssistLogger.Instance = new TestLogger(output);
+            XunitLogger.Init(output);
 
             de2settings = new FakeLocoConfig
             {
@@ -388,29 +384,6 @@ namespace DriverAssist.Cruise
 
         public FakeLocoController(float fixedDeltaTime) : base(fixedDeltaTime)
         {
-        }
-    }
-
-    public class TestLogger : Logger
-    {
-        public string Prefix { get; set; }
-
-        public void Info(string message)
-        {
-            output.WriteLine(message);
-        }
-
-        public void Warn(string message)
-        {
-            output.WriteLine(message);
-        }
-
-        private readonly ITestOutputHelper output;
-
-        public TestLogger(ITestOutputHelper output)
-        {
-            Prefix = "";
-            this.output = output;
         }
     }
 }

@@ -13,11 +13,11 @@ namespace DriverAssist
 
     public class LogFactory
     {
-        public static ThreadLocal<CreateLogger> CreateLogger;
+        public static readonly ThreadLocal<CreateLogger> Factory;
 
         static LogFactory()
         {
-            CreateLogger = new ThreadLocal<CreateLogger>
+            Factory = new ThreadLocal<CreateLogger>
             {
                 Value = (scope) => new NullLogger()
             };
@@ -25,7 +25,7 @@ namespace DriverAssist
 
         public static Logger GetLogger(string scope)
         {
-            Logger logger = CreateLogger.Value.Invoke(scope);
+            Logger logger = Factory.Value.Invoke(scope);
             return logger;
         }
 

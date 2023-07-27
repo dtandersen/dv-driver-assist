@@ -1,5 +1,6 @@
 #pragma warning disable CS8629
 
+using DriverAssist.Extension;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -13,7 +14,7 @@ namespace DriverAssist.Cruise
 
         public ShiftSystemTest(ITestOutputHelper output)
         {
-            LogFactory.CreateLogger.Value = (scope) => new TestLogger(output);
+            XunitLogger.Init(output);
 
             train = new FakeTrainCarWrapper
             {

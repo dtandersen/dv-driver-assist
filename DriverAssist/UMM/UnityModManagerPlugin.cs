@@ -24,7 +24,7 @@ namespace DriverAssist.UMM
 
         public static bool Load(ModEntry modEntry)
         {
-            LogFactory.CreateLogger.Value = (scope) =>
+            LogFactory.Factory.Value = (scope) =>
             {
                 return new UmmLogger(modEntry.Logger, scope);
             };
