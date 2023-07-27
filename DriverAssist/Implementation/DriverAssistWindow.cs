@@ -7,33 +7,29 @@ namespace DriverAssist.Implementation
 {
     class DriverAssistWindow : MonoBehaviour
     {
-#pragma warning disable CS8618
-        public LocoController LocoController { get; internal set; }
-        public CruiseControl CruiseControl { get; internal set; }
-        public UnifiedSettings Config { get; internal set; }
-#pragma warning restore CS8618
+        public CruiseControl? CruiseControl { get; internal set; }
+        public UnifiedSettings? Config { get; internal set; }
 
         private Rect windowRect;
-        private bool loaded;
         private const float SCALE = 1.5f;
         private readonly Logger logger = LogFactory.GetLogger("DriverAssistWindow");
+        private LocoController? locoController;
 
         public void Awake()
         {
-            // logger = LogFactory.GetLogger("DriverAssistWindow");
-            logger.Info("DriverAssistWindow::Awake");
+            logger.Info("Awake");
             windowRect = new Rect(20, 20, SCALE * 120, SCALE * 50);
+            enabled = false;
         }
 
         public void OnGUI()
         {
-            if (LocoController == null) return;
-            if (!loaded) return;
+            if (locoController == null) return;
 
             if (Event.current.keyCode == KeyCode.Tab || Event.current.character == '\t')
                 Event.current.Use();
 
-            if (!LocoController.IsLoco) return;
+            if (!locoController.IsLoco) return;
 
             GUI.skin = DVGUI.skin;
 
@@ -49,7 +45,12 @@ namespace DriverAssist.Implementation
         bool laststats;
         protected void Window()
         {
+            if (Config == null) return;
+            if (CruiseControl == null) return;
+            if (locoController == null) return;
+
             Translation localization = TranslationManager.Current;
+
             if (laststats != Config.ShowStats)
             {
                 windowRect = new Rect(20, 20, SCALE * 120, SCALE * 50);
@@ -77,9 +78,9 @@ namespace DriverAssist.Implementation
 
             if (Config.ShowStats)
             {
-                int mass = (int)(LocoController.Mass / 1000);
-                int locoMass = (int)(LocoController.LocoMass / 1000);
-                int cargoMass = (int)(LocoController.CargoMass / 1000);
+                int mass = (int)(locoController.Mass / 1000);
+                int locoMass = (int)(locoController.LocoMass / 1000);
+                int cargoMass = (int)(locoController.CargoMass / 1000);
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"", GUILayout.Width(labelwidth));
@@ -106,50 +107,50 @@ namespace DriverAssist.Implementation
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(localization.STAT_SPEED, GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{LocoController.RelativeSpeedKmh:N1}", GUILayout.Width(width));
-                GUILayout.TextField($"{LocoController.RelativeAccelerationMs:N3}", GUILayout.Width(width));
-                GUILayout.TextField($"{LocoController.RelativeSpeedKmh + predTime * LocoController.RelativeAccelerationMs * 3.6f:N1}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.RelativeSpeedKmh:N1}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.RelativeAccelerationMs:N3}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.RelativeSpeedKmh + predTime * locoController.RelativeAccelerationMs * 3.6f:N1}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(localization.STAT_TEMPERATURE, GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{LocoController.Temperature:N1}", GUILayout.Width(width));
-                GUILayout.TextField($"{LocoController.TemperatureChange:N2}", GUILayout.Width(width));
-                GUILayout.TextField($"{LocoController.Temperature + predTime * LocoController.TemperatureChange:N1}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.Temperature:N1}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.TemperatureChange:N2}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.Temperature + predTime * locoController.TemperatureChange:N1}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(localization.STAT_AMPS, GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{LocoController.Amps:N0}", GUILayout.Width(width));
-                GUILayout.TextField($"{LocoController.AmpsRoc:N1}", GUILayout.Width(width));
-                GUILayout.TextField($"{LocoController.Amps + predTime * LocoController.AmpsRoc:N0}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.Amps:N0}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.AmpsRoc:N1}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.Amps + predTime * locoController.AmpsRoc:N0}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(localization.STAT_RPM, GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{Math.Round(LocoController.Rpm, 0)}", GUILayout.Width(width));
+                GUILayout.TextField($"{Math.Round(locoController.Rpm, 0)}", GUILayout.Width(width));
                 GUILayout.TextField($"", GUILayout.Width(width));
                 GUILayout.TextField($"", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(localization.STAT_TORQUE, GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{(int)LocoController.RelativeTorque}", GUILayout.Width(width));
+                GUILayout.TextField($"{(int)locoController.RelativeTorque}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(localization.STAT_THROTTLE, GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{(int)(LocoController.Throttle * 100)}%", GUILayout.Width(width));
+                GUILayout.TextField($"{(int)(locoController.Throttle * 100)}%", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Gear", GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{LocoController.Gear + 1}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.Gear + 1}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 // if (loco.Components.GearChangeRequest.HasValue)
                 // {
-                GearChangeRequest? req = LocoController.Components?.GearChangeRequest;
+                GearChangeRequest? req = locoController.Components?.GearChangeRequest;
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Requested Gear", GUILayout.Width(labelwidth));
                 GUILayout.TextField($"{req?.RequestedGear ?? -1}", GUILayout.Width(width));
@@ -163,25 +164,25 @@ namespace DriverAssist.Implementation
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Gear Ratio", GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{LocoController.GearRatio}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.GearRatio}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Shifting", GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{LocoController.GearShiftInProgress}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.GearShiftInProgress}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Train Brake", GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{LocoController.TrainBrake:F2}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.TrainBrake:F2}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Acceleration", GUILayout.Width(labelwidth));
-                GUILayout.TextField($"{LocoController.Components?.LocoStats.AccelerationMs2:F3}", GUILayout.Width(width));
+                GUILayout.TextField($"{locoController.Components?.LocoStats.AccelerationMs2:F3}", GUILayout.Width(width));
                 GUILayout.EndHorizontal();
 
-                float speed2 = 3f / 25f * (float)Math.PI * LocoController.WheelRadius * LocoController.Rpm / LocoController.GearRatio;
+                float speed2 = 3f / 25f * (float)Math.PI * locoController.WheelRadius * locoController.Rpm / locoController.GearRatio;
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Speed", GUILayout.Width(labelwidth));
                 GUILayout.TextField($"{speed2:N1}", GUILayout.Width(width));
@@ -191,19 +192,21 @@ namespace DriverAssist.Implementation
 
         public void OnDestroy()
         {
-            logger.Info("DriverAssistWindow::OnDestroy");
+            logger.Info("OnDestroy");
         }
 
-        public void OnLoad(object sender, EventArgs e)
+        public void Show(LocoController loco)
         {
-            logger.Info("DriverAssistWindow::OnLoad");
-            loaded = true;
+            logger.Info("Show");
+            this.locoController = loco;
+            enabled = true;
         }
 
-        public void OnUnload(object sender, EventArgs e)
+        public void Hide()
         {
-            logger.Info("DriverAssistWindow::OnUnload");
-            loaded = false;
+            logger.Info("Hide");
+            this.locoController = null;
+            enabled = false;
         }
     }
 }

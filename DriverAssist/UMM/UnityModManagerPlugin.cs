@@ -30,7 +30,7 @@ namespace DriverAssist.UMM
             };
             logger = LogFactory.GetLogger(typeof(DriverAssistUmmMod));
 
-            logger.Info($"Begin Load");
+            logger.Info($"Loading...");
 
             TranslationManager.SetLangage(LocalizationManager.CurrentLanguage);
 
@@ -46,7 +46,7 @@ namespace DriverAssist.UMM
             modEntry.OnUpdate = OnUpdate;
             modEntry.OnFixedUpdate = OnFixedUpdate;
 
-            logger.Info($"End Load");
+            logger.Info($"Finished loading");
 
             return true;
         }
@@ -68,13 +68,13 @@ namespace DriverAssist.UMM
 
         static void OnSaveGUI(ModEntry modEntry)
         {
-            logger.Info($"UMM:OnSaveGUI");
+            logger.Info($"OnSaveGUI");
             settings.Save(modEntry);
         }
 
         static bool OnUnload(ModEntry e)
         {
-            logger.Info($"UMM:OnUnload");
+            logger.Info($"OnUnload");
             controller.Unload();
             controller.OnDestroy();
 

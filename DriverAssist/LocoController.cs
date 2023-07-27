@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using PlaceholderSoftware.WetStuff.Debugging;
 
 namespace DriverAssist
 {
@@ -381,11 +379,6 @@ namespace DriverAssist
             lastSpeedMs = speedMs;
         }
 
-        internal void Log(string v)
-        {
-            logger.Info(v);
-        }
-
         internal void Upshift()
         {
             ChangeGear(Gear + 1);
@@ -414,7 +407,7 @@ namespace DriverAssist
                 gearChangeRequest.RestoreThrottle = loco.Throttle;
             }
             Components.GearChangeRequest = gearChangeRequest;
-            logger.Info($"LocoController: Requesting gear change RequestedGear={gearChangeRequest.RequestedGear} RestoreThrottle={gearChangeRequest.RestoreThrottle ?? -1}");
+            logger.Info($"Requesting gear change RequestedGear={gearChangeRequest.RequestedGear} RestoreThrottle={gearChangeRequest.RestoreThrottle ?? -1}");
         }
     }
 

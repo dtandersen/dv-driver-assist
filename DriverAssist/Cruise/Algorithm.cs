@@ -7,15 +7,6 @@ namespace DriverAssist.Cruise
         void Tick(CruiseControlContext context);
     }
 
-#pragma warning disable IDE1006
-    public interface DASystem
-#pragma warning restore IDE1006
-    {
-        bool Enabled { get; set; }
-
-        void OnUpdate();
-    }
-
     public class CruiseControlContext
     {
         public LocoSettings Config { get; }

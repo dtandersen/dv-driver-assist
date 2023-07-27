@@ -40,18 +40,4 @@ namespace DriverAssist.Cruise
             }
         }
     }
-
-    public abstract class BaseSystem : DASystem
-    {
-        public bool Enabled { get; set; }
-
-        protected Logger logger;
-
-        public abstract void OnUpdate();
-
-        public BaseSystem()
-        {
-            logger = LogFactory.GetLogger(this.GetType().Name);
-        }
-    }
 }

@@ -1,31 +1,35 @@
 using System;
 using DriverAssist.Cruise;
-using DriverAssist.Localization;
-using DV.Rain;
 using UnityEngine;
 
 namespace DriverAssist.Implementation
 {
+    public delegate void EnterLocoHandler(LocoController locoController);
+    public delegate void NoArgsHandler();
+
     public class DriverAssistController
     {
         private const int CC_SPEED_STEP = 5;
 
-        private LocoController? loco;
+        private LocoController? locoController;
         private CruiseControl? cruiseControl;
         private readonly UnifiedSettings config;
         private float updateAccumulator;
         private bool loaded = false;
         private GameObject? gameObject;
         private DriverAssistWindow? window;
-        private ShiftSystem? shiftSystem;
-        private LocoStatsSystem? locoStatsSystem;
         private readonly Logger logger = LogFactory.GetLogger(typeof(DriverAssistController));
+        private SystemManager? systemManager;
+
+        public event EventHandler Loaded = delegate { };
+        public event EventHandler Unloaded = delegate { };
+        public event EnterLocoHandler EnterLoco = delegate { };
+        public event NoArgsHandler ExitLoco = delegate { };
 
         public DriverAssistController(UnifiedSettings config)
-#pragma warning disable CS8618
-#pragma warning restore CS8618
         {
             this.config = config;
+            // systemManager = new SystemManager();
         }
 
         public void Init()
@@ -46,6 +50,10 @@ namespace DriverAssist.Implementation
         public void OnDestroy()
         {
             logger.Info("OnDestroy");
+            if (!loaded)
+            {
+                logger.Warn("Called OnDestroy before Unload");
+            }
 
             WorldStreamingInit.LoadingFinished -= OnLoadingFinished;
             UnloadWatcher.UnloadRequested -= OnUnloadRequested;
@@ -55,11 +63,10 @@ namespace DriverAssist.Implementation
         {
             if (!loaded) return;
 
-            if (loco?.IsLoco ?? false)
+            if (locoController?.IsLoco ?? false)
             {
-                locoStatsSystem?.OnUpdate();
-                shiftSystem?.OnUpdate();
-                loco.UpdateStats(Time.fixedDeltaTime);
+                systemManager?.Update();
+                locoController.UpdateStats(Time.fixedDeltaTime);
                 updateAccumulator += Time.fixedDeltaTime;
                 if (updateAccumulator > config.UpdateInterval)
                 {
@@ -89,19 +96,19 @@ namespace DriverAssist.Implementation
                 }
             }
 
-            if (loco != null)
+            if (locoController != null)
             {
                 if (IsKeyPressed(config.Upshift))
                 {
-                    loco.Upshift();
+                    locoController.Upshift();
                 }
                 if (IsKeyPressed(config.Downshift))
                 {
-                    loco.Downshift();
+                    locoController.Downshift();
                 }
                 if (IsKeyPressed(config.DumpPorts))
                 {
-                    foreach (var port in loco.Ports)
+                    foreach (var port in locoController.Ports)
                     {
                         logger.Info($"{port}");
                     }
@@ -117,37 +124,38 @@ namespace DriverAssist.Implementation
             gameObject = new GameObject("DriverAssistWindow");
             window = gameObject.AddComponent<DriverAssistWindow>();
             window.Config = config;
-            Loaded += window.OnLoad;
-            Unloaded += window.OnUnload;
+            // Loaded += window.OnLoad;
+            // Unloaded += window.OnUnload;
+            EnterLoco += window.Show;
+            ExitLoco += window.Hide;
 
             PlayerManager.CarChanged += OnCarChanged;
 
-            loco = new LocoController(Time.fixedDeltaTime);
+            locoController = new LocoController(Time.fixedDeltaTime);
 
-            cruiseControl = new CruiseControl(loco, config, new UnityClock())
+            cruiseControl = new CruiseControl(locoController, config, new UnityClock())
             {
                 Accelerator = new PredictiveAcceleration(),
                 Decelerator = new PredictiveDeceleration()
             };
 
-            shiftSystem = new ShiftSystem(loco);
-            locoStatsSystem = new LocoStatsSystem(loco, 0.5f, Time.fixedDeltaTime);
+            systemManager = new SystemManager();
+            ShiftSystem shiftSystem = new ShiftSystem(locoController);
+            LocoStatsSystem locoStatsSystem = new LocoStatsSystem(locoController, 0.5f, Time.fixedDeltaTime);
+            systemManager.AddSystem(shiftSystem);
+            systemManager.AddSystem(locoStatsSystem);
 
             updateAccumulator = 0;
             Loaded?.Invoke(this, null);
-            window.LocoController = loco;
             window.CruiseControl = cruiseControl;
         }
-
-        public event EventHandler Loaded = delegate { };
-        public event EventHandler Unloaded = delegate { };
 
         public void Unload()
         {
             logger.Info("Unload");
             if (!loaded)
             {
-                logger.Warn("Tried to unload DriverAssist when it is not loaded");
+                logger.Warn("Tried to unload DriverAssist, but it's not loaded");
                 return;
             }
 
@@ -158,8 +166,10 @@ namespace DriverAssist.Implementation
 
             if (window != null)
             {
-                Loaded -= window.OnLoad;
-                Unloaded -= window.OnUnload;
+                // Loaded -= window.OnLoad;
+                // Unloaded -= window.OnUnload;
+                EnterLoco -= window.Show;
+                ExitLoco -= window.Hide;
             }
 
             UnityEngine.Object.Destroy(window);
@@ -181,7 +191,8 @@ namespace DriverAssist.Implementation
             LoadIfNotLoaded();
             if (trainCar == null || !trainCar.IsLoco)
             {
-                loco?.UpdateLocomotive(NullTrainCarWrapper.Instance);
+                ExitLoco.Invoke();
+                locoController?.UpdateLocomotive(NullTrainCarWrapper.Instance);
                 logger.Info($"Exited train car");
                 if (cruiseControl != null)
                 {
@@ -192,7 +203,8 @@ namespace DriverAssist.Implementation
             {
                 DVTrainCarWrapper train = new(trainCar);
                 logger.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
-                loco?.UpdateLocomotive(train);
+                locoController?.UpdateLocomotive(train);
+                if (locoController != null) EnterLoco.Invoke(locoController);
             }
         }
 
