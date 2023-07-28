@@ -12,12 +12,6 @@ namespace DriverAssist
             Deceleration = "";
         }
 
-        public int MinTorque { get; set; }
-        public int MinAmps { get; }
-        public int MaxAmps { get; }
-        public int MaxTemperature { get; }
-        public int OverdriveTemperature { get; }
-        public bool OverdriveEnabled { get; }
         public float Offset { get; set; }
         public float Diff { get; set; }
         public float UpdateInterval { get; set; }
@@ -30,9 +24,8 @@ namespace DriverAssist
     public class FakeLocoConfig : LocoSettings
     {
         public int MinTorque { get; set; }
-        public int MinAmps { get; set; }
         public int MaxAmps { get; set; }
-        public int MaxTemperature { get; set; }
+        public int OperatingTemp { get; set; }
         public int HillClimbTemp { get; set; }
         public bool OverdriveEnabled { get; set; }
         public int BrakingTime { get; set; }

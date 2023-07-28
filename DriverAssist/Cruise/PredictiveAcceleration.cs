@@ -65,7 +65,7 @@ namespace DriverAssist.Cruise
                 AdjustThrottle(context, -STEP);
             }
             else if (
-                projectedTemperature >= context.Config.MaxTemperature
+                projectedTemperature >= context.Config.OperatingTemp
                 && !tempDecreasing
                 && !hillClimbActive
                 && timeSinceThrottle >= 3)
@@ -103,8 +103,8 @@ namespace DriverAssist.Cruise
             else if (
                 torque < context.Config.MinTorque
                 && acceleration < context.Config.MaxAccel
-                && projectedTemperature < context.Config.MaxTemperature
-                && (tempDecreasing || projectedTemperature <= context.Config.MaxTemperature - 5)
+                && projectedTemperature < context.Config.OperatingTemp
+                && (tempDecreasing || projectedTemperature <= context.Config.OperatingTemp - 5)
                 && timeSinceThrottle >= 3
                 )
             {

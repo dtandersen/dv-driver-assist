@@ -27,9 +27,8 @@ namespace DriverAssist.Cruise
                 BrakingTime = 10,
                 HillClimbAccel = .025f,
                 MaxAmps = 750,
-                MaxTemperature = 105,
+                OperatingTemp = 105,
                 HillClimbTemp = 118,
-                MinAmps = 400,
                 MinBrake = 0.1f,
                 MinTorque = 22000,
                 OverdriveEnabled = true
@@ -43,9 +42,8 @@ namespace DriverAssist.Cruise
                 BrakingTime = 10,
                 HillClimbAccel = .025f,
                 MaxAmps = 0,
-                MaxTemperature = 105,
+                OperatingTemp = 105,
                 HillClimbTemp = 118,
-                MinAmps = 400,
                 MinBrake = 0,
                 MinTorque = 35000,
                 OverdriveEnabled = true

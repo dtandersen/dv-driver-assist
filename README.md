@@ -49,9 +49,8 @@ All locomotives
 * `MaxTemperature` - Throttle down if temperture is above this threshold.
 * `OverdriveTemperature` - If the train is slowing down use this heat threshold.
 
-The DE2 and DE6 have an electrical traction motor. `MinAmps` forces the locomotive to throttle up if the amps are low. `MaxAmps` forces the locomotive to throttle down in order to avoid blowing up the traction motor.
+The DE2 and DE6 have an electrical traction motor. `MaxAmps` forces the locomotive to throttle down in order to avoid blowing up the traction motor.
 
-* `MinAmps` - Throttle up if amps are below this threshold.
 * `MaxAmps` - Throttle down if amps are above this threshold.
 
 ### Braking

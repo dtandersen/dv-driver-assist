@@ -26,9 +26,8 @@ namespace DriverAssist.Cruise
                 BrakingTime = 10,
                 HillClimbAccel = .025f,
                 MaxAmps = 750,
-                MaxTemperature = 105,
+                OperatingTemp = 105,
                 HillClimbTemp = 118,
-                MinAmps = 400,
                 MinBrake = 0,
                 MinTorque = 22000,
                 OverdriveEnabled = true
@@ -42,9 +41,8 @@ namespace DriverAssist.Cruise
                 BrakingTime = 10,
                 HillClimbAccel = .025f,
                 MaxAmps = 0,
-                MaxTemperature = 105,
+                OperatingTemp = 105,
                 HillClimbTemp = 118,
-                MinAmps = 400,
                 MinBrake = 0,
                 MinTorque = 35000,
                 OverdriveEnabled = true
@@ -230,7 +228,7 @@ namespace DriverAssist.Cruise
             loco.TemperatureChange = 0f;
             train.Throttle = 3 * STEP;
             train.Torque = 10000;
-            train.Temperature = de2settings.MaxTemperature - 5;
+            train.Temperature = de2settings.OperatingTemp - 5;
             // train.SpeedKmh = 0;
 
             WhenAccel();
@@ -249,7 +247,7 @@ namespace DriverAssist.Cruise
             context.DesiredSpeed = 5;
             loco.AccelerationMs = de2settings.HillClimbAccel;
             train.Throttle = 3 * STEP;
-            train.Temperature = de2settings.MaxTemperature;
+            train.Temperature = de2settings.OperatingTemp;
 
             WhenAccel();
 

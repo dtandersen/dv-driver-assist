@@ -17,9 +17,8 @@ namespace DriverAssist.Cruise
     public interface LocoSettings
     {
         int MinTorque { get; }
-        int MinAmps { get; }
         int MaxAmps { get; }
-        int MaxTemperature { get; }
+        int OperatingTemp { get; }
         int HillClimbTemp { get; }
         int BrakingTime { get; }
         float BrakeReleaseFactor { get; }

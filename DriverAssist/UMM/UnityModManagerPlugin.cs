@@ -93,8 +93,6 @@ namespace DriverAssist.UMM
         [Header("DE2")]
         [Draw("Minimum Torque", Min = 0)]
         public int De2MinTorque = 22000;
-        [Draw("Minimum Amps", Min = 0)]
-        public int De2MinAmps = 400;
         [Draw("Maximum Amps", Min = 0)]
         public int De2MaxAmps = 750;
         [Draw("Operating Temperature", Min = 0)]
@@ -105,8 +103,6 @@ namespace DriverAssist.UMM
         [Header("DE6")]
         [Draw("Minimum Torque", Min = 0)]
         public int De6MinTorque = 50000;
-        [Draw("Minimum Amps", Min = 0)]
-        public int De6MinAmps = 200;
         [Draw("Maximum Amps", Min = 0)]
         public int De6MaxAmps = 435;
         [Draw("Operating Temperature", Min = 0)]
@@ -207,7 +203,6 @@ namespace DriverAssist.UMM
                 {
                     [LocoType.DE2] = new UmmLocoSettings(
                     minTorque: settings.De2MinTorque,
-                    minAmps: settings.De2MinAmps,
                     maxAmps: settings.De2MaxAmps,
                     maxTemperature: settings.De2MaxTemperature,
                     overdriveTemperature: settings.De2OverdriveTemperature,
@@ -217,7 +212,6 @@ namespace DriverAssist.UMM
                 ),
                     [LocoType.DE6] = new UmmLocoSettings(
                     minTorque: settings.De6MinTorque,
-                    minAmps: settings.De6MinAmps,
                     maxAmps: settings.De6MaxAmps,
                     maxTemperature: settings.De6MaxTemperature,
                     overdriveTemperature: settings.De6OverdriveTemperature,
@@ -227,7 +221,6 @@ namespace DriverAssist.UMM
                 ),
                     [LocoType.DH4] = new UmmLocoSettings(
                     minTorque: settings.Dh4MinTorque,
-                    minAmps: 0,
                     maxAmps: 1000,
                     maxTemperature: settings.Dh4MaxTemperature,
                     overdriveTemperature: settings.Dh4OverdriveTemperature,
@@ -237,7 +230,6 @@ namespace DriverAssist.UMM
                 ),
                     [LocoType.DM3] = new UmmLocoSettings(
                     minTorque: settings.Dm3MinTorque,
-                    minAmps: 0,
                     maxAmps: 1000,
                     maxTemperature: settings.Dm3MaxTemperature,
                     overdriveTemperature: settings.Dm3OverdriveTemperature,
@@ -255,7 +247,6 @@ namespace DriverAssist.UMM
     internal class UmmLocoSettings : LocoSettings
     {
         private readonly int minTorque;
-        private readonly int minAmps;
         private readonly int maxAmps;
         private readonly int maxTemperature;
         private readonly int overdriveTemperature;
@@ -265,7 +256,6 @@ namespace DriverAssist.UMM
 
         public UmmLocoSettings(
          int minTorque,
-         int minAmps,
          int maxAmps,
          int maxTemperature,
          int overdriveTemperature,
@@ -275,7 +265,6 @@ namespace DriverAssist.UMM
             )
         {
             this.minTorque = minTorque;
-            this.minAmps = minAmps;
             this.maxAmps = maxAmps;
             this.maxTemperature = maxTemperature;
             this.overdriveTemperature = overdriveTemperature;
@@ -292,14 +281,6 @@ namespace DriverAssist.UMM
             }
         }
 
-        public int MinAmps
-        {
-            get
-            {
-                return minAmps;
-            }
-        }
-
         public int MaxAmps
         {
             get
@@ -308,7 +289,7 @@ namespace DriverAssist.UMM
             }
         }
 
-        public int MaxTemperature
+        public int OperatingTemp
         {
             get
             {
