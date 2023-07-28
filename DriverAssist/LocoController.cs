@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace DriverAssist
@@ -103,6 +104,12 @@ namespace DriverAssist
 
                 loco.Throttle = value;
             }
+        }
+
+
+        internal void ZeroThrottle()
+        {
+            loco.Throttle = 0;
         }
 
         public float TrainBrake

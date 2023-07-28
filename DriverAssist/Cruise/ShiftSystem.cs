@@ -17,26 +17,30 @@ namespace DriverAssist.Cruise
 
             int requestedGear = request.RequestedGear;
 
-            if (loco.Throttle > 0 && !loco.GearShiftInProgress && loco.Gear != requestedGear)
+            if (loco.Throttle == 0 && loco.Gear != requestedGear)
             {
-                logger.Info($"ShiftSystem: Throttle=0");
-                loco.Throttle = 0;
-            }
-            else if (loco.Gear != requestedGear)
-            {
-                logger.Info($"ShiftSystem: Setting gear to {requestedGear}");
+                logger.Info($"Shifting to gear {requestedGear}");
                 loco.Gear = requestedGear;
                 if (!request.RestoreThrottle.HasValue)
                 {
-                    logger.Info($"ShiftSystem: End request");
+                    logger.Info($"Instant gear shift");
                     loco.Components.GearChangeRequest = null;
                 }
             }
-            else if (!loco.GearShiftInProgress && request.RestoreThrottle != null)
+            else if (loco.Throttle > 0 && loco.Gear != requestedGear)
             {
-                logger.Info($"ShiftSystem: Restoring throttle to {request.RestoreThrottle.Value}");
+                logger.Info($"Throttling down for gear change");
+                loco.ZeroThrottle();
+            }
+            else if (loco.Rpm < 750 && !loco.GearShiftInProgress && request.RestoreThrottle != null)
+            {
+                logger.Info($"Restoring throttle to {request.RestoreThrottle.Value} rpm={loco.Rpm}");
                 loco.Throttle = request.RestoreThrottle.Value;
                 loco.Components.GearChangeRequest = null;
+            }
+            else
+            {
+                // logger.Info($"Waiting requestedGear={requestedGear} loco.Gear={loco.Gear} rpm={loco.Rpm}");
             }
         }
     }

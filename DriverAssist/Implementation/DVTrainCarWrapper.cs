@@ -91,6 +91,9 @@ namespace DriverAssist.Implementation
             }
             set
             {
+                if (value > 1) value = 1;
+                if (value < 0) value = 0;
+
                 BaseControls?.Throttle?.Set(value);
             }
         }

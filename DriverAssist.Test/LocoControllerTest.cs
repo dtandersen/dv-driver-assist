@@ -156,7 +156,7 @@ namespace DriverAssist.Cruise
 
             // Assert.Equal(1, loco.Components.RequestedGear);
             Assert.Equal(1, loco.Components.GearChangeRequest.Value.RequestedGear);
-            Assert.Equal(1, loco.Components.GearChangeRequest.Value.RestoreThrottle);
+            Assert.Equal(1f, loco.Components.GearChangeRequest.Value.RestoreThrottle);
         }
 
         /// The train is a DM3

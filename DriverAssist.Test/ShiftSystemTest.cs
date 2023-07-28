@@ -56,8 +56,54 @@ namespace DriverAssist.Cruise
 
             train.GearChangeInProgress = false;
             WhenSystemUpdates();
-            Assert.Equal(1, train.Throttle);
+            Assert.Equal(1f, train.Throttle);
             Assert.Null(loco.Components.GearChangeRequest);
+        }
+
+        /// A gear change has been requested,
+        /// but the train has not completely throttled down.
+        /// Wait.
+        [Fact]
+        public void WaitForZeroThrottleBeforeShifting()
+        {
+            train.LocoType = LocoType.DM3;
+            train.Throttle = 1;
+
+            loco.ChangeGear(3);
+
+            // throttle is not yet 0
+            train.Throttle = 0.1f;
+            train.GearChangeInProgress = true;
+
+            WhenSystemUpdates();
+            Assert.Equal(0, train.GearboxA);
+            Assert.Equal(0, train.GearboxB);
+            Assert.Equal(0, train.Throttle);
+
+            // throttle is now 0
+            train.Throttle = 0f;
+
+            WhenSystemUpdates();
+            Assert.Equal(0.5f, train.GearboxA);
+            Assert.Equal(0.5f, train.GearboxB);
+        }
+
+        /// RPM >= 750.
+        /// Dont restore throttle.
+        [Fact]
+        public void WaitForLowRpmBeforeThrottle()
+        {
+            train.LocoType = LocoType.DM3;
+            train.Throttle = 1;
+
+            loco.ChangeGear(3);
+            loco.Gear = 3;
+            train.Rpm = 750;
+            train.Throttle = 0;
+            train.GearChangeInProgress = false;
+
+            WhenSystemUpdates();
+            Assert.Equal(0, train.Throttle);
         }
 
         /// The train is a DM3

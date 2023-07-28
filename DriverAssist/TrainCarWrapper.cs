@@ -118,7 +118,7 @@ namespace DriverAssist
 
         public float Amps { get; set; }
 
-        public float Rpm { get; }
+        public float Rpm { get; set; }
 
         public string LocoType { get; set; }
 
