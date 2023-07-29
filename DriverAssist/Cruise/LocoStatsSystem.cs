@@ -1,5 +1,3 @@
-using DriverAssist.Cruise;
-
 namespace DriverAssist
 {
     public class LocoStatsSystem : BaseSystem
@@ -19,13 +17,13 @@ namespace DriverAssist
 
         public override void OnUpdate()
         {
-            integrator.Add(loco.SpeedMs - loco.Components.LocoStats.SpeedMs);
+            integrator.Add(loco.RelativeSpeedMs - loco.Components.LocoStats.SpeedMs);
             float acc = integrator.Sum() / (samples * deltaTime);
 
             loco.Components.LocoStats = new LocoStats()
             {
                 AccelerationMs2 = Lerp(acc, loco.Components.LocoStats.AccelerationMs2, 0.5f),
-                SpeedMs = loco.SpeedMs
+                SpeedMs = loco.RelativeSpeedMs
             };
         }
 
