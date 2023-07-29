@@ -1,3 +1,12 @@
+0.9.0 - 7/29/2023
+
+- Throttle down when the wheels start slipping.
+- Hide the cruise control window in photo mode.
+- Don't reapply throttle in DM3 unless RPM is below 750 to reduce gear grinding.
+- DH4 max temperature is now 118C instead of 119C.
+- Improved the settings UI.
+- Removed the MinAmps setting since it was no longer used.
+
 0.8.1 - 7/25/2023
 
 - Fixed a bug entering cloned cars when the interior was not loaded.
