@@ -2,6 +2,11 @@
   "Releases": [
     {
       "Id": "DriverAssist",
+      "Version": "0.9.0",
+      "DownloadUrl": "https://github.com/dtandersen/dv-driver-assist/releases/download/v0.9.0/DriverAssist-v0.9.0.zip"
+    },
+    {
+      "Id": "DriverAssist",
       "Version": "0.8.1",
       "DownloadUrl": "https://github.com/dtandersen/dv-driver-assist/releases/download/v0.8.1/DriverAssist-v0.8.1.zip"
     },
