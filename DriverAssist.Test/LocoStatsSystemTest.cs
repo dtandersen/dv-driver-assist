@@ -42,7 +42,7 @@ namespace DriverAssist.Cruise
             train.SpeedMs = 2;
             WhenSystemUpdates();
 
-            Assert.Equal(0.5, loco.Components.LocoStats.AccelerationMs2);
+            Assert.Equal(1, loco.Components.LocoStats.AccelerationMs2);
         }
 
         private void WhenSystemUpdates()

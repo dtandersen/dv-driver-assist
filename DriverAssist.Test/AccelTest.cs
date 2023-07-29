@@ -311,6 +311,25 @@ namespace DriverAssist.Cruise
         }
 
         /// <summary> 
+        /// The wheels are slipping.
+        /// The train should slow down.
+        /// </summary>
+        [Fact]
+        public void SlowsDownIfWheelsAreSlipping()
+        {
+            context.DesiredSpeed = 5;
+            // loco.TemperatureChange = -.1f;
+            train.Throttle = 3 * STEP;
+            train.WheelSlip = 0.5f;
+            // train.Torque = 10000;
+            // train.Amps = 750;
+
+            WhenAccel();
+
+            Assert.Equal(2 * STEP, loco.Throttle);
+        }
+
+        /// <summary> 
         /// The DE4 has no traction motor,
         /// It should speed up.
         /// </summary>

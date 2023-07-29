@@ -81,6 +81,12 @@ namespace DriverAssist.Cruise
                 AdjustThrottle(context, -STEP);
             }
             else if (
+                loco.IsWheelsSlipping)
+            {
+                Log("Wheels are slipping");
+                AdjustThrottle(context, -STEP);
+            }
+            else if (
                 acceleration >= context.Config.MaxAccel
                 && loco.Throttle > STEP)
             {

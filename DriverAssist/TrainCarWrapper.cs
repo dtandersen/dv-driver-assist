@@ -124,8 +124,8 @@ namespace DriverAssist
         public float Amps { get; set; }
 
         public float Rpm { get; set; }
-        public float WheelSlip { get; }
-        public bool IsWheelSlipping { get; }
+        public float WheelSlip { get; set; }
+        public bool IsWheelSlipping { get { return WheelSlip > 0; } }
 
         public float Mass { get; }
         public float LocoMass { get; }

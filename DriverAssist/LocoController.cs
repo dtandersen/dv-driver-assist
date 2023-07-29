@@ -359,6 +359,8 @@ namespace DriverAssist
 
         public int Length { get { return loco.Length; } }
 
+        public bool IsWheelsSlipping { get { return loco.IsWheelSlipping; } }
+
         public void UpdateStats(float deltaTime)
         {
             if (!loco.IsLoco)
