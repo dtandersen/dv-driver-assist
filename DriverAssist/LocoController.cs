@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using DriverAssist.Cruise;
 
 namespace DriverAssist
 {
@@ -105,7 +105,6 @@ namespace DriverAssist
                 loco.Throttle = value;
             }
         }
-
 
         internal void ZeroThrottle()
         {
@@ -611,5 +610,6 @@ namespace DriverAssist
         public GearChangeRequest? GearChangeRequest { get; set; }
         public LocoStats LocoStats { get; set; }
         public float LocoStatsCooldown { get; set; }
+        public LocoSettings? LocoSettings { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using DriverAssist.Cruise;
+using DV.Utils;
 using UnityEngine;
 
 namespace DriverAssist.Implementation
@@ -26,10 +27,11 @@ namespace DriverAssist.Implementation
         public event EnterLocoHandler EnterLoco = delegate { };
         public event NoArgsHandler ExitLoco = delegate { };
 
+        public PlayerCameraSwitcher? PlayerCameraSwitcher { get { return SingletonBehaviour<PlayerCameraSwitcher>.Instance; } }
+
         public DriverAssistController(UnifiedSettings config)
         {
             this.config = config;
-            // systemManager = new SystemManager();
         }
 
         public void Init()
@@ -128,8 +130,10 @@ namespace DriverAssist.Implementation
             // Unloaded += window.OnUnload;
             EnterLoco += window.Show;
             ExitLoco += window.Hide;
+            if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged += window.OnPhotoModeChanged;
 
             PlayerManager.CarChanged += OnCarChanged;
+
 
             locoController = new LocoController(Time.fixedDeltaTime);
 
@@ -170,6 +174,7 @@ namespace DriverAssist.Implementation
                 // Unloaded -= window.OnUnload;
                 EnterLoco -= window.Show;
                 ExitLoco -= window.Hide;
+                if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged -= window.OnPhotoModeChanged;
             }
 
             UnityEngine.Object.Destroy(window);
@@ -192,7 +197,11 @@ namespace DriverAssist.Implementation
             if (trainCar == null || !trainCar.IsLoco)
             {
                 ExitLoco.Invoke();
-                locoController?.UpdateLocomotive(NullTrainCarWrapper.Instance);
+                if (locoController != null)
+                {
+                    locoController.UpdateLocomotive(NullTrainCarWrapper.Instance);
+                    locoController.Components.LocoSettings = null;
+                }
                 logger.Info($"Exited train car");
                 if (cruiseControl != null)
                 {
@@ -203,8 +212,17 @@ namespace DriverAssist.Implementation
             {
                 DVTrainCarWrapper train = new(trainCar);
                 logger.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
-                locoController?.UpdateLocomotive(train);
-                if (locoController != null) EnterLoco.Invoke(locoController);
+                LocoSettings settings = config.LocoSettings[locoController?.LocoType ?? ""];
+                if (locoController != null)
+                {
+                    locoController.UpdateLocomotive(train);
+                    locoController.Components.LocoSettings = null;
+                    if (settings != null)
+                    {
+                        locoController.Components.LocoSettings = settings;
+                    }
+                    EnterLoco.Invoke(locoController);
+                }
             }
         }
 

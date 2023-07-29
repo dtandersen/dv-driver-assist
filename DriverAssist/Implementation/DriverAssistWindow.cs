@@ -14,9 +14,11 @@ namespace DriverAssist.Implementation
         private const float SCALE = 1.5f;
         private readonly Logger logger = LogFactory.GetLogger("DriverAssistWindow");
         private LocoController? locoController;
+        private bool photoMode;
 
         public void Awake()
         {
+            photoMode = false;
             logger.Info("Awake");
             windowRect = new Rect(20, 20, SCALE * 120, SCALE * 50);
             enabled = false;
@@ -24,6 +26,7 @@ namespace DriverAssist.Implementation
 
         public void OnGUI()
         {
+            if (photoMode) return;
             if (locoController == null) return;
 
             if (Event.current.keyCode == KeyCode.Tab || Event.current.character == '\t')
@@ -207,6 +210,12 @@ namespace DriverAssist.Implementation
             logger.Info("Hide");
             this.locoController = null;
             enabled = false;
+        }
+
+        internal void OnPhotoModeChanged(bool photoMode)
+        {
+            logger.Info($"OnPhotoModeChanged photoMode={photoMode}");
+            this.photoMode = photoMode;
         }
     }
 }
