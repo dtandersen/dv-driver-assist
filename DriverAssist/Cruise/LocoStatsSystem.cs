@@ -22,15 +22,15 @@ namespace DriverAssist
 
             loco.Components.LocoStats = new LocoStats()
             {
-                AccelerationMs2 = Lerp(acc, loco.Components.LocoStats.AccelerationMs2, 0.5f),
+                AccelerationMs2 = acc,
                 SpeedMs = loco.RelativeSpeedMs
             };
         }
 
         /// https://stackoverflow.com/questions/4353525/floating-point-linear-interpolation
-        float Lerp(float a, float b, float f)
-        {
-            return a * (1.0f - f) + (b * f);
-        }
+        // float Lerp(float a, float b, float f)
+        // {
+        //     return a * (1.0f - f) + (b * f);
+        // }
     }
 }

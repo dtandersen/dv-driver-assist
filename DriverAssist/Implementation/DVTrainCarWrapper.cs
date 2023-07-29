@@ -10,7 +10,12 @@ namespace DriverAssist.Implementation
 {
     internal class DVTrainCarWrapper : TrainCarWrapper
     {
-        private readonly TrainCar loco;
+        private readonly TrainCar trainCar;
+
+        public DVTrainCarWrapper(TrainCar trainCar)
+        {
+            this.trainCar = trainCar;
+        }
 
         private BaseControlsOverrider? BaseControls
         {
@@ -24,7 +29,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return loco?.loadedInterior?.GetComponent<LocoIndicatorReader>();
+                return trainCar?.loadedInterior?.GetComponent<LocoIndicatorReader>();
             }
         }
 
@@ -32,7 +37,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return loco.GetComponent<SimController>()?.simFlow;
+                return trainCar.GetComponent<SimController>()?.simFlow;
             }
         }
 
@@ -54,13 +59,8 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return loco.GetComponent<SimController>();
+                return trainCar.GetComponent<SimController>();
             }
-        }
-
-        public DVTrainCarWrapper(TrainCar car)
-        {
-            this.loco = car;
         }
 
         public bool IsLoco { get { return true; } }
@@ -69,7 +69,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                float speed = loco.GetForwardSpeed() * 3.6f;
+                float speed = trainCar.GetForwardSpeed() * 3.6f;
                 return speed;
             }
         }
@@ -78,7 +78,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                float speed = loco.GetForwardSpeed();
+                float speed = trainCar.GetForwardSpeed();
                 return speed;
             }
         }
@@ -127,7 +127,7 @@ namespace DriverAssist.Implementation
             get
             {
                 // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
-                InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
+                InteriorControlsManager controls = trainCar.interior.GetComponentInChildren<InteriorControlsManager>();
                 if (!controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference))
                 {
                     return 0;
@@ -139,7 +139,7 @@ namespace DriverAssist.Implementation
             set
             {
                 // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
-                InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
+                InteriorControlsManager controls = trainCar.interior.GetComponentInChildren<InteriorControlsManager>();
                 if (controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference))
                 {
                     // controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference6)
@@ -154,7 +154,7 @@ namespace DriverAssist.Implementation
             get
             {
                 // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
-                InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
+                InteriorControlsManager controls = trainCar.interior.GetComponentInChildren<InteriorControlsManager>();
                 if (!controls.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference))
                 {
                     return 0;
@@ -166,7 +166,7 @@ namespace DriverAssist.Implementation
             set
             {
                 // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
-                InteriorControlsManager controls = loco.interior.GetComponentInChildren<InteriorControlsManager>();
+                InteriorControlsManager controls = trainCar.interior.GetComponentInChildren<InteriorControlsManager>();
                 if (controls.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference))
                 {
                     // controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference6)
@@ -282,11 +282,15 @@ namespace DriverAssist.Implementation
             }
         }
 
+        public bool IsWheelSlipping { get { return trainCar?.adhesionController?.wheelslipController?.IsWheelslipping ?? false; } }
+
+        public float WheelSlip { get { return trainCar?.adhesionController?.wheelslipController?.wheelslip ?? 0; } }
+
         public string LocoType
         {
             get
             {
-                return loco.carType.ToString();
+                return trainCar.carType.ToString();
             }
         }
 
@@ -296,7 +300,7 @@ namespace DriverAssist.Implementation
             {
                 float mass = 0;
 
-                foreach (TrainCar car in loco.trainset.cars)
+                foreach (TrainCar car in trainCar.trainset.cars)
                 {
                     mass += car.massController.TotalMass;
                 }
@@ -311,7 +315,7 @@ namespace DriverAssist.Implementation
             {
                 float mass = 0;
 
-                foreach (TrainCar car in loco.trainset.cars)
+                foreach (TrainCar car in trainCar.trainset.cars)
                 {
                     if (car.IsLoco) mass += car.massController.TotalMass;
                 }
@@ -326,7 +330,7 @@ namespace DriverAssist.Implementation
             {
                 float mass = 0;
 
-                foreach (TrainCar car in loco.trainset.cars)
+                foreach (TrainCar car in trainCar.trainset.cars)
                 {
                     if (!car.IsLoco) mass += car.massController.TotalMass;
                 }
@@ -339,7 +343,7 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return loco.carLivery.parentType.wheelRadius;
+                return trainCar.carLivery.parentType.wheelRadius;
             }
         }
 
@@ -420,7 +424,7 @@ namespace DriverAssist.Implementation
             }
         }
 
-        public int Length { get { return loco.trainset.cars.Count; } }
+        public int Length { get { return trainCar.trainset.cars.Count; } }
     }
 
     public class UnityClock : Clock

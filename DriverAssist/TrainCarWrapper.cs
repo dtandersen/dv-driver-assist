@@ -19,6 +19,8 @@ namespace DriverAssist
         string TractionMotors { get; }
         float Amps { get; }
         float Rpm { get; }
+        bool IsWheelSlipping { get; }
+        float WheelSlip { get; }
         string LocoType { get; }
         float Mass { get; }
         float LocoMass { get; }
@@ -72,6 +74,8 @@ namespace DriverAssist
         public float Amps { get; }
 
         public float Rpm { get; }
+        public float WheelSlip { get; }
+        public bool IsWheelSlipping { get; }
 
         public string LocoType { get; }
 
@@ -96,6 +100,7 @@ namespace DriverAssist
 
     public class FakeTrainCarWrapper : TrainCarWrapper
     {
+        public string LocoType { get; set; }
         public bool IsLoco { get { return LocoType != ""; } }
 
         public float SpeedKmh { get; set; }
@@ -119,8 +124,8 @@ namespace DriverAssist
         public float Amps { get; set; }
 
         public float Rpm { get; set; }
-
-        public string LocoType { get; set; }
+        public float WheelSlip { get; }
+        public bool IsWheelSlipping { get; }
 
         public float Mass { get; }
         public float LocoMass { get; }
