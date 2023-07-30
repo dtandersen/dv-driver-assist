@@ -1,4 +1,5 @@
-using DriverAssist.Extension;
+using DriverAssist.ECS;
+using DriverAssist.Test;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -50,11 +51,11 @@ namespace DriverAssist.Cruise
             };
             train = new FakeTrainCarWrapper
             {
-                LocoType = LocoType.DE2
+                Type = LocoType.DE2
             };
             loco = new FakeLocoController(1f / 60f);
             loco.UpdateLocomotive(train);
-            train.LocoType = LocoType.DE2;
+            train.Type = LocoType.DE2;
             train.Length = 2;
             train.IndBrake = 1;
             loco.Reverser = 1;
@@ -149,7 +150,7 @@ namespace DriverAssist.Cruise
         {
             dm3settings.MinBrake = 0.1f;
             context = new CruiseControlContext(dm3settings, loco);
-            train.LocoType = DriverAssist.LocoType.DM3;
+            train.Type = LocoType.DM3;
             context.DesiredSpeed = 5;
             loco.AccelerationMs = -1;
             train.SpeedKmh = 6;
@@ -168,7 +169,7 @@ namespace DriverAssist.Cruise
         {
             dm3settings.MinBrake = 0.1f;
             context = new CruiseControlContext(dm3settings, loco);
-            train.LocoType = DriverAssist.LocoType.DM3;
+            train.Type = LocoType.DM3;
             context.DesiredSpeed = 5;
             train.SpeedKmh = 6;
 

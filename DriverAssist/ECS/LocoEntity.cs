@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using DriverAssist.Cruise;
 
-namespace DriverAssist
+namespace DriverAssist.ECS
 {
-    public class LocoController
+    public class LocoEntity
     {
         public readonly LocoComponents Components;
 
@@ -31,14 +31,11 @@ namespace DriverAssist
         };
         private readonly Logger logger;
 
-        // private readonly float fixedDeltaTime;
-
-        public LocoController(float fixedDeltaTime)
+        public LocoEntity(float fixedDeltaTime)
         {
             logger = LogFactory.GetLogger("LocoController");
             Components = new();
             loco = NullTrainCarWrapper.Instance;
-            // this.fixedDeltaTime = fixedDeltaTime;
             int size = (int)(lookahead / fixedDeltaTime);
             speedIntegratorMs = new Integrator(size);
 
@@ -224,9 +221,9 @@ namespace DriverAssist
         {
             get
             {
-                return LocoType switch
+                return Type switch
                 {
-                    DriverAssist.LocoType.DE2 or DriverAssist.LocoType.DE6 => true,
+                    LocoType.DE2 or LocoType.DE6 => true,
                     _ => false,
                 };
             }
@@ -301,11 +298,11 @@ namespace DriverAssist
             }
         }
 
-        public string LocoType
+        public string Type
         {
             get
             {
-                return loco.LocoType;
+                return loco.Type;
             }
         }
 
@@ -345,7 +342,7 @@ namespace DriverAssist
         {
             get
             {
-                return loco.LocoType == DriverAssist.LocoType.DM3;
+                return loco.Type == LocoType.DM3;
             }
         }
 
@@ -399,7 +396,7 @@ namespace DriverAssist
 
         public void ChangeGear(int requestedGear)
         {
-            if (loco.LocoType != DriverAssist.LocoType.DM3) return;
+            if (loco.Type != LocoType.DM3) return;
 
             if (requestedGear < 0) return;
             if (requestedGear >= gearBox.Count) return;
@@ -519,7 +516,6 @@ namespace DriverAssist
             }
         }
     }
-
 
     internal class RollingSample
     {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DriverAssist.ECS;
 using DriverAssist.Localization;
 
 namespace DriverAssist.Cruise
@@ -45,7 +46,7 @@ namespace DriverAssist.Cruise
 
         public string Status { get; internal set; }
 
-        private readonly LocoController loco;
+        private readonly LocoEntity loco;
         private float minSpeed;
         private float maxSpeed;
         private float positiveDesiredSpeed;
@@ -57,7 +58,7 @@ namespace DriverAssist.Cruise
         private readonly Translation localization;
         private readonly Clock clock;
 
-        public CruiseControl(LocoController loco, CruiseControlSettings config, Clock clock)
+        public CruiseControl(LocoEntity loco, CruiseControlSettings config, Clock clock)
         {
             logger = LogFactory.GetLogger("CruiseControl");
             localization = TranslationManager.Current;
@@ -67,7 +68,7 @@ namespace DriverAssist.Cruise
             Decelerator = CreateAlgo(config.Deceleration);
             this.clock = clock;
             Status = "";
-            context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco);
+            context = new CruiseControlContext(config.LocoSettings[loco.Type], loco);
         }
 
         private CruiseControlAlgorithm CreateAlgo(string name)
@@ -83,14 +84,14 @@ namespace DriverAssist.Cruise
 
             try
             {
-                context = new CruiseControlContext(config.LocoSettings[loco.LocoType], loco)
+                context = new CruiseControlContext(config.LocoSettings[loco.Type], loco)
                 {
                     Time = clock.Time2
                 };
             }
             catch (KeyNotFoundException)
             {
-                Status = string.Format(localization.CC_UNSUPPORTED, loco.LocoType);
+                Status = string.Format(localization.CC_UNSUPPORTED, loco.Type);
                 // Status = String.Format("No settings found for {0}", loco.LocoType);
                 return;
             }
@@ -124,7 +125,7 @@ namespace DriverAssist.Cruise
                 Status = string.Format(localization.CC_STOPPING);
                 // Status = String.Format("Stop");
                 loco.Throttle = 0;
-                if (!(loco.LocoType == LocoType.DM3))
+                if (!(loco.Type == LocoType.DM3))
                     loco.TrainBrake = 1;
                 else
                     loco.TrainBrake = .666f;
@@ -134,7 +135,7 @@ namespace DriverAssist.Cruise
                 Status = string.Format(localization.CC_CHANGING_DIRECTION);
                 // Status = String.Format("Direction change");
                 loco.Throttle = 0;
-                if (!(loco.LocoType == LocoType.DM3))
+                if (!(loco.Type == LocoType.DM3))
                     loco.TrainBrake = 1;
                 else
                     loco.TrainBrake = .666f;

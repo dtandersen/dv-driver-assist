@@ -1,4 +1,4 @@
-using System;
+using DriverAssist.ECS;
 
 namespace DriverAssist.Cruise
 {
@@ -9,7 +9,7 @@ namespace DriverAssist.Cruise
 
         public void Tick(CruiseControlContext context)
         {
-            LocoController loco = context.LocoController;
+            LocoEntity loco = context.LocoController;
             float predictedSpeedKmh = context.Config.BrakingTime * loco.RelativeAccelerationMs * 3.6f;
             float speedKmh = loco.RelativeSpeedKmh + predictedSpeedKmh;
             float brake;

@@ -1,13 +1,13 @@
-namespace DriverAssist
+namespace DriverAssist.ECS
 {
     public class LocoStatsSystem : BaseSystem
     {
-        private readonly LocoController loco;
+        private readonly LocoEntity loco;
         private readonly RollingSample integrator;
         private readonly float deltaTime;
         private readonly int samples;
 
-        public LocoStatsSystem(LocoController loco, float period, float deltaTime)
+        public LocoStatsSystem(LocoEntity loco, float period, float deltaTime)
         {
             this.loco = loco;
             this.deltaTime = deltaTime;

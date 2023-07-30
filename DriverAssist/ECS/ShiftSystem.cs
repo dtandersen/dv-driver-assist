@@ -1,10 +1,10 @@
-namespace DriverAssist.Cruise
+namespace DriverAssist.ECS
 {
     public class ShiftSystem : BaseSystem
     {
-        private readonly LocoController loco;
+        private readonly LocoEntity loco;
 
-        public ShiftSystem(LocoController loco)
+        public ShiftSystem(LocoEntity loco)
         {
             this.loco = loco;
         }

@@ -1,7 +1,6 @@
-//#pragma warning disable CS8602 // disable Dereference of a possibly null reference
-
-using DriverAssist.Extension;
+using DriverAssist.ECS;
 using DriverAssist.Localization;
+using DriverAssist.Test;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -10,7 +9,7 @@ namespace DriverAssist.Cruise
     public class CruiseControlTest
     {
         private readonly CruiseControl cruiseControl;
-        private readonly LocoController loco;
+        private readonly LocoEntity loco;
         private readonly Translation localization;
         private readonly FakeCruiseControlConfig config;
         private readonly LocoSettings de2settings;
@@ -36,9 +35,9 @@ namespace DriverAssist.Cruise
             config.LocoSettings[LocoType.DE2] = de2settings;
             config.LocoSettings[LocoType.DH4] = dh4settings;
             train = new FakeTrainCarWrapper();
-            loco = new LocoController(1f / 60f);
+            loco = new LocoEntity(1f / 60f);
             loco.UpdateLocomotive(train);
-            train.LocoType = LocoType.DE2;
+            train.Type = LocoType.DE2;
             loco.Reverser = 1;
             clock = new FakeClock();
             cruiseControl = new CruiseControl(loco, config, clock)
@@ -372,7 +371,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void UseTheSettingsForTheLocoType()
         {
-            train.LocoType = LocoType.DH4;
+            train.Type = LocoType.DH4;
             cruiseControl.DesiredSpeed = 10;
             train.SpeedKmh = 0;
 
@@ -384,7 +383,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void ReportIfLocoHasNoSettings()
         {
-            train.LocoType = LocoType.DE6;
+            train.Type = LocoType.DE6;
 
             WhenCruise();
 
@@ -394,7 +393,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void PassTimeToContext()
         {
-            train.LocoType = LocoType.DH4;
+            train.Type = LocoType.DH4;
             cruiseControl.DesiredSpeed = 10;
             train.SpeedKmh = 0;
             clock.Time2 = 5;

@@ -1,5 +1,6 @@
 using System;
 using DriverAssist.Cruise;
+using DriverAssist.ECS;
 using DriverAssist.Localization;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace DriverAssist.Implementation
         private Rect windowRect;
         private const float SCALE = 1.5f;
         private readonly Logger logger = LogFactory.GetLogger("DriverAssistWindow");
-        private LocoController? locoController;
+        private LocoEntity? locoController;
         private bool photoMode;
 
         public void Awake()
@@ -198,7 +199,7 @@ namespace DriverAssist.Implementation
             logger.Info("OnDestroy");
         }
 
-        public void Show(LocoController loco)
+        public void Show(LocoEntity loco)
         {
             logger.Info("Show");
             this.locoController = loco;

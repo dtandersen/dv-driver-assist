@@ -1,3 +1,5 @@
+using DriverAssist.ECS;
+
 namespace DriverAssist.Cruise
 {
     public class PredictiveDeceleration : CruiseControlAlgorithm
@@ -13,9 +15,9 @@ namespace DriverAssist.Cruise
 
         public void Tick(CruiseControlContext context)
         {
-            LocoController loco = context.LocoController;
+            LocoEntity loco = context.LocoController;
 
-            if (loco.LocoType == LocoType.DM3 && loco.Length > 1)
+            if (loco.Type == LocoType.DM3 && loco.Length > 1)
             {
                 manualLap.Tick(context);
             }

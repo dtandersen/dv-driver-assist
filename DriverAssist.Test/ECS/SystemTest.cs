@@ -1,8 +1,8 @@
-using DriverAssist.Extension;
+using DriverAssist.Test;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DriverAssist.Cruise
+namespace DriverAssist.ECS
 {
     public class SystemTest
     {

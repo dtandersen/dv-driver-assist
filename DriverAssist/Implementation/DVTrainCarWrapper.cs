@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DriverAssist.Cruise;
+using DriverAssist.ECS;
 using DV.HUD;
 using DV.Simulation.Cars;
 using LocoSim.Implementations;
@@ -220,9 +221,9 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                return LocoType switch
+                return Type switch
                 {
-                    DriverAssist.LocoType.DE2 or DriverAssist.LocoType.DE6 => true,
+                    LocoType.DE2 or LocoType.DE6 => true,
                     _ => false,
                 };
             }
@@ -286,7 +287,7 @@ namespace DriverAssist.Implementation
 
         public float WheelSlip { get { return trainCar?.adhesionController?.wheelslipController?.wheelslip ?? 0; } }
 
-        public string LocoType
+        public string Type
         {
             get
             {
@@ -351,9 +352,9 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                switch (LocoType)
+                switch (Type)
                 {
-                    case DriverAssist.LocoType.DM3:
+                    case LocoType.DM3:
                         if (SimFlow != null && SimFlow.TryGetPort("transmissionAB.MECHANICAL_GEAR_RATIO", out Port gearRatioPort))
                         {
                             return gearRatioPort.Value;
@@ -370,9 +371,9 @@ namespace DriverAssist.Implementation
             get
             {
                 float gearA;
-                switch (LocoType)
+                switch (Type)
                 {
-                    case DriverAssist.LocoType.DM3:
+                    case LocoType.DM3:
                         if (SimFlow != null && SimFlow.TryGetPort("transmissionA.GEAR_CHANGE_IN_PROGRESS", out Port gearRatioPort))
                         {
                             gearA = gearRatioPort.Value;
@@ -386,9 +387,9 @@ namespace DriverAssist.Implementation
                 }
 
                 float gearB;
-                switch (LocoType)
+                switch (Type)
                 {
-                    case DriverAssist.LocoType.DM3:
+                    case LocoType.DM3:
                         if (SimFlow != null && SimFlow.TryGetPort("transmissionB.GEAR_CHANGE_IN_PROGRESS", out Port gearRatioPort))
                         {
                             gearB = gearRatioPort.Value;

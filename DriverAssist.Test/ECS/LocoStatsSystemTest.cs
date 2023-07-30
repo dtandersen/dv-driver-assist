@@ -1,14 +1,12 @@
-#pragma warning disable CS8629
-
-using DriverAssist.Extension;
+using DriverAssist.Test;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DriverAssist.Cruise
+namespace DriverAssist.ECS
 {
     public class LocoStatsSystemTest
     {
-        private readonly LocoController loco;
+        private readonly LocoEntity loco;
         private readonly FakeTrainCarWrapper train;
         private readonly LocoStatsSystem system;
 
@@ -18,11 +16,11 @@ namespace DriverAssist.Cruise
 
             train = new FakeTrainCarWrapper
             {
-                LocoType = LocoType.DE2,
+                Type = LocoType.DE2,
                 Reverser = 1
             };
 
-            loco = new LocoController(1f / 60f);
+            loco = new LocoEntity(1f / 60f);
             loco.UpdateLocomotive(train);
             system = new LocoStatsSystem(loco, 1, .5f);
         }

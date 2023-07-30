@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DriverAssist.ECS;
 
 namespace DriverAssist
 {
@@ -21,7 +22,7 @@ namespace DriverAssist
         float Rpm { get; }
         bool IsWheelSlipping { get; }
         float WheelSlip { get; }
-        string LocoType { get; }
+        string Type { get; }
         float Mass { get; }
         float LocoMass { get; }
         float CargoMass { get; }
@@ -77,7 +78,7 @@ namespace DriverAssist
         public float WheelSlip { get; }
         public bool IsWheelSlipping { get; }
 
-        public string LocoType { get; }
+        public string Type { get; }
 
         public float Mass { get; }
         public float LocoMass { get; }
@@ -94,14 +95,14 @@ namespace DriverAssist
         {
             Ports = new();
             TractionMotors = "";
-            LocoType = DriverAssist.LocoType.DE2;
+            Type = LocoType.DE2;
         }
     }
 
     public class FakeTrainCarWrapper : TrainCarWrapper
     {
-        public string LocoType { get; set; }
-        public bool IsLoco { get { return LocoType != ""; } }
+        public string Type { get; set; }
+        public bool IsLoco { get { return Type != ""; } }
 
         public float SpeedKmh { get; set; }
 
@@ -140,7 +141,7 @@ namespace DriverAssist
         {
             Ports = new();
             TractionMotors = "";
-            LocoType = DriverAssist.LocoType.DE2;
+            Type = LocoType.DE2;
         }
     }
 }

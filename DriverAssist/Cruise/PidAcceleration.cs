@@ -1,6 +1,7 @@
 #pragma warning disable IDE0090
 
 using System;
+using DriverAssist.ECS;
 
 namespace DriverAssist.Cruise
 {
@@ -35,7 +36,7 @@ namespace DriverAssist.Cruise
 
         public void Tick(CruiseControlContext context)
         {
-            LocoController loco = context.LocoController;
+            LocoEntity loco = context.LocoController;
             // logger.LogInfo("tick");
             currentTime = 0;
             dt = currentTime - lastThrottle;

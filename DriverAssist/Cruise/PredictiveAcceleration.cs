@@ -1,4 +1,5 @@
 using System;
+using DriverAssist.ECS;
 
 namespace DriverAssist.Cruise
 {
@@ -22,7 +23,7 @@ namespace DriverAssist.Cruise
         public void Tick(CruiseControlContext context)
         {
             // PluginLoggerSingleton.ThreadInstance.Value.Info("test");
-            LocoController loco = context.LocoController;
+            LocoEntity loco = context.LocoController;
 
             // float reverser;// = loco.Reverser;
             float speed = loco.RelativeSpeedKmh;
@@ -153,7 +154,7 @@ namespace DriverAssist.Cruise
         {
             if (throttleAdj == 0) return;
 
-            LocoController loco = context.LocoController;
+            LocoEntity loco = context.LocoController;
             loco.Throttle += throttleAdj;
             LastThrottleChange = context.Time;
         }

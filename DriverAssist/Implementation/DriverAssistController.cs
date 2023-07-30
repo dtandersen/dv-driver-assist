@@ -1,18 +1,19 @@
 using System;
 using DriverAssist.Cruise;
+using DriverAssist.ECS;
 using DV.Utils;
 using UnityEngine;
 
 namespace DriverAssist.Implementation
 {
-    public delegate void EnterLocoHandler(LocoController locoController);
+    public delegate void EnterLocoHandler(LocoEntity locoController);
     public delegate void NoArgsHandler();
 
     public class DriverAssistController
     {
         private const int CC_SPEED_STEP = 5;
 
-        private LocoController? locoController;
+        private LocoEntity? locoController;
         private CruiseControl? cruiseControl;
         private readonly UnifiedSettings config;
         private float updateAccumulator;
@@ -135,7 +136,7 @@ namespace DriverAssist.Implementation
             PlayerManager.CarChanged += OnCarChanged;
 
 
-            locoController = new LocoController(Time.fixedDeltaTime);
+            locoController = new LocoEntity(Time.fixedDeltaTime);
 
             cruiseControl = new CruiseControl(locoController, config, new UnityClock())
             {
@@ -212,7 +213,7 @@ namespace DriverAssist.Implementation
             {
                 DVTrainCarWrapper train = new(trainCar);
                 logger.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
-                LocoSettings settings = config.LocoSettings[locoController?.LocoType ?? ""];
+                LocoSettings settings = config.LocoSettings[locoController?.Type ?? ""];
                 if (locoController != null)
                 {
                     locoController.UpdateLocomotive(train);

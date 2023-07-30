@@ -1,15 +1,13 @@
-#pragma warning disable CS8629
-
-using DriverAssist.Extension;
+using DriverAssist.ECS;
+using DriverAssist.Test;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    // [Collection("Sequential")]
     public class LocoControllerTest
     {
-        private readonly LocoController loco;
+        private readonly LocoEntity loco;
         private readonly FakeTrainCarWrapper train;
 
         public LocoControllerTest(ITestOutputHelper output)
@@ -18,18 +16,13 @@ namespace DriverAssist.Cruise
 
             train = new FakeTrainCarWrapper
             {
-                LocoType = LocoType.DE2,
+                Type = LocoType.DE2,
                 Reverser = 1
             };
 
-            loco = new LocoController(1f / 60f);
+            loco = new LocoEntity(1f / 60f);
             loco.UpdateLocomotive(train);
         }
-
-        // public void Dispose()
-        // {
-        //     PluginLoggerSingleton.Instance = new NullLogger();
-        // }
 
         /// The train is a DM3
         /// and a throttle change has been requested,
@@ -38,62 +31,13 @@ namespace DriverAssist.Cruise
         [Fact]
         public void PreventsThrottleChangeDuringShift()
         {
-            train.LocoType = LocoType.DM3;
+            train.Type = LocoType.DM3;
             train.Throttle = 0;
             train.GearChangeInProgress = true;
             loco.Throttle = 1;
 
             Assert.Equal(0, train.Throttle);
         }
-
-        // /// The train is a DM3
-        // /// and a gear change has been requested.
-        // /// Proceed.
-        // [Fact]
-        // public void ShiftGearsInDm3()
-        // {
-        //     train.LocoType = LocoType.DM3;
-        //     train.Throttle = 1;
-        //     train.GearboxA = 0;
-        //     train.GearboxB = 0;
-
-        //     loco.RequestedGear = 3;
-        //     loco.UpdateStats(1 / 60);
-        //     Assert.Equal(0, train.GearboxA);
-        //     Assert.Equal(0, train.GearboxB);
-        //     Assert.Equal(0, train.Throttle);
-
-        //     loco.UpdateStats(1 / 60);
-        //     Assert.Equal(0.5f, train.GearboxA);
-        //     Assert.Equal(0.5f, train.GearboxB);
-        //     Assert.Equal(0, train.Throttle);
-
-        //     train.GearChangeInProgress = true;
-        //     loco.UpdateStats(1 / 60);
-        //     Assert.Equal(0, train.Throttle);
-
-        //     train.GearChangeInProgress = false;
-        //     loco.UpdateStats(1 / 60);
-        //     Assert.Equal(1, train.Throttle);
-        // }
-
-        // /// The train is a DE2
-        // /// and a gear change has been requested.
-        // /// Ignore it.
-        // [Fact]
-        // public void DoesntAutoShiftIfTrainNotMechanical()
-        // {
-        //     train.Throttle = 1;
-        //     train.GearboxA = 0;
-        //     train.GearboxB = 0;
-
-        //     loco.RequestedGear = 2;
-        //     loco.UpdateStats(1 / 60);
-
-        //     Assert.Equal(0, train.GearboxA);
-        //     Assert.Equal(0, train.GearboxB);
-        //     Assert.Equal(1, train.Throttle);
-        // }
 
         /// The train is a DE2
         /// and Gear is set.
@@ -146,7 +90,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void AllowDm3GearShift()
         {
-            train.LocoType = DriverAssist.LocoType.DM3;
+            train.Type = LocoType.DM3;
 
             // loco.Gear = 0;
             train.GearboxA = 0;
@@ -165,7 +109,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void DontRestoreThrottleIfThrottleIsZero()
         {
-            train.LocoType = DriverAssist.LocoType.DM3;
+            train.Type = LocoType.DM3;
 
             // loco.Gear = 0;
             train.GearboxA = 0;
@@ -184,7 +128,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void DoesntShiftIfShifting()
         {
-            train.LocoType = DriverAssist.LocoType.DM3;
+            train.Type = LocoType.DM3;
 
             // loco.Gear = 0;
             train.GearboxA = 0;
@@ -211,7 +155,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void CantShiftBelowMinGear()
         {
-            train.LocoType = DriverAssist.LocoType.DM3;
+            train.Type = LocoType.DM3;
 
             loco.Gear = 0;
             loco.ChangeGear(-1);
@@ -227,7 +171,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void CantShiftAboveMaxGear()
         {
-            train.LocoType = DriverAssist.LocoType.DM3;
+            train.Type = LocoType.DM3;
 
             loco.Gear = 8;
             loco.ChangeGear(9);
@@ -243,7 +187,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void DoesntShiftToSameGear()
         {
-            train.LocoType = DriverAssist.LocoType.DM3;
+            train.Type = LocoType.DM3;
 
             loco.Gear = 1;
             loco.ChangeGear(1);
@@ -251,7 +195,5 @@ namespace DriverAssist.Cruise
             // Assert.Null(loco.Components.RequestedGear);
             Assert.Null(loco.Components.GearChangeRequest);
         }
-
-
     }
 }

@@ -1,8 +1,8 @@
+using DriverAssist.ECS;
+
 namespace DriverAssist.Cruise
 {
-#pragma warning disable IDE1006
     public interface CruiseControlAlgorithm
-#pragma warning restore IDE1006
     {
         void Tick(CruiseControlContext context);
     }
@@ -10,11 +10,11 @@ namespace DriverAssist.Cruise
     public class CruiseControlContext
     {
         public LocoSettings Config { get; }
-        public LocoController LocoController { get; }
+        public LocoEntity LocoController { get; }
         public float DesiredSpeed { get; set; }
         public float Time { get; set; }
 
-        public CruiseControlContext(LocoSettings config, LocoController loco)
+        public CruiseControlContext(LocoSettings config, LocoEntity loco)
         {
             Config = config;
             LocoController = loco;
@@ -28,7 +28,7 @@ namespace DriverAssist.Cruise
 
         public void Tick(CruiseControlContext context)
         {
-            LocoController loco = context.LocoController;
+            LocoEntity loco = context.LocoController;
             if (loco.RelativeSpeedKmh < context.DesiredSpeed)
             {
                 loco.Throttle += .1f;
@@ -45,7 +45,7 @@ namespace DriverAssist.Cruise
 
         public void Tick(CruiseControlContext context)
         {
-            LocoController loco = context.LocoController;
+            LocoEntity loco = context.LocoController;
             if (loco.RelativeSpeedKmh > context.DesiredSpeed)
             {
                 loco.TrainBrake += .1f;

@@ -1,14 +1,12 @@
-#pragma warning disable CS8629
-
-using DriverAssist.Extension;
+using DriverAssist.Test;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DriverAssist.Cruise
+namespace DriverAssist.ECS
 {
     public class ShiftSystemTest
     {
-        private readonly LocoController loco;
+        private readonly LocoEntity loco;
         private readonly FakeTrainCarWrapper train;
         private readonly ShiftSystem system;
 
@@ -18,11 +16,11 @@ namespace DriverAssist.Cruise
 
             train = new FakeTrainCarWrapper
             {
-                LocoType = LocoType.DE2,
+                Type = LocoType.DE2,
                 Reverser = 1
             };
 
-            loco = new LocoController(1f / 60f);
+            loco = new LocoEntity(1f / 60f);
             loco.UpdateLocomotive(train);
             system = new ShiftSystem(loco);
         }
@@ -33,7 +31,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void ShiftGearsInDm3()
         {
-            train.LocoType = LocoType.DM3;
+            train.Type = LocoType.DM3;
             train.Throttle = 1;
             train.GearboxA = 0;
             train.GearboxB = 0;
@@ -66,7 +64,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void WaitForZeroThrottleBeforeShifting()
         {
-            train.LocoType = LocoType.DM3;
+            train.Type = LocoType.DM3;
             train.Throttle = 1;
 
             loco.ChangeGear(3);
@@ -93,7 +91,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void WaitForLowRpmBeforeThrottle()
         {
-            train.LocoType = LocoType.DM3;
+            train.Type = LocoType.DM3;
             train.Throttle = 1;
 
             loco.ChangeGear(3);
@@ -113,7 +111,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void ChangeGearInstantlyIfZeroThrottle()
         {
-            train.LocoType = LocoType.DM3;
+            train.Type = LocoType.DM3;
             train.Throttle = 0;
             train.GearboxA = 0;
             train.GearboxB = 0;
@@ -133,7 +131,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void DoesntAdjustThrottleIfNotShifting()
         {
-            train.LocoType = LocoType.DM3;
+            train.Type = LocoType.DM3;
             train.Throttle = 1;
             train.GearboxA = 0;
             train.GearboxB = 0;
@@ -155,7 +153,7 @@ namespace DriverAssist.Cruise
         [Fact]
         public void DoesntRestoreThrottleIfNotRequested()
         {
-            train.LocoType = LocoType.DM3;
+            train.Type = LocoType.DM3;
             train.Throttle = 0;
 
             loco.ChangeGear(1);

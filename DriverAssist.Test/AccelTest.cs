@@ -1,4 +1,5 @@
-using DriverAssist.Extension;
+using DriverAssist.ECS;
+using DriverAssist.Test;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -49,11 +50,11 @@ namespace DriverAssist.Cruise
             };
             train = new FakeTrainCarWrapper
             {
-                LocoType = LocoType.DE2
+                Type = LocoType.DE2
             };
             loco = new FakeLocoController(1f / 60f);
             loco.UpdateLocomotive(train);
-            train.LocoType = LocoType.DE2;
+            train.Type = LocoType.DE2;
             loco.Reverser = 1;
             accelerator = new PredictiveAcceleration
             {
@@ -344,7 +345,7 @@ namespace DriverAssist.Cruise
             loco.TemperatureChange = -.1f;
             train.Throttle = 3 * STEP;
             train.Torque = 10000;
-            train.LocoType = LocoType.DH4;
+            train.Type = LocoType.DH4;
             train.Amps = 0;
 
             WhenAccel();
@@ -394,7 +395,7 @@ namespace DriverAssist.Cruise
         }
     }
 
-    class FakeLocoController : LocoController
+    class FakeLocoController : LocoEntity
     {
         override public float AccelerationMs { get; set; }
         override public float TemperatureChange { get; set; }

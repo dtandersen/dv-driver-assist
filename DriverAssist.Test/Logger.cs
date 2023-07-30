@@ -1,6 +1,6 @@
 using Xunit.Abstractions;
 
-namespace DriverAssist.Extension
+namespace DriverAssist.Test
 {
     public class XunitLogger : Logger
     {

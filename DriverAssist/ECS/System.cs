@@ -1,19 +1,17 @@
-using System;
 using System.Collections.Generic;
 
-namespace DriverAssist
+namespace DriverAssist.ECS
 {
-    public interface DASystem
+    public interface System
     {
         bool Enabled { get; set; }
 
         void OnUpdate();
     }
 
-    public abstract class BaseSystem : DASystem
+    public abstract class BaseSystem : System
     {
-        private bool enabled;
-        public bool Enabled { get { return enabled; } set { logger.Info($"enabled={enabled}"); enabled = value; } }
+        public bool Enabled { get; set; }
 
         public abstract void OnUpdate();
 
@@ -23,13 +21,12 @@ namespace DriverAssist
         {
             logger = LogFactory.GetLogger(this.GetType().Name);
             Enabled = true;
-            // logger.Info($"BaseSystem Enabled={Enabled}");
         }
     }
 
     public class SystemManager
     {
-        private readonly List<DASystem> systems;
+        private readonly List<System> systems;
         protected Logger logger;
 
         public SystemManager()
@@ -38,17 +35,15 @@ namespace DriverAssist
             systems = new();
         }
 
-        public void AddSystem(DASystem system)
+        public void AddSystem(System system)
         {
             systems.Add(system);
         }
 
         public void Update()
         {
-            foreach (DASystem system in systems)
+            foreach (System system in systems)
             {
-                // system.Enabled = true;
-                // logger.Info($"enabled={system.Enabled}");
                 if (system.Enabled) system.OnUpdate();
             }
         }
