@@ -1,6 +1,5 @@
 #if UMM
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using DriverAssist.Cruise;
@@ -193,17 +192,22 @@ namespace DriverAssist.UMM
             this.settings = settings;
         }
 
-        public int[] AccelerateKeys { get { return new int[] { (int)settings.Accelerate.keyCode }; } }
+        static KeyMatcher GetKeyCode(KeyBinding keyBinding)
+        {
+            return new UmmKeyMatcher(keyBinding);
+        }
 
-        public int[] DecelerateKeys { get { return new int[] { (int)settings.Decelerate.keyCode }; } }
+        public KeyMatcher AccelerateKeys { get { return GetKeyCode(settings.Accelerate); } }
 
-        public int[] ToggleKeys { get { return new int[] { (int)settings.Toggle.keyCode }; } }
+        public KeyMatcher DecelerateKeys { get { return GetKeyCode(settings.Decelerate); } }
 
-        public int[] Upshift { get { return new int[] { (int)settings.Upshift.keyCode }; } }
+        public KeyMatcher ToggleKeys { get { return GetKeyCode(settings.Toggle); } }
 
-        public int[] Downshift { get { return new int[] { (int)settings.Downshift.keyCode }; } }
+        public KeyMatcher Upshift { get { return GetKeyCode(settings.Upshift); } }
 
-        public int[] DumpPorts { get { return new int[] { (int)settings.DumpPorts.keyCode }; } }
+        public KeyMatcher Downshift { get { return GetKeyCode(settings.Downshift); } }
+
+        public KeyMatcher DumpPorts { get { return GetKeyCode(settings.DumpPorts); } }
 
         public bool ShowStats { get { return settings.ShowStats; } }
 
@@ -379,6 +383,60 @@ namespace DriverAssist.UMM
         public void Warn(string message)
         {
             logger.Log($"{scope,-25} WARN  {message}");
+        }
+    }
+
+    class UmmKeyMatcher : KeyMatcher
+    {
+        private KeyCode Key { get; }
+        private KeyCode[] Modifiers { get; }
+
+        private const byte CTRL = 1;
+        private const byte SHIFT = 2;
+        private const byte ALT = 4;
+
+        public UmmKeyMatcher(KeyBinding keyBinding)
+        {
+            Key = keyBinding.keyCode;
+
+            if ((keyBinding.modifiers & CTRL) > 0)
+            {
+                Modifiers = new KeyCode[] { KeyCode.LeftControl, KeyCode.RightControl };
+            }
+            else if ((keyBinding.modifiers & SHIFT) > 0)
+            {
+                Modifiers = new KeyCode[] { KeyCode.LeftShift, KeyCode.RightShift };
+            }
+            else if ((keyBinding.modifiers & ALT) > 0)
+            {
+                Modifiers = new KeyCode[] { KeyCode.LeftAlt, KeyCode.RightAlt };
+            }
+            else
+            {
+                Modifiers = new KeyCode[0];
+            }
+        }
+
+        public bool IsKeyPressed()
+        {
+            return IsKeyPressed(Key) && IsModifierPressed();
+        }
+
+        private bool IsModifierPressed()
+        {
+            if (Modifiers.Length == 0) return true;
+
+            foreach (KeyCode key in Modifiers)
+            {
+                if (IsKeyPressed(key)) return true;
+            }
+
+            return false;
+        }
+
+        private bool IsKeyPressed(KeyCode key)
+        {
+            return Input.GetKeyDown(key);
         }
     }
 

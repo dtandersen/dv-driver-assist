@@ -25,7 +25,6 @@ namespace DriverAssist.Implementation
         private JobWindow? jobWindow;
         private readonly Logger logger = LogFactory.GetLogger(typeof(DriverAssistController));
         private SystemManager? systemManager;
-        // private JobManager? jobManager;
         private JobSystem? jobSystem;
 
         public event EventHandler Loaded = delegate { };
@@ -131,7 +130,6 @@ namespace DriverAssist.Implementation
         internal void Load()
         {
             logger.Info("Register jobs");
-            // jobManager = new JobManager();
             loaded = true;
             logger.Info("Load");
 
@@ -144,8 +142,6 @@ namespace DriverAssist.Implementation
 
             jobWindow = gameObject.AddComponent<JobWindow>();
             jobWindow.Config = config;
-            // Loaded += window.OnLoad;
-            // Unloaded += window.OnUnload;
             EnterLoco += statsWindow.Show;
             ExitLoco += statsWindow.Hide;
             if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged += statsWindow.OnPhotoModeChanged;
@@ -189,9 +185,6 @@ namespace DriverAssist.Implementation
             Loaded?.Invoke(this, null);
             statsWindow.CruiseControl = cruiseControl;
             cruiseControlWindow.CruiseControl = cruiseControl;
-
-
-
         }
 
         public void Unload()
@@ -210,8 +203,6 @@ namespace DriverAssist.Implementation
 
             if (statsWindow != null)
             {
-                // Loaded -= window.OnLoad;
-                // Unloaded -= window.OnUnload;
                 EnterLoco -= statsWindow.Show;
                 ExitLoco -= statsWindow.Hide;
                 if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged -= statsWindow.OnPhotoModeChanged;
@@ -219,8 +210,6 @@ namespace DriverAssist.Implementation
 
             if (cruiseControlWindow != null)
             {
-                // Loaded -= window.OnLoad;
-                // Unloaded -= window.OnUnload;
                 EnterLoco -= cruiseControlWindow.Show;
                 ExitLoco -= cruiseControlWindow.Hide;
                 if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged -= cruiseControlWindow.OnPhotoModeChanged;
@@ -228,32 +217,17 @@ namespace DriverAssist.Implementation
 
             if (jobWindow != null)
             {
-                // Loaded -= window.OnLoad;
-                // Unloaded -= window.OnUnload;
                 EnterLoco -= jobWindow.Show;
                 ExitLoco -= jobWindow.Hide;
                 if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged -= jobWindow.OnPhotoModeChanged;
             }
 
-            // var updateTask = jobSystem?.UpdateTask;
-            // var removeTask = jobSystem?.RemoveTask;
-            // if (jobWindow != null)
-            // {
-            //     updateTask -= jobWindow.OnJobAccepted;
-            //     removeTask -= jobWindow.OnJobRemoved;
-            // }
-
-            // var updateTask = jobSystem?.UpdateTask;
-            // var removeTask = jobSystem?.RemoveTask;
             if (jobSystem != null)
             {
                 jobSystem.UpdateTask = delegate { };
                 jobSystem.RemoveTask = delegate { };
             }
 
-            // UnityEngine.Object.Destroy(cruiseControlWindow);
-            // UnityEngine.Object.Destroy(statsWindow);
-            // UnityEngine.Object.Destroy(jobWindow);
             UnityEngine.Object.Destroy(gameObject);
         }
 
@@ -320,16 +294,9 @@ namespace DriverAssist.Implementation
             Unload();
         }
 
-        bool IsKeyPressed(int[] keys)
+        bool IsKeyPressed(KeyMatcher keyMatcher)
         {
-            foreach (int intkey in keys)
-            {
-                KeyCode key = (KeyCode)intkey;
-                if (!Input.GetKeyDown(key))
-                    return false;
-            }
-
-            return true;
+            return keyMatcher.IsKeyPressed();
         }
 
         /// Player has entered or exited a car
@@ -343,18 +310,6 @@ namespace DriverAssist.Implementation
         {
             logger.Info($"OnRegisterJob {job.ID} {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
             jobSystem?.AddJob(new DVJobWrapper(job));
-            // JobWrapper jobWrapper = new DVJobWrapper(job);
-            // jobWindow?.OnJobAccepted(new TaskRow()
-            // {
-            //     ID = jobWrapper.ID,
-            //     Origin = jobWrapper?.GetNextTask()?.Source ?? "",
-            //     Destination = jobWrapper?.GetNextTask()?.Destination ?? ""
-            // });
-            // jobManager?.Add(jobWrapper);
-            // // foreach (JobWrapper jobWrapper in job)
-            // TaskWrapper? task = jobWrapper.GetNextTask();
-            // if (task != null)
-            //     logger.Info($"{task.Type} {task.Source} -> {task.Destination}");
         }
 
         internal void OnUnregisterJob(Job job)
