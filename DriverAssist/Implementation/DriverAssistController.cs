@@ -1,6 +1,7 @@
 using System;
 using DriverAssist.Cruise;
 using DriverAssist.ECS;
+using DV.Logic.Job;
 using DV.Utils;
 using UnityEngine;
 
@@ -19,9 +20,13 @@ namespace DriverAssist.Implementation
         private float updateAccumulator;
         private bool loaded = false;
         private GameObject? gameObject;
-        private DriverAssistWindow? window;
+        private CruiseControlWindow? cruiseControlWindow;
+        private StatsWindow? statsWindow;
+        private JobWindow? jobWindow;
         private readonly Logger logger = LogFactory.GetLogger(typeof(DriverAssistController));
         private SystemManager? systemManager;
+        // private JobManager? jobManager;
+        private JobSystem? jobSystem;
 
         public event EventHandler Loaded = delegate { };
         public event EventHandler Unloaded = delegate { };
@@ -30,6 +35,8 @@ namespace DriverAssist.Implementation
 
         public PlayerCameraSwitcher? PlayerCameraSwitcher { get { return SingletonBehaviour<PlayerCameraSwitcher>.Instance; } }
 
+        public static DriverAssistController? Instance { get; internal set; }
+
         public DriverAssistController(UnifiedSettings config)
         {
             this.config = config;
@@ -37,6 +44,7 @@ namespace DriverAssist.Implementation
 
         public void Init()
         {
+            Instance = this;
             logger.Info($"Init");
 
             WorldStreamingInit.LoadingFinished += OnLoadingFinished;
@@ -66,9 +74,10 @@ namespace DriverAssist.Implementation
         {
             if (!loaded) return;
 
+            systemManager?.Update();
+
             if (locoController?.IsLoco ?? false)
             {
-                systemManager?.Update();
                 locoController.UpdateStats(Time.fixedDeltaTime);
                 updateAccumulator += Time.fixedDeltaTime;
                 if (updateAccumulator > config.UpdateInterval)
@@ -121,20 +130,35 @@ namespace DriverAssist.Implementation
 
         internal void Load()
         {
+            logger.Info("Register jobs");
+            // jobManager = new JobManager();
             loaded = true;
             logger.Info("Load");
 
             gameObject = new GameObject("DriverAssistWindow");
-            window = gameObject.AddComponent<DriverAssistWindow>();
-            window.Config = config;
+            statsWindow = gameObject.AddComponent<StatsWindow>();
+            statsWindow.Config = config;
+
+            cruiseControlWindow = gameObject.AddComponent<CruiseControlWindow>();
+            cruiseControlWindow.Config = config;
+
+            jobWindow = gameObject.AddComponent<JobWindow>();
+            jobWindow.Config = config;
             // Loaded += window.OnLoad;
             // Unloaded += window.OnUnload;
-            EnterLoco += window.Show;
-            ExitLoco += window.Hide;
-            if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged += window.OnPhotoModeChanged;
+            EnterLoco += statsWindow.Show;
+            ExitLoco += statsWindow.Hide;
+            if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged += statsWindow.OnPhotoModeChanged;
+
+            EnterLoco += cruiseControlWindow.Show;
+            ExitLoco += cruiseControlWindow.Hide;
+            if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged += cruiseControlWindow.OnPhotoModeChanged;
+
+            EnterLoco += jobWindow.Show;
+            ExitLoco += jobWindow.Hide;
+            if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged += jobWindow.OnPhotoModeChanged;
 
             PlayerManager.CarChanged += OnCarChanged;
-
 
             locoController = new LocoEntity(Time.fixedDeltaTime);
 
@@ -147,12 +171,27 @@ namespace DriverAssist.Implementation
             systemManager = new SystemManager();
             ShiftSystem shiftSystem = new ShiftSystem(locoController);
             LocoStatsSystem locoStatsSystem = new LocoStatsSystem(locoController, 0.5f, Time.fixedDeltaTime);
+            jobSystem = new JobSystem();
+            jobSystem.UpdateTask += jobWindow.OnJobAccepted;
+            jobSystem.RemoveTask += jobWindow.OnJobRemoved;
+
+            JobsManager jm = SingletonBehaviour<JobsManager>.Instance;
+            foreach (Job job in jm.currentJobs)
+            {
+                OnRegisterJob(job);
+            }
+
             systemManager.AddSystem(shiftSystem);
             systemManager.AddSystem(locoStatsSystem);
+            systemManager.AddSystem(jobSystem);
 
             updateAccumulator = 0;
             Loaded?.Invoke(this, null);
-            window.CruiseControl = cruiseControl;
+            statsWindow.CruiseControl = cruiseControl;
+            cruiseControlWindow.CruiseControl = cruiseControl;
+
+
+
         }
 
         public void Unload()
@@ -169,16 +208,52 @@ namespace DriverAssist.Implementation
             loaded = false;
             Unloaded?.Invoke(this, null);
 
-            if (window != null)
+            if (statsWindow != null)
             {
                 // Loaded -= window.OnLoad;
                 // Unloaded -= window.OnUnload;
-                EnterLoco -= window.Show;
-                ExitLoco -= window.Hide;
-                if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged -= window.OnPhotoModeChanged;
+                EnterLoco -= statsWindow.Show;
+                ExitLoco -= statsWindow.Hide;
+                if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged -= statsWindow.OnPhotoModeChanged;
             }
 
-            UnityEngine.Object.Destroy(window);
+            if (cruiseControlWindow != null)
+            {
+                // Loaded -= window.OnLoad;
+                // Unloaded -= window.OnUnload;
+                EnterLoco -= cruiseControlWindow.Show;
+                ExitLoco -= cruiseControlWindow.Hide;
+                if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged -= cruiseControlWindow.OnPhotoModeChanged;
+            }
+
+            if (jobWindow != null)
+            {
+                // Loaded -= window.OnLoad;
+                // Unloaded -= window.OnUnload;
+                EnterLoco -= jobWindow.Show;
+                ExitLoco -= jobWindow.Hide;
+                if (PlayerCameraSwitcher != null) PlayerCameraSwitcher.externalCamera.PhotoModeChanged -= jobWindow.OnPhotoModeChanged;
+            }
+
+            // var updateTask = jobSystem?.UpdateTask;
+            // var removeTask = jobSystem?.RemoveTask;
+            // if (jobWindow != null)
+            // {
+            //     updateTask -= jobWindow.OnJobAccepted;
+            //     removeTask -= jobWindow.OnJobRemoved;
+            // }
+
+            // var updateTask = jobSystem?.UpdateTask;
+            // var removeTask = jobSystem?.RemoveTask;
+            if (jobSystem != null)
+            {
+                jobSystem.UpdateTask = delegate { };
+                jobSystem.RemoveTask = delegate { };
+            }
+
+            // UnityEngine.Object.Destroy(cruiseControlWindow);
+            // UnityEngine.Object.Destroy(statsWindow);
+            // UnityEngine.Object.Destroy(jobWindow);
             UnityEngine.Object.Destroy(gameObject);
         }
 
@@ -262,6 +337,30 @@ namespace DriverAssist.Implementation
         {
             logger.Info($"OnCarChanged {enteredCar?.carType.ToString() ?? "null"}");
             ChangeCar(enteredCar);
+        }
+
+        internal void OnRegisterJob(Job job)
+        {
+            logger.Info($"OnRegisterJob {job.ID} {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
+            jobSystem?.AddJob(new DVJobWrapper(job));
+            // JobWrapper jobWrapper = new DVJobWrapper(job);
+            // jobWindow?.OnJobAccepted(new TaskRow()
+            // {
+            //     ID = jobWrapper.ID,
+            //     Origin = jobWrapper?.GetNextTask()?.Source ?? "",
+            //     Destination = jobWrapper?.GetNextTask()?.Destination ?? ""
+            // });
+            // jobManager?.Add(jobWrapper);
+            // // foreach (JobWrapper jobWrapper in job)
+            // TaskWrapper? task = jobWrapper.GetNextTask();
+            // if (task != null)
+            //     logger.Info($"{task.Type} {task.Source} -> {task.Destination}");
+        }
+
+        internal void OnUnregisterJob(Job job)
+        {
+            logger.Info($"OnUnregisterJob {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
+            jobWindow?.OnJobRemoved(job.ID);
         }
     }
 

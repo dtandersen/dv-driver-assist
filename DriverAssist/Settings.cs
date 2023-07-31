@@ -15,5 +15,6 @@ namespace DriverAssist
         int[] Downshift { get; }
         int[] DumpPorts { get; }
         bool ShowStats { get; }
+        bool ShowJobs { get; }
     }
 }

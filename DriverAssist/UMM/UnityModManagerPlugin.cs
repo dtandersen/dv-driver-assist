@@ -1,10 +1,14 @@
 #if UMM
 
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using DriverAssist.Cruise;
 using DriverAssist.ECS;
 using DriverAssist.Implementation;
 using DriverAssist.Localization;
+using DV.Logic.Job;
+using HarmonyLib;
 using I2.Loc;
 using UnityEngine;
 using UnityModManagerNet;
@@ -46,8 +50,25 @@ namespace DriverAssist.UMM
             modEntry.OnUnload = OnUnload;
             modEntry.OnUpdate = OnUpdate;
             modEntry.OnFixedUpdate = OnFixedUpdate;
+            modEntry.OnToggle = OnToggle;
 
             logger.Info($"Finished loading");
+
+            return true;
+        }
+
+        private static bool OnToggle(ModEntry modEntry, bool value)
+        {
+            Harmony harmony = new Harmony(modEntry.Info.Id);
+
+            if (value)
+            {
+                harmony.PatchAll(Assembly.GetExecutingAssembly());
+            }
+            else
+            {
+                harmony.UnpatchAll(modEntry.Info.Id);
+            }
 
             return true;
         }
@@ -185,6 +206,8 @@ namespace DriverAssist.UMM
         public int[] DumpPorts { get { return new int[] { (int)settings.DumpPorts.keyCode }; } }
 
         public bool ShowStats { get { return settings.ShowStats; } }
+
+        public bool ShowJobs { get { return true; } }
 
         public float Offset { get { return settings.Offset; } }
 
@@ -356,6 +379,64 @@ namespace DriverAssist.UMM
         public void Warn(string message)
         {
             logger.Log($"{scope,-25} WARN  {message}");
+        }
+    }
+
+    public static class JobPatches
+    {
+        [HarmonyPatch(typeof(JobsManager), nameof(JobsManager.RegisterGeneratedJob))]
+        public static class JobsManager_RegisterGeneratedJob
+        {
+#pragma warning disable IDE0060, IDE1006
+            public static void Postfix(JobsManager __instance, Job job, HashSet<TrainCar> cars)
+#pragma warning restore IDE0060, IDE1006
+            {
+                // DriverAssistController.Instance?.OnRegisterJob(job);
+            }
+        }
+
+        [HarmonyPatch(typeof(JobsManager), nameof(JobsManager.UnregisterJob))]
+        public static class JobsManager_UnregisterJob
+        {
+#pragma warning disable IDE0060, IDE1006
+            public static void Postfix(JobsManager __instance, Job job)
+#pragma warning restore IDE0060, IDE1006
+            {
+                // DriverAssistController.Instance?.OnUnregisterJob(job);
+            }
+        }
+
+        [HarmonyPatch(typeof(JobsManager), nameof(JobsManager.TakeJob))]
+        public static class JobsManager_TakeJob
+        {
+#pragma warning disable IDE0060, IDE1006
+            public static void Postfix(JobsManager __instance, Job job, bool takenViaLoadGame = false)
+#pragma warning restore IDE0060, IDE1006
+            {
+                DriverAssistController.Instance?.OnRegisterJob(job);
+            }
+        }
+
+        [HarmonyPatch(typeof(JobsManager), nameof(JobsManager.AbandonJob))]
+        public static class JobsManager_AbandonJob
+        {
+#pragma warning disable IDE0060, IDE1006
+            public static void Postfix(JobsManager __instance, Job job)
+#pragma warning restore IDE0060, IDE1006
+            {
+                DriverAssistController.Instance?.OnUnregisterJob(job);
+            }
+        }
+
+        [HarmonyPatch(typeof(JobsManager), nameof(JobsManager.CompleteTheJob))]
+        public static class JobsManager_CompleteTheJob
+        {
+#pragma warning disable IDE0060, IDE1006
+            public static void Postfix(JobsManager __instance, Job job)
+#pragma warning restore IDE0060, IDE1006
+            {
+                DriverAssistController.Instance?.OnUnregisterJob(job);
+            }
         }
     }
 }
