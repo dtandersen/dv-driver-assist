@@ -27,15 +27,15 @@ namespace DriverAssist.ECS
                     loco.Components.GearChangeRequest = null;
                 }
             }
-            else if (loco.Throttle > 0 && loco.Gear != requestedGear)
+            else if (loco.Throttle > 0)
             {
-                logger.Info($"Throttling down for gear change");
-                loco.ZeroThrottle();
+                logger.Info($"Zeroing throttle for gear change");
+                loco.ForceThrottle(0);
             }
             else if (loco.Rpm < 750 && !loco.GearShiftInProgress && request.RestoreThrottle != null)
             {
                 logger.Info($"Restoring throttle to {request.RestoreThrottle.Value} rpm={loco.Rpm}");
-                loco.Throttle = request.RestoreThrottle.Value;
+                loco.ForceThrottle(request.RestoreThrottle.Value);
                 loco.Components.GearChangeRequest = null;
             }
             else

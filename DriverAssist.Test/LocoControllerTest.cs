@@ -5,12 +5,12 @@ using Xunit.Abstractions;
 
 namespace DriverAssist.Cruise
 {
-    public class LocoControllerTest
+    public class LocoEntityTest
     {
         private readonly LocoEntity loco;
         private readonly FakeTrainCarWrapper train;
 
-        public LocoControllerTest(ITestOutputHelper output)
+        public LocoEntityTest(ITestOutputHelper output)
         {
             XunitLogger.Init(output);
 
@@ -33,7 +33,11 @@ namespace DriverAssist.Cruise
         {
             train.Type = LocoType.DM3;
             train.Throttle = 0;
-            train.GearChangeInProgress = true;
+
+            // train is now changing gears
+            loco.Components.GearChangeRequest = new GearChangeRequest();
+
+            // should ignore this
             loco.Throttle = 1;
 
             Assert.Equal(0, train.Throttle);
@@ -74,13 +78,9 @@ namespace DriverAssist.Cruise
         [Fact]
         public void DenyDe2Shift()
         {
-            // train.GearboxA = 1;
-            // train.GearboxB = 1;
-
             loco.Gear = 0;
             loco.ChangeGear(1);
 
-            // Assert.Null(loco.Components.RequestedGear);
             Assert.Null(loco.Components.GearChangeRequest);
         }
 
@@ -98,7 +98,6 @@ namespace DriverAssist.Cruise
             train.Throttle = 1;
             loco.ChangeGear(1);
 
-            // Assert.Equal(1, loco.Components.RequestedGear);
             Assert.Equal(1, loco.Components.GearChangeRequest.Value.RequestedGear);
             Assert.Equal(1f, loco.Components.GearChangeRequest.Value.RestoreThrottle);
         }
@@ -111,13 +110,11 @@ namespace DriverAssist.Cruise
         {
             train.Type = LocoType.DM3;
 
-            // loco.Gear = 0;
             train.GearboxA = 0;
             train.GearboxB = 0;
             train.Throttle = 0;
             loco.ChangeGear(1);
 
-            // Assert.Equal(1, loco.Components.RequestedGear);
             Assert.Equal(1, loco.Components.GearChangeRequest.Value.RequestedGear);
             Assert.Null(loco.Components.GearChangeRequest.Value.RestoreThrottle);
         }
@@ -130,7 +127,6 @@ namespace DriverAssist.Cruise
         {
             train.Type = LocoType.DM3;
 
-            // loco.Gear = 0;
             train.GearboxA = 0;
             train.GearboxB = 0;
             train.Throttle = 0;
@@ -142,10 +138,8 @@ namespace DriverAssist.Cruise
             loco.Components.GearChangeRequest = request;
             loco.ChangeGear(1);
 
-            // Assert.Equal(1, loco.Components.RequestedGear);
             Assert.Equal(8, loco.Components.GearChangeRequest.Value.RequestedGear);
             Assert.Equal(1, loco.Components.GearChangeRequest.Value.RestoreThrottle);
-            // Assert.Null(loco.Components.GearChangeRequest.Value.RestoreThrottle);
         }
 
         /// The train is a DM3
@@ -160,7 +154,6 @@ namespace DriverAssist.Cruise
             loco.Gear = 0;
             loco.ChangeGear(-1);
 
-            // Assert.Null(loco.Components.RequestedGear);
             Assert.Null(loco.Components.GearChangeRequest);
         }
 
@@ -176,7 +169,6 @@ namespace DriverAssist.Cruise
             loco.Gear = 8;
             loco.ChangeGear(9);
 
-            // Assert.Null(loco.Components.RequestedGear);
             Assert.Null(loco.Components.GearChangeRequest);
         }
 
@@ -192,7 +184,6 @@ namespace DriverAssist.Cruise
             loco.Gear = 1;
             loco.ChangeGear(1);
 
-            // Assert.Null(loco.Components.RequestedGear);
             Assert.Null(loco.Components.GearChangeRequest);
         }
     }

@@ -14,7 +14,7 @@ namespace DriverAssist.ECS
         private float lastSpeedMs;
         private float lastAmps;
         private float lastHeat;
-        private TrainCarWrapper loco;
+        private TrainCarWrapper trainCar;
         private readonly float lookahead = 1f;
         private readonly float temperatureLookAhead = 1f;
         // https://discord.com/channels/332511223536943105/332511223536943105/1129517819416018974
@@ -35,7 +35,7 @@ namespace DriverAssist.ECS
         {
             logger = LogFactory.GetLogger("LocoController");
             Components = new();
-            loco = NullTrainCarWrapper.Instance;
+            trainCar = NullTrainCarWrapper.Instance;
             int size = (int)(lookahead / fixedDeltaTime);
             speedIntegratorMs = new Integrator(size);
 
@@ -50,31 +50,25 @@ namespace DriverAssist.ECS
 
         public void UpdateLocomotive(TrainCarWrapper newloco)
         {
-            this.loco = newloco;
+            this.trainCar = newloco;
         }
 
         public float SpeedKmh
         {
-            get
-            {
-                return loco.SpeedKmh;
-            }
+            get { return trainCar.SpeedKmh; }
         }
 
         public float SpeedMs
         {
-            get
-            {
-                return loco.SpeedMs;
-            }
+            get { return trainCar.SpeedMs; }
         }
 
         public float RelativeSpeedMs
         {
             get
             {
-                if (IsForward) return loco.SpeedMs;
-                else return -loco.SpeedMs;
+                if (IsForward) return trainCar.SpeedMs;
+                else return -trainCar.SpeedMs;
             }
         }
 
@@ -82,54 +76,37 @@ namespace DriverAssist.ECS
         {
             get
             {
-                if (IsForward)
-                    return SpeedKmh;
-                else
-                    return -SpeedKmh;
+                if (IsForward) return SpeedKmh;
+                else return -SpeedKmh;
             }
         }
 
         public float Throttle
         {
-            get
-            {
-                return loco.Throttle;
-            }
+            get { return trainCar.Throttle; }
             set
             {
-                if (GearShiftInProgress) return;
+                if (Components.GearChangeRequest.HasValue) return;
 
-                loco.Throttle = value;
+                trainCar.Throttle = value;
             }
         }
 
-        internal void ZeroThrottle()
+        internal void ForceThrottle(float throttle)
         {
-            loco.Throttle = 0;
+            trainCar.Throttle = throttle;
         }
 
         public float TrainBrake
         {
-            get
-            {
-                return loco.TrainBrake;
-            }
-            set
-            {
-                loco.TrainBrake = value;
-            }
+            get { return trainCar.TrainBrake; }
+            set { trainCar.TrainBrake = value; }
         }
 
         public float IndBrake
         {
-            get
-            {
-                return loco.IndBrake;
-            }
-            set
-            {
-                loco.IndBrake = value;
-            }
+            get { return trainCar.IndBrake; }
+            set { trainCar.IndBrake = value; }
         }
 
         public int Gear
@@ -141,7 +118,7 @@ namespace DriverAssist.ECS
                 for (int i = 0; i < gearBox.Count; i++)
                 {
                     float[] gear = gearBox[i];
-                    if (gear[0] == loco.GearboxA && gear[1] == loco.GearboxB)
+                    if (gear[0] == trainCar.GearboxA && gear[1] == trainCar.GearboxB)
                     {
                         return i;
                     }
@@ -150,54 +127,37 @@ namespace DriverAssist.ECS
             }
             set
             {
-                logger.Info($"{IsMechanical}");
+                // logger.Info($"IsMechanical={IsMechanical}");
                 if (IsMechanical)
                 {
                     float[] gear = gearBox[value];
-                    loco.GearboxA = gear[0];
-                    loco.GearboxB = gear[1];
-                    logger.Info($"GearboxA={loco.GearboxA} GearboxB={loco.GearboxB}");
+                    trainCar.GearboxA = gear[0];
+                    trainCar.GearboxB = gear[1];
+                    logger.Info($"Changed gear GearboxA={trainCar.GearboxA} GearboxB={trainCar.GearboxB}");
                 }
             }
         }
 
         public float Temperature
         {
-            get
-            {
-                return loco.Temperature;
-            }
+            get { return trainCar.Temperature; }
         }
 
         public virtual float TemperatureChange
         {
-            get
-            {
-                return heatIntegrator.Integrate() / temperatureLookAhead;
-            }
-
+            get { return heatIntegrator.Integrate() / temperatureLookAhead; }
             set { }
         }
 
         public float Reverser
         {
-            get
-            {
-                return loco.Reverser;
-            }
-
-            set
-            {
-                loco.Reverser = value;
-            }
+            get { return trainCar.Reverser; }
+            set { trainCar.Reverser = value; }
         }
 
         public float Torque
         {
-            get
-            {
-                return loco.Torque;
-            }
+            get { return trainCar.Torque; }
         }
 
         public float RelativeTorque
@@ -211,10 +171,7 @@ namespace DriverAssist.ECS
 
         public string TractionMotors
         {
-            get
-            {
-                return loco.TractionMotors;
-            }
+            get { return trainCar.TractionMotors; }
         }
 
         public bool IsElectric
@@ -231,27 +188,17 @@ namespace DriverAssist.ECS
 
         public bool IsForward
         {
-            get
-            {
-                return Reverser >= 0.5f;
-            }
+            get { return Reverser >= 0.5f; }
         }
 
         public bool IsReversing
         {
-            get
-            {
-                return !IsForward;
-            }
+            get { return !IsForward; }
         }
 
         public virtual float AccelerationMs
         {
-            get
-            {
-                return Components.LocoStats.AccelerationMs2;
-            }
-
+            get { return Components.LocoStats.AccelerationMs2; }
             set { }
         }
 
@@ -268,102 +215,69 @@ namespace DriverAssist.ECS
 
         public float Amps
         {
-            get
-            {
-                return loco.Amps;
-            }
+            get { return trainCar.Amps; }
         }
 
         public float AmpsRoc
         {
-            get
-            {
-                return ampsIntegrator.Integrate();
-            }
+            get { return ampsIntegrator.Integrate(); }
         }
 
         public float AverageAmps
         {
-            get
-            {
-                return averageAmps.Average();
-            }
+            get { return averageAmps.Average(); }
         }
 
         public float Rpm
         {
-            get
-            {
-                return loco.Rpm;
-            }
+            get { return trainCar.Rpm; }
         }
 
         public string Type
         {
-            get
-            {
-                return loco.Type;
-            }
+            get { return trainCar.Type; }
         }
 
         public float Mass
         {
-            get
-            {
-                return loco.Mass;
-            }
+            get { return trainCar.Mass; }
         }
 
         public float LocoMass
         {
-            get
-            {
-                return loco.LocoMass;
-            }
+            get { return trainCar.LocoMass; }
         }
 
         public float CargoMass
         {
-            get
-            {
-                return loco.CargoMass;
-            }
+            get { return trainCar.CargoMass; }
         }
 
         public bool IsLoco
         {
-            get
-            {
-                return loco.IsLoco;
-            }
+            get { return trainCar.IsLoco; }
         }
 
         public bool IsMechanical
         {
-            get
-            {
-                return loco.Type == LocoType.DM3;
-            }
+            get { return trainCar.Type == LocoType.DM3; }
         }
 
-        public float GearRatio { get { return loco.GearRatio; } }
+        public float GearRatio { get { return trainCar.GearRatio; } }
 
-        public List<string> Ports { get { return loco.Ports; } }
+        public List<string> Ports { get { return trainCar.Ports; } }
 
-        public float WheelRadius { get { return loco.WheelRadius; } }
+        public float WheelRadius { get { return trainCar.WheelRadius; } }
 
-        public bool GearShiftInProgress { get { return loco.GearChangeInProgress; } }
+        public bool GearShiftInProgress { get { return trainCar.GearChangeInProgress; } }
 
-        public int Length { get { return loco.Length; } }
+        public int Length { get { return trainCar.Length; } }
 
-        public bool IsWheelsSlipping { get { return loco.IsWheelSlipping; } }
+        public bool IsWheelsSlipping { get { return trainCar.IsWheelSlipping; } }
 
         public void UpdateStats(float deltaTime)
         {
-            if (!loco.IsLoco)
-            {
-                return;
-            }
+            if (!trainCar.IsLoco) return;
 
             float speedMs = SpeedMs;
             float accelerationMs = speedMs - lastSpeedMs;
@@ -375,7 +289,7 @@ namespace DriverAssist.ECS
 
             averageAmps.Add(amps, deltaTime);
 
-            float heat = loco.Temperature;
+            float heat = trainCar.Temperature;
             float deltaHeat = heat - lastHeat;
             heatIntegrator.Add(deltaHeat, deltaTime);
 
@@ -396,8 +310,7 @@ namespace DriverAssist.ECS
 
         public void ChangeGear(int requestedGear)
         {
-            if (loco.Type != LocoType.DM3) return;
-
+            if (trainCar.Type != LocoType.DM3) return;
             if (requestedGear < 0) return;
             if (requestedGear >= gearBox.Count) return;
             if (requestedGear == Gear) return;
@@ -407,9 +320,9 @@ namespace DriverAssist.ECS
             {
                 RequestedGear = requestedGear
             };
-            if (loco.Throttle > 0)
+            if (trainCar.Throttle > 0)
             {
-                gearChangeRequest.RestoreThrottle = loco.Throttle;
+                gearChangeRequest.RestoreThrottle = trainCar.Throttle;
             }
             Components.GearChangeRequest = gearChangeRequest;
             logger.Info($"Requesting gear change RequestedGear={gearChangeRequest.RequestedGear} RestoreThrottle={gearChangeRequest.RestoreThrottle ?? -1}");
