@@ -36,8 +36,8 @@ namespace DriverAssist.ECS
                 }}
             };
             FakeJobView view = new FakeJobView();
-            system.UpdateTask += view.OnJobAccepted;
-            system.RemoveTask += view.OnJobRemoved;
+            system.UpdateTask += view.OnAddJob;
+            system.RemoveTask += view.OnRemoveJob;
             system.AddJob(job);
 
             Assert.Equal(system.Jobs2["SM-SU-33"].Job, job);
@@ -77,8 +77,8 @@ namespace DriverAssist.ECS
                 Tasks = { fakeTask1, fakeTask2 }
             };
             FakeJobView view = new FakeJobView();
-            system.UpdateTask += view.OnJobAccepted;
-            system.RemoveTask += view.OnJobRemoved;
+            system.UpdateTask += view.OnAddJob;
+            system.RemoveTask += view.OnRemoveJob;
             system.AddJob(job);
 
             // job.Tasks = { fakeTask2};
@@ -146,12 +146,12 @@ namespace DriverAssist.ECS
     {
         public Dictionary<string, TaskRow> Rows = new();
 
-        public void OnJobAccepted(TaskRow row)
+        public void OnAddJob(TaskRow row)
         {
             Rows[row.ID] = row;
         }
 
-        public void OnJobRemoved(string id)
+        public void OnRemoveJob(string id)
         {
             Rows.Remove(id);
         }

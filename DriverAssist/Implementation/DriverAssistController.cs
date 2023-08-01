@@ -168,8 +168,8 @@ namespace DriverAssist.Implementation
             ShiftSystem shiftSystem = new ShiftSystem(locoController);
             LocoStatsSystem locoStatsSystem = new LocoStatsSystem(locoController, 0.5f, Time.fixedDeltaTime);
             jobSystem = new JobSystem();
-            jobSystem.UpdateTask += jobWindow.OnJobAccepted;
-            jobSystem.RemoveTask += jobWindow.OnJobRemoved;
+            jobSystem.UpdateTask += jobWindow.OnAddJob;
+            jobSystem.RemoveTask += jobWindow.OnRemoveJob;
 
             JobsManager jm = SingletonBehaviour<JobsManager>.Instance;
             foreach (Job job in jm.currentJobs)
@@ -315,7 +315,7 @@ namespace DriverAssist.Implementation
         internal void OnUnregisterJob(Job job)
         {
             logger.Info($"OnUnregisterJob {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
-            jobWindow?.OnJobRemoved(job.ID);
+            jobWindow?.OnRemoveJob(job.ID);
         }
     }
 

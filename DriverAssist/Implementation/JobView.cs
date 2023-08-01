@@ -1,46 +1,23 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using DriverAssist.Cruise;
 using DriverAssist.ECS;
-using DriverAssist.Localization;
 using UnityEngine;
 
 namespace DriverAssist.Implementation
 {
-    class JobWindow : MonoBehaviour, JobView
+    abstract class BaseWindow : MonoBehaviour
     {
-        public UnifiedSettings? Config { get; internal set; }
-
-        private Rect windowRect;
-        private const float SCALE = 1.5f;
-        private readonly Logger logger = LogFactory.GetLogger(typeof(JobWindow));
-        // private LocoEntity? locoController;
-        private bool photoMode;
-        private readonly Dictionary<string, TaskRow> rows = new();
-
-        public void Awake()
-        {
-            photoMode = false;
-            logger.Info("Awake");
-            windowRect = new Rect(Screen.width - 300, 10, SCALE * 120, SCALE * 50);
-            // enabled = true;
-        }
+        protected Rect windowRect = new(0, 0, 100, 100);
+        protected virtual bool Visible { get; set; }
+        protected virtual string Title { get; set; } = "";
 
         public void OnGUI()
         {
-            if (photoMode) return;
-            // if (locoController == null) return;
-            if (!Config?.ShowJobs ?? false) return;
-
-            // if (Event.current.keyCode == KeyCode.Tab || Event.current.character == '\t')
-            //     Event.current.Use();
-
-            // if (!locoController.IsLoco) return;
+            if (!Visible) return;
 
             GUI.skin = DVGUI.skin;
 
-            windowRect = GUILayout.Window(293847732, windowRect, GUIWindow, "Jobs");
+            windowRect = GUILayout.Window(293847732, windowRect, GUIWindow, Title);
         }
 
         private void GUIWindow(int id)
@@ -49,40 +26,41 @@ namespace DriverAssist.Implementation
             GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
 
-        // bool laststats;
-        protected void Window()
+
+        protected abstract void Window();
+    }
+
+    class JobWindow : BaseWindow, JobView
+    {
+        public UnifiedSettings? Config { get; internal set; }
+
+        private const float SCALE = 1.5f;
+        private readonly Logger logger = LogFactory.GetLogger(typeof(JobWindow));
+        private bool photoMode;
+        private readonly Dictionary<string, TaskRow> rows = new();
+
+        override protected bool Visible
         {
-            if (Config == null) return;
-            // if (CruiseControl == null) return;
-            // if (locoController == null) return;
+            get
+            {
+                if (photoMode) return false;
+                if (!Config?.ShowJobs ?? false) return false;
 
-            // Translation localization = TranslationManager.Current;
-            // bool x = false;
-            // if (GUILayout.Button("X"))
-            // {
-            //     //Config.ShowStats = false;
-            //     Hide();
-            // }
-            // if (laststats != Config.ShowStats)
-            // {
-            //     windowRect = new Rect(20, 20, SCALE * 120, SCALE * 50);
-            //     laststats = Config.ShowStats;
-            // }
-            // if (LocoController == null) return;
-            // float Speed = loco.RelativeSpeedKmh;
-            // float Throttle = loco.Throttle;
-            // float mass = LocoController.Mass;
-            // float powerkw = Mass * loco.RelativeAccelerationMs * loco.RelativeSpeedKmh / 3.6f / 1000;
-            // float Force = Mass * 9.8f / 2f;
+                return true;
+            }
+        }
 
+        public void Awake()
+        {
+            logger.Info("Awake");
+            Title = "Jobs";
+            windowRect = new Rect(Screen.width - 300, 10, SCALE * 120, SCALE * 50);
+            photoMode = false;
+        }
+
+        override protected void Window()
+        {
             int labelwidth = (int)(SCALE * 50);
-            // int width = (int)(SCALE * 50);
-
-            // if (Config.ShowStats)
-            // {
-            // int mass = (int)(locoController.Mass / 1000);
-            // int locoMass = (int)(locoController.LocoMass / 1000);
-            // int cargoMass = (int)(locoController.CargoMass / 1000);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label($"Job", GUILayout.Width(labelwidth));
@@ -110,13 +88,11 @@ namespace DriverAssist.Implementation
 #pragma warning restore IDE0060
         {
             logger.Info("Show");
-            // enabled = true;
         }
 
         public void Hide()
         {
             logger.Info("Hide");
-            // enabled = false;
         }
 
         internal void OnPhotoModeChanged(bool photoMode)
@@ -125,9 +101,9 @@ namespace DriverAssist.Implementation
             this.photoMode = photoMode;
         }
 
-        public void OnJobAccepted(TaskRow row)
+        public void OnAddJob(TaskRow row)
         {
-            logger.Info($"OnJobAccepted {row.ID}");
+            logger.Info($"OnAddJob {row.ID}");
             if (rows.ContainsKey(row.ID))
             {
                 rows.Remove(row.ID);
@@ -136,17 +112,12 @@ namespace DriverAssist.Implementation
             enabled = true;
         }
 
-        public void OnJobRemoved(string id)
+        public void OnRemoveJob(string id)
         {
-            logger.Info($"OnJobRemoved {id}");
+            logger.Info($"OnRemoveJob {id}");
             rows.Remove(id);
             enabled = rows.Count > 0;
         }
-
-        // public void OnRegisterJob(TaskRow row)
-        // {
-        //     throw new NotImplementedException();
-        // }
     }
 
     public class TaskRow : IEquatable<TaskRow>
@@ -166,7 +137,7 @@ namespace DriverAssist.Implementation
 
     public interface JobView
     {
-        void OnJobAccepted(TaskRow row);
-        void OnJobRemoved(string id);
+        void OnAddJob(TaskRow row);
+        void OnRemoveJob(string id);
     }
 }
