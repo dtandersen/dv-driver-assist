@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DriverAssist
 {
     public interface JobWrapper
@@ -6,14 +8,18 @@ namespace DriverAssist
         string Type { get; }
         string Origin { get; }
         string Destination { get; }
-        TaskWrapper? GetNextTask();
+        List<TaskWrapper> Tasks { get; }
     }
 
     public interface TaskWrapper
     {
-        string Type { get; }
+        int Type { get; }
         string Source { get; }
         string Destination { get; }
         bool IsComplete { get; }
+        bool IsSingular { get; }
+        bool IsParallel { get; }
+        bool IsSequential { get; }
+        List<TaskWrapper> Tasks { get; }
     }
 }

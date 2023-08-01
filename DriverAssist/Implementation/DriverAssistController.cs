@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using DriverAssist.Cruise;
 using DriverAssist.ECS;
 using DV.Logic.Job;
@@ -309,7 +310,25 @@ namespace DriverAssist.Implementation
         internal void OnRegisterJob(Job job)
         {
             logger.Info($"OnRegisterJob {job.ID} {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
-            jobSystem?.AddJob(new DVJobWrapper(job));
+            JobWrapper jw = new DVJobWrapper(job);
+            void LogTasks(List<TaskWrapper> tasks, string prefix)
+            {
+                int i = 1;
+                foreach (TaskWrapper task in tasks)
+                {
+                    logger.Info($"{prefix}{i} - Type={(TaskType)task.Type} Source={task.Source} Dest={task.Destination}");
+                    if (task.IsParallel || task.IsSequential)
+                    {
+                        logger.Info($"--- BEGIN SUBTASKS ---");
+                        LogTasks(task.Tasks, $"{prefix}{i}.");
+                        logger.Info($"--- END SUBTASKS ---");
+                    }
+                    i++;
+                }
+
+            }
+            LogTasks(jw.Tasks, "");
+            jobSystem?.AddJob(jw);
         }
 
         internal void OnUnregisterJob(Job job)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DriverAssist.ECS;
 using UnityEngine;
 
@@ -37,7 +38,7 @@ namespace DriverAssist.Implementation
         private const float SCALE = 1.5f;
         private readonly Logger logger = LogFactory.GetLogger(typeof(JobWindow));
         private bool photoMode;
-        private readonly Dictionary<string, TaskRow> rows = new();
+        private readonly Dictionary<string, JobRow> rows = new();
 
         override protected bool Visible
         {
@@ -68,13 +69,16 @@ namespace DriverAssist.Implementation
             GUILayout.Label($"Destination", GUILayout.Width(labelwidth));
             GUILayout.EndHorizontal();
 
-            foreach (TaskRow row in rows.Values)
+            foreach (JobRow job in rows.Values)
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"{row.ID}", GUILayout.Width(labelwidth));
-                GUILayout.Label($"{row.Origin}", GUILayout.Width(labelwidth));
-                GUILayout.Label($"{row.Destination}", GUILayout.Width(labelwidth));
-                GUILayout.EndHorizontal();
+                foreach (TaskRow task in job.Tasks)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label($"{job.ID}", GUILayout.Width(labelwidth));
+                    GUILayout.Label($"{task.Origin}", GUILayout.Width(labelwidth));
+                    GUILayout.Label($"{task.Destination}", GUILayout.Width(labelwidth));
+                    GUILayout.EndHorizontal();
+                }
             }
         }
 
@@ -101,7 +105,7 @@ namespace DriverAssist.Implementation
             this.photoMode = photoMode;
         }
 
-        public void OnAddJob(TaskRow row)
+        public void OnAddJob(JobRow row)
         {
             logger.Info($"OnAddJob {row.ID}");
             if (rows.ContainsKey(row.ID))
@@ -120,24 +124,47 @@ namespace DriverAssist.Implementation
         }
     }
 
-    public class TaskRow : IEquatable<TaskRow>
+    public class JobRow : IEquatable<JobRow>
     {
         public string ID = "";
+        public List<TaskRow> Tasks = new();
+        // public string Origin = "";
+        // public string Destination = "";
+
+        public bool Equals(JobRow other)
+        {
+            return
+                ID == other.ID &&
+                Tasks.SequenceEqual(other.Tasks);
+        }
+
+        public override string ToString()
+        {
+            return $"JobRow[ID={ID}, Tasks=[{string.Join(",", Tasks)}]";
+        }
+    }
+
+    public class TaskRow : IEquatable<TaskRow>
+    {
         public string Origin = "";
         public string Destination = "";
 
         public bool Equals(TaskRow other)
         {
             return
-                ID == other.ID &&
                 Origin == other.Origin &&
                 Destination == other.Destination;
+        }
+
+        public override string ToString()
+        {
+            return $"TaskRow[Origin={Origin}, Destination={Destination}]";
         }
     }
 
     public interface JobView
     {
-        void OnAddJob(TaskRow row);
+        void OnAddJob(JobRow row);
         void OnRemoveJob(string id);
     }
 }

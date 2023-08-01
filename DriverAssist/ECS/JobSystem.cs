@@ -5,13 +5,13 @@ using DV.Logic.Job;
 
 namespace DriverAssist.ECS
 {
-    public delegate void UpdateTask(TaskRow job);
+    public delegate void UpdateTask(JobRow job);
     public delegate void RemoveTask(string id);
 
     public struct JobTask
     {
         public JobWrapper Job;
-        public TaskWrapper? Task;
+        public List<TaskWrapper> Tasks;
     }
 
     public class JobSystem : BaseSystem
@@ -26,41 +26,17 @@ namespace DriverAssist.ECS
             List<JobTask> updates = new();
             foreach (JobTask jobTask in Jobs2.Values)
             {
-                TaskWrapper? task = jobTask.Task;
-                if (task == null)
-                {
-                    // logger.Info($"Task is null");
-                    continue;
-                }
-
-                // logger.Info($"{task.IsComplete}");
-                if (task != null && task.IsComplete)
+                if (IsAllComplete(jobTask.Tasks))
                 {
                     JobWrapper job = jobTask.Job;
-                    logger.Info($"{job.ID}: Task completed");
-                    TaskWrapper? nextTask = job.GetNextTask();
-                    if (nextTask == null)
-                    {
-                        // logger.Info($"nextTask is null");
-                        updates.Add(new JobTask()
-                        {
-                            Job = job,
-                            Task = null
-                        });
-                        continue;
-                    }
-                    UpdateTask?.Invoke(new TaskRow()
-                    {
-                        ID = job.ID,
-                        Origin = nextTask?.Source ?? "",
-                        Destination = nextTask?.Destination ?? ""
-                    });
+                    List<TaskWrapper> tasks = NextTasks(job);
+                    logger.Info($"{job.ID}: Tasks completed");
+                    UpdateTask?.Invoke(MakeJob(job, tasks));
 
-                    //utested
                     updates.Add(new JobTask()
                     {
                         Job = job,
-                        Task = nextTask
+                        Tasks = tasks
                     });
 
                 }
@@ -73,21 +49,87 @@ namespace DriverAssist.ECS
             }
         }
 
+        private bool IsAllComplete(List<TaskWrapper> tasks)
+        {
+            foreach (TaskWrapper task in tasks)
+            {
+                if (!task.IsComplete) return false;
+            }
+            return true;
+        }
+
+        public JobRow MakeJob(JobWrapper job, List<TaskWrapper> tasks)
+        {
+            List<TaskRow> taskrows = new();
+            foreach (TaskWrapper task in tasks)
+            {
+                taskrows.Add(new TaskRow()
+                {
+                    Origin = task.Source,
+                    Destination = task.Destination
+                });
+            }
+            return new JobRow()
+            {
+                ID = job.ID,
+                Tasks = taskrows
+            };
+        }
+
         public void AddJob(JobWrapper job)
         {
             logger.Info($"AddJob {job.ID}");
-            TaskWrapper? task = job.GetNextTask();
+            // TaskWrapper? task = job.GetNextTask();
+            List<TaskWrapper> tasks = NextTasks(job);
             Jobs2[job.ID] = new JobTask()
             {
                 Job = job,
-                Task = task
+                Tasks = tasks
             };
-            UpdateTask?.Invoke(new TaskRow()
+            UpdateTask?.Invoke(MakeJob(job, tasks));
+        }
+
+        public List<TaskWrapper> NextTasks(JobWrapper job)
+        {
+            logger.Info($"NextTasks {job.ID}");
+            return NextTasks(job.Tasks, false);
+        }
+
+        public List<TaskWrapper> NextTasks(List<TaskWrapper> tasks, bool parentIsParallel)
+        {
+            logger.Info($"NextTasks {string.Join(",", tasks)} {parentIsParallel}");
+            if (parentIsParallel && !IsAllComplete(tasks))
             {
-                ID = job.ID,
-                Origin = string.Copy(task?.Source ?? ""),
-                Destination = string.Copy(task?.Destination ?? "")
-            });
+                logger.Info($"Parallel parent");
+                return tasks;
+            }
+            foreach (TaskWrapper task in tasks)
+            {
+                logger.Info($"evaluating {task}");
+                if (task.IsComplete)
+                {
+                    logger.Info($"{task} is complete");
+                    continue;
+                }
+                else if (!task.IsComplete && task.IsSingular)
+                {
+                    logger.Info($"Selected {task}");
+                    return new List<TaskWrapper>() { task };
+                }
+                else if (task.IsComplete && task.IsSingular)
+                {
+                    continue;
+                }
+
+                List<TaskWrapper> nextTasks = NextTasks(task.Tasks, task.IsParallel);
+                if (IsAllComplete(nextTasks))
+                {
+                    continue;
+                }
+                return nextTasks;
+            }
+
+            return new();
         }
 
         public void RemoveJob(string id)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net;
 using DriverAssist.Implementation;
 using DriverAssist.Test;
 using Xunit;
@@ -9,10 +10,18 @@ namespace DriverAssist.ECS
     public class JobSystemTest
     {
         private readonly JobSystem system;
+        const int TRANSPORT = 0;
+        const int WAREHOUSE = 1;
+        const int SEQUENTIAL = 2;
+        const int PARALLEL = 3;
+        protected Logger logger;
+
 
         public JobSystemTest(ITestOutputHelper output)
         {
             XunitLogger.Init(output);
+            logger = LogFactory.GetLogger(this.GetType().Name);
+
             system = new JobSystem();
         }
 
@@ -27,8 +36,6 @@ namespace DriverAssist.ECS
             FakeJob job = new FakeJob()
             {
                 ID = "SM-SU-33",
-                Origin = "",
-                Destination = "",
                 Tasks = new List<TaskWrapper>{new FakeTask()
                 {
                     Source = "SM-A6I",
@@ -41,11 +48,14 @@ namespace DriverAssist.ECS
             system.AddJob(job);
 
             Assert.Equal(system.Jobs2["SM-SU-33"].Job, job);
-            Assert.Equal(new List<TaskRow>(view.Rows.Values), new List<TaskRow> {
-                new TaskRow() {
+            Assert.Equal(new List<JobRow>(view.Rows.Values), new List<JobRow> {
+                new JobRow() {
                     ID = "SM-SU-33",
-                    Origin = "SM-A6I",
-                    Destination = "SM-A7L"
+                    Tasks = {
+                        new TaskRow() {
+                            Origin = "SM-A6I",
+                            Destination = "SM-A7L"
+                    }}
                 }
             });
 
@@ -58,12 +68,14 @@ namespace DriverAssist.ECS
         {
             FakeTask fakeTask1 = new FakeTask()
             {
+                Type = WAREHOUSE,
                 Source = "SM-A6I",
                 Destination = "SM-A7L",
                 IsComplete = false
             };
             FakeTask fakeTask2 = new FakeTask()
             {
+                Type = TRANSPORT,
                 Source = "SM-A7L",
                 Destination = "SM-B50",
                 IsComplete = false
@@ -72,30 +84,166 @@ namespace DriverAssist.ECS
             FakeJob job = new FakeJob()
             {
                 ID = "SM-SU-33",
-                Origin = "",
-                Destination = "",
                 Tasks = { fakeTask1, fakeTask2 }
             };
+            logger.Info($"{fakeTask1}");
+            logger.Info($"{fakeTask2}");
+
             FakeJobView view = new FakeJobView();
             system.UpdateTask += view.OnAddJob;
             system.RemoveTask += view.OnRemoveJob;
             system.AddJob(job);
+
+            Assert.Equal(new List<JobRow> {
+                new JobRow() {
+                    ID = "SM-SU-33",
+                    Tasks = {
+                        new TaskRow() {
+                            Origin = "SM-A6I",
+                            Destination = "SM-A7L"
+                    }}
+                }
+            }, new List<JobRow>(view.Rows.Values));
 
             // job.Tasks = { fakeTask2};
             fakeTask1.IsComplete = true;
             system.OnUpdate();
 
             // Assert.Equal(system.Jobs["SM-SU-33"], job);
-            Assert.Equal(new List<TaskRow>(view.Rows.Values), new List<TaskRow> {
-                new TaskRow() {
+            Assert.Equal(new List<JobRow> {
+                new JobRow() {
                     ID = "SM-SU-33",
-                    Origin = "SM-A7L",
-                    Destination = "SM-B50"
+                    Tasks = {
+                        new TaskRow() {
+                            Origin = "SM-A7L",
+                            Destination = "SM-B50"
+                    }}
                 }
-            });
+            }, new List<JobRow>(view.Rows.Values));
 
             system.RemoveJob(job.ID);
             Assert.Empty(view.Rows);
+        }
+
+
+        /// Job has multiple parallel tasks.
+        /// Print them all.
+        [Fact]
+        public void ShowsAllParallelTasks()
+        {
+            // 1
+            FakeTask parent = new FakeTask()
+            {
+                Type = SEQUENTIAL,
+            };
+            // 1.1
+            parent.AddSubTask(new FakeTask()
+            {
+                Type = TRANSPORT,
+                Source = "SM-A6I",
+                Destination = "SM-A7L",
+                IsComplete = true,
+            });
+            // 1.2
+            FakeTask task12 = parent.AddSubTask(new FakeTask()
+            {
+                Type = PARALLEL,
+                Source = "SM-A6I",
+                Destination = "SM-A7L",
+                IsComplete = true
+            });
+            // 1.2.1
+            task12.AddSubTask(new FakeTask()
+            {
+                Type = WAREHOUSE,
+                Destination = "SM-A7L",
+                IsComplete = true
+            });
+            // 1.3
+            FakeTask task13 = parent.AddSubTask(new FakeTask()
+            {
+                Type = PARALLEL,
+                IsComplete = false
+            });
+            // 1.3.1
+            task13.AddSubTask(new FakeTask()
+            {
+                Type = TRANSPORT,
+                Source = "SM-A7L",
+                Destination = "SM-B7S",
+            });
+            // 1.3.2
+            task13.AddSubTask(new FakeTask()
+            {
+                Type = TRANSPORT,
+                Source = "SM-A7L",
+                Destination = "SM-A5S",
+            });
+            // 1.3.3
+            task13.AddSubTask(new FakeTask()
+            {
+                Type = TRANSPORT,
+                Source = "SM-A7L",
+                Destination = "SM-A3S",
+            });
+
+            FakeJob job = new FakeJob()
+            {
+                ID = "SM-SU-33",
+                Origin = "",
+                Destination = "",
+                Tasks = { parent }
+            };
+            FakeJobView view = new FakeJobView();
+            system.UpdateTask += view.OnAddJob;
+            // system.RemoveTask += view.OnRemoveJob;
+            system.AddJob(job);
+            Assert.Equal(new List<JobRow> {
+                new JobRow() {
+                    ID = "SM-SU-33",
+                    Tasks = {
+                        new TaskRow() {
+                            Origin = "SM-A7L",
+                            Destination = "SM-B7S"
+                        },
+                         new TaskRow() {
+                            Origin = "SM-A7L",
+                            Destination = "SM-A5S"
+                        },
+                         new TaskRow() {
+                            Origin = "SM-A7L",
+                            Destination = "SM-A3S"
+                        }
+                    }
+                }
+            }, new List<JobRow>(view.Rows.Values));
+
+            // job.Tasks = { fakeTask2};
+            // fakeTask1.IsComplete = true;
+            system.OnUpdate();
+            // Assert.Equal(system.Jobs["SM-SU-33"], job);
+            Assert.Equal(new List<JobRow> {
+                new JobRow() {
+                    ID = "SM-SU-33",
+                    Tasks = {
+                        new TaskRow() {
+                            Origin = "SM-A7L",
+                            Destination = "SM-B7S"
+                        },
+                         new TaskRow() {
+                            Origin = "SM-A7L",
+                            Destination = "SM-A5S"
+                        },
+                         new TaskRow() {
+                            Origin = "SM-A7L",
+                            Destination = "SM-A3S"
+                        }
+                    }
+                }
+            }, new List<JobRow>(view.Rows.Values));
+
+            // system.RemoveJob(job.ID);
+            // Assert.Empty(view.Rows);
         }
 
         // private void WhenSystemUpdates()
@@ -133,20 +281,39 @@ namespace DriverAssist.ECS
 
     class FakeTask : TaskWrapper
     {
-        public string Type { get; set; } = "";
+        public int Type { get; set; } = 0;
 
         public string Source { get; set; } = "";
 
         public string Destination { get; set; } = "";
 
+        public bool IsSingular { get { return this.Type == 0 || this.Type == 1; } }
+
         public bool IsComplete { get; set; } = false;
+
+        public bool IsParallel { get { return this.Type == 3; } }
+
+        public bool IsSequential { get { return this.Type == 2; } }
+
+        public List<TaskWrapper> Tasks { get; set; } = new();
+
+        public FakeTask AddSubTask(FakeTask task)
+        {
+            Tasks.Add(task);
+            return task;
+        }
+
+        public override string ToString()
+        {
+            return $"FakeTask[Source={Source}, Destination={Destination}]";
+        }
     }
 
     class FakeJobView : JobView
     {
-        public Dictionary<string, TaskRow> Rows = new();
+        public Dictionary<string, JobRow> Rows = new();
 
-        public void OnAddJob(TaskRow row)
+        public void OnAddJob(JobRow row)
         {
             Rows[row.ID] = row;
         }
