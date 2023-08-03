@@ -17,6 +17,7 @@
     <!-- Derail Valley -->
     <Reference Include="Assembly-CSharp" />
     <Reference Include="CommandTerminal" />
+    <Reference Include="DV.BrakeSystem" />
     <Reference Include="DV.Common" />
     <Reference Include="DV.Interaction" />
     <Reference Include="DV.Inventory" />

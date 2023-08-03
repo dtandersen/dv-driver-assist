@@ -169,8 +169,8 @@ namespace DriverAssist.Implementation
             ShiftSystem shiftSystem = new ShiftSystem(locoController);
             LocoStatsSystem locoStatsSystem = new LocoStatsSystem(locoController, 0.5f, Time.fixedDeltaTime);
             jobSystem = new JobSystem();
-            jobSystem.UpdateTask += jobWindow.OnAddJob;
-            jobSystem.RemoveTask += jobWindow.OnRemoveJob;
+            jobSystem.JobUpdated += jobWindow.OnAddJob;
+            jobSystem.JobRemoved += jobWindow.OnRemoveJob;
 
             JobsManager jm = SingletonBehaviour<JobsManager>.Instance;
             foreach (Job job in jm.currentJobs)
@@ -225,8 +225,8 @@ namespace DriverAssist.Implementation
 
             if (jobSystem != null)
             {
-                jobSystem.UpdateTask = delegate { };
-                jobSystem.RemoveTask = delegate { };
+                jobSystem.JobUpdated = delegate { };
+                jobSystem.JobRemoved = delegate { };
             }
 
             UnityEngine.Object.Destroy(gameObject);
@@ -334,7 +334,7 @@ namespace DriverAssist.Implementation
         internal void OnUnregisterJob(Job job)
         {
             logger.Info($"OnUnregisterJob {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
-            jobWindow?.OnRemoveJob(job.ID);
+            jobSystem?.RemoveJob(job.ID);
         }
     }
 

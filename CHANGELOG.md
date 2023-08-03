@@ -1,3 +1,9 @@
+0.9.3 - 7/29/2023
+
+- Fixed an issue that prevented shift completion when the throttle was applied after shifting.
+- Brake cylinder is released after braking. Should see less overshoots.
+- Fixed bug in acceleration calculation when locomotive is in reverse.
+
 0.9.0 - 7/29/2023
 
 - Throttle down when the wheels start slipping.

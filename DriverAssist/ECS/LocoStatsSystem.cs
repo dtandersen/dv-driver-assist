@@ -17,13 +17,13 @@ namespace DriverAssist.ECS
 
         public override void OnUpdate()
         {
-            integrator.Add(loco.RelativeSpeedMs - loco.Components.LocoStats.SpeedMs);
+            integrator.Add(loco.SpeedMs - loco.Components.LocoStats.SpeedMs);
             float acc = integrator.Sum() / (samples * deltaTime);
 
             loco.Components.LocoStats = new LocoStats()
             {
                 AccelerationMs2 = acc,
-                SpeedMs = loco.RelativeSpeedMs
+                SpeedMs = loco.SpeedMs
             };
         }
 

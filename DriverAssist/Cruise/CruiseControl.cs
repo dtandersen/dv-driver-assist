@@ -177,6 +177,8 @@ namespace DriverAssist.Cruise
                 Status = string.Format(localization.CC_COASTING);
                 loco.Throttle = 0;
                 loco.TrainBrake = 0;
+                loco.IndBrake = 0;
+                if (loco.BrakeCylinderPressure > 0) loco.ReleaseBrakeCylinder();
                 minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
                 maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
             }

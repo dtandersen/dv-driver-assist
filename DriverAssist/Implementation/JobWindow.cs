@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DriverAssist.ECS;
+using DriverAssist.Localization;
 using UnityEngine;
 
 namespace DriverAssist.Implementation
@@ -46,6 +48,7 @@ namespace DriverAssist.Implementation
             {
                 if (photoMode) return false;
                 if (!Config?.ShowJobs ?? false) return false;
+                if (rows.Count == 0) return false;
 
                 return true;
             }
@@ -53,30 +56,43 @@ namespace DriverAssist.Implementation
 
         public void Awake()
         {
+            Translation localization = TranslationManager.Current;
+
             logger.Info("Awake");
-            Title = "Jobs";
+            Title = localization.JOB_TITLE;
             windowRect = new Rect(Screen.width - 300, 10, SCALE * 120, SCALE * 50);
             photoMode = false;
         }
 
         override protected void Window()
         {
-            int labelwidth = (int)(SCALE * 50);
+            Translation localization = TranslationManager.Current;
+
+            int jobWidth = (int)(SCALE * 60);
+            int stationWidth = (int)(SCALE * 50);
+
+
+            // white = new GUIStyle(EditorStyles.label);
+            // white.normal.textColor = Color.white;
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label($"Job", GUILayout.Width(labelwidth));
-            GUILayout.Label($"Origin", GUILayout.Width(labelwidth));
-            GUILayout.Label($"Destination", GUILayout.Width(labelwidth));
+            GUILayout.Label(localization.JOB_ID, GUILayout.Width(jobWidth));
+            GUILayout.Label(localization.JOB_ORIGIN, GUILayout.Width(stationWidth));
+            GUILayout.Label(localization.JOB_DESTINATION, GUILayout.Width(stationWidth));
             GUILayout.EndHorizontal();
 
             foreach (JobRow job in rows.Values)
             {
                 foreach (TaskRow task in job.Tasks)
                 {
+                    GUIStyle boxStyle = new GUIStyle(GUI.skin.label);
+                    if (task.Complete) boxStyle.normal.textColor = Color.green;
+                    else boxStyle.normal.textColor = Color.white;
+
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label($"{job.ID}", GUILayout.Width(labelwidth));
-                    GUILayout.Label($"{task.Origin}", GUILayout.Width(labelwidth));
-                    GUILayout.Label($"{task.Destination}", GUILayout.Width(labelwidth));
+                    GUILayout.Label($"{job.ID}", boxStyle, GUILayout.Width(jobWidth));
+                    GUILayout.Label($"{task.Origin}", boxStyle, GUILayout.Width(stationWidth));
+                    GUILayout.Label($"{task.Destination}", boxStyle, GUILayout.Width(stationWidth));
                     GUILayout.EndHorizontal();
                 }
             }
@@ -148,17 +164,19 @@ namespace DriverAssist.Implementation
     {
         public string Origin = "";
         public string Destination = "";
+        public bool Complete = false;
 
         public bool Equals(TaskRow other)
         {
             return
                 Origin == other.Origin &&
-                Destination == other.Destination;
+                Destination == other.Destination &&
+                Complete == other.Complete;
         }
 
         public override string ToString()
         {
-            return $"TaskRow[Origin={Origin}, Destination={Destination}]";
+            return $"TaskRow[Origin={Origin}, Destination={Destination}, Complete={Complete}]";
         }
     }
 

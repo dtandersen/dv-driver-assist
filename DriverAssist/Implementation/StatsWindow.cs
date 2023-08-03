@@ -149,8 +149,6 @@ namespace DriverAssist.Implementation
             GUILayout.TextField($"{locoController.Gear + 1}", GUILayout.Width(width));
             GUILayout.EndHorizontal();
 
-            // if (loco.Components.GearChangeRequest.HasValue)
-            // {
             GearChangeRequest? req = locoController.Components?.GearChangeRequest;
             GUILayout.BeginHorizontal();
             GUILayout.Label("Requested Gear", GUILayout.Width(labelwidth));
@@ -161,7 +159,6 @@ namespace DriverAssist.Implementation
             GUILayout.Label("Restore Throttle", GUILayout.Width(labelwidth));
             GUILayout.TextField($"{req?.RestoreThrottle ?? -1}", GUILayout.Width(width));
             GUILayout.EndHorizontal();
-            // }
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Gear Ratio", GUILayout.Width(labelwidth));

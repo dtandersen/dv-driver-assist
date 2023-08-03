@@ -37,6 +37,11 @@ namespace DriverAssist.Localization
         string LOCO_ABBV { get; }
         string LOCOMOTIVE { get; }
         string CARGO { get; }
+
+        string JOB_TITLE { get; }
+        string JOB_ID { get; }
+        string JOB_ORIGIN { get; }
+        string JOB_DESTINATION { get; }
     }
 
     public class TranslationManager
@@ -112,6 +117,11 @@ namespace DriverAssist.Localization
         public string STAT_CHANGE => "Δ";
         public string TRAIN => "Train";
         public string LOCO_ABBV => "Loco";
+
+        public string JOB_TITLE => "Jobs";
+        public string JOB_ID => "Job";
+        public string JOB_ORIGIN => "Origin";
+        public string JOB_DESTINATION => "Destination";
     }
 
     public class TranslationDE : Translation
@@ -147,5 +157,10 @@ namespace DriverAssist.Localization
         public string STAT_CHANGE => "Δ";
         public string TRAIN => "Zug";
         public string LOCO_ABBV => "Loko";
+
+        public string JOB_TITLE => "Arbeitsplätze";
+        public string JOB_ID => "Arbeit";
+        public string JOB_ORIGIN => "Herkunft";
+        public string JOB_DESTINATION => "Ziel";
     }
 }

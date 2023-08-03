@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DriverAssist.Cruise;
 using DriverAssist.ECS;
 using DV.HUD;
+using DV.Simulation.Brake;
 using DV.Simulation.Cars;
 using LocoSim.Implementations;
 using UnityEngine;
@@ -20,26 +21,17 @@ namespace DriverAssist.Implementation
 
         private BaseControlsOverrider? BaseControls
         {
-            get
-            {
-                return SimController?.controlsOverrider;
-            }
+            get { return SimController?.controlsOverrider; }
         }
 
         private LocoIndicatorReader? IndicatorReader
         {
-            get
-            {
-                return trainCar?.loadedInterior?.GetComponent<LocoIndicatorReader>();
-            }
+            get { return trainCar?.loadedInterior?.GetComponent<LocoIndicatorReader>(); }
         }
 
         private SimulationFlow? SimFlow
         {
-            get
-            {
-                return trainCar.GetComponent<SimController>()?.simFlow;
-            }
+            get { return trainCar.GetComponent<SimController>()?.simFlow; }
         }
 
         private Port? TorqueGeneratedPort
@@ -58,38 +50,34 @@ namespace DriverAssist.Implementation
 
         private SimController? SimController
         {
-            get
-            {
-                return trainCar.GetComponent<SimController>();
-            }
+            get { return trainCar.GetComponent<SimController>(); }
+        }
+
+        private BrakeSystem? BrakeSystem
+        {
+            get { return trainCar.brakeSystem; }
+        }
+
+        private InteriorControlsManager? InteriorControls
+        {
+            get { return trainCar?.interior?.GetComponentInChildren<InteriorControlsManager>(); }
         }
 
         public bool IsLoco { get { return true; } }
 
         public float SpeedKmh
         {
-            get
-            {
-                float speed = trainCar.GetForwardSpeed() * 3.6f;
-                return speed;
-            }
+            get { return trainCar.GetForwardSpeed() * 3.6f; }
         }
 
         public float SpeedMs
         {
-            get
-            {
-                float speed = trainCar.GetForwardSpeed();
-                return speed;
-            }
+            get { return trainCar.GetForwardSpeed(); ; }
         }
 
         public float Throttle
         {
-            get
-            {
-                return BaseControls?.Throttle.Value ?? 0;
-            }
+            get { return BaseControls?.Throttle.Value ?? 0; }
             set
             {
                 if (value > 1) value = 1;
@@ -101,52 +89,35 @@ namespace DriverAssist.Implementation
 
         public float TrainBrake
         {
-            get
-            {
-                return BaseControls?.Brake.Value ?? 0;
-            }
-            set
-            {
-                BaseControls?.Brake.Set(value);
-            }
+            get { return BaseControls?.Brake.Value ?? 0; }
+            set { BaseControls?.Brake.Set(value); }
         }
 
         public float IndBrake
         {
-            get
-            {
-                return BaseControls?.IndependentBrake.Value ?? 0;
-            }
-            set
-            {
-                BaseControls?.IndependentBrake.Set(value);
-            }
+            get { return BaseControls?.IndependentBrake.Value ?? 0; }
+            set { BaseControls?.IndependentBrake.Set(value); }
         }
+
+        public float BrakeCylinderPressure { get { return BrakeSystem?.brakeCylinderPressure ?? 0; } }
 
         public float GearboxA
         {
             get
             {
-                // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
-                InteriorControlsManager controls = trainCar.interior.GetComponentInChildren<InteriorControlsManager>();
-                if (!controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference))
+                if (InteriorControls?.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference) ?? false)
                 {
-                    return 0;
+                    return reference.controlImplBase.Value;
                 }
-                return reference.controlImplBase.Value;
+                return 0;
             }
-            // return overrider.bas;
 
             set
             {
-                // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
-                InteriorControlsManager controls = trainCar.interior.GetComponentInChildren<InteriorControlsManager>();
-                if (controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference))
+                if (InteriorControls?.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference) ?? false)
                 {
-                    // controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference6)
                     reference.controlImplBase.SetValue(value);
                 }
-                // return reference.controlImplBase.Value;
             }
         }
 
@@ -154,26 +125,19 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
-                InteriorControlsManager controls = trainCar.interior.GetComponentInChildren<InteriorControlsManager>();
-                if (!controls.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference))
+                if (InteriorControls?.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference) ?? false)
                 {
-                    return 0;
+                    return reference.controlImplBase.Value;
                 }
-                return reference.controlImplBase.Value;
+                return 0;
             }
-            // return overrider.bas;
 
             set
             {
-                // BaseControlsOverrider overrider = loco.GetComponentInChildren<BaseControlsOverrider>(includeInactive: true);
-                InteriorControlsManager controls = trainCar.interior.GetComponentInChildren<InteriorControlsManager>();
-                if (controls.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference))
+                if (InteriorControls?.TryGetControl(InteriorControlsManager.ControlType.GearboxB, out var reference) ?? false)
                 {
-                    // controls.TryGetControl(InteriorControlsManager.ControlType.GearboxA, out var reference6)
                     reference.controlImplBase.SetValue(value);
                 }
-                // return reference.controlImplBase.Value;
             }
         }
 
@@ -181,15 +145,8 @@ namespace DriverAssist.Implementation
         {
             get
             {
-                if (!IndicatorReader)
-                {
-                    return 0;
-                }
-
-                if (IndicatorReader?.tmTemp)
-                    return IndicatorReader?.tmTemp?.Value ?? 0;
-                if (IndicatorReader?.oilTemp)
-                    return IndicatorReader?.oilTemp?.Value ?? 0;
+                if (IndicatorReader?.tmTemp) return IndicatorReader?.tmTemp?.Value ?? 0;
+                if (IndicatorReader?.oilTemp) return IndicatorReader?.oilTemp?.Value ?? 0;
 
                 return 0;
             }
@@ -197,24 +154,13 @@ namespace DriverAssist.Implementation
 
         public float Reverser
         {
-            get
-            {
-                return BaseControls?.Reverser.Value ?? 0;
-            }
-
-            set
-            {
-                BaseControls?.Reverser.Set(value);
-            }
+            get { return BaseControls?.Reverser.Value ?? 0; }
+            set { BaseControls?.Reverser.Set(value); }
         }
-
 
         public float Torque
         {
-            get
-            {
-                return TorqueGeneratedPort?.Value ?? 0f;
-            }
+            get { return TorqueGeneratedPort?.Value ?? 0f; }
         }
 
         public bool IsElectric
@@ -269,18 +215,12 @@ namespace DriverAssist.Implementation
 
         public float Amps
         {
-            get
-            {
-                return IndicatorReader?.amps?.Value ?? 0;
-            }
+            get { return IndicatorReader?.amps?.Value ?? 0; }
         }
 
         public float Rpm
         {
-            get
-            {
-                return IndicatorReader?.engineRpm?.Value ?? 0;
-            }
+            get { return IndicatorReader?.engineRpm?.Value ?? 0; }
         }
 
         public bool IsWheelSlipping { get { return trainCar?.adhesionController?.wheelslipController?.IsWheelslipping ?? false; } }
@@ -289,10 +229,7 @@ namespace DriverAssist.Implementation
 
         public string Type
         {
-            get
-            {
-                return trainCar.carType.ToString();
-            }
+            get { return trainCar.carType.ToString(); }
         }
 
         public float Mass
@@ -342,10 +279,7 @@ namespace DriverAssist.Implementation
 
         public float WheelRadius
         {
-            get
-            {
-                return trainCar.carLivery.parentType.wheelRadius;
-            }
+            get { return trainCar.carLivery.parentType.wheelRadius; }
         }
 
         public float GearRatio
@@ -405,6 +339,7 @@ namespace DriverAssist.Implementation
                 return Math.Max(gearA, gearB) > 0;
             }
         }
+
         public List<string> Ports
         {
             get
@@ -426,6 +361,11 @@ namespace DriverAssist.Implementation
         }
 
         public int Length { get { return trainCar.trainset.cars.Count; } }
+
+        public void ReleaseBrakeCylinder()
+        {
+            BrakeSystem?.ReleaseBrakeCylinderPressure();
+        }
     }
 
     public class UnityClock : Clock

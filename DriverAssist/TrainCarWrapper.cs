@@ -12,6 +12,7 @@ namespace DriverAssist
         float Throttle { get; set; }
         float TrainBrake { get; set; }
         float IndBrake { get; set; }
+        float BrakeCylinderPressure { get; }
         float GearboxA { get; set; }
         float GearboxB { get; set; }
         float Temperature { get; }
@@ -30,9 +31,10 @@ namespace DriverAssist
         float GearRatio { get; }
         List<string> Ports { get; }
         bool GearChangeInProgress { get; }
-
         bool IsLoco { get; }
         int Length { get; }
+
+        void ReleaseBrakeCylinder();
     }
 
     public class NullTrainCarWrapper : TrainCarWrapper
@@ -61,6 +63,7 @@ namespace DriverAssist
         public float Throttle { get; set; }
         public float TrainBrake { get; set; }
         public float IndBrake { get; set; }
+        public float BrakeCylinderPressure { get; set; }
         public float GearboxA { get; set; }
         public float GearboxB { get; set; }
 
@@ -97,6 +100,10 @@ namespace DriverAssist
             TractionMotors = "";
             Type = LocoType.DE2;
         }
+
+        public void ReleaseBrakeCylinder()
+        {
+        }
     }
 
     public class FakeTrainCarWrapper : TrainCarWrapper
@@ -111,6 +118,7 @@ namespace DriverAssist
         public float Throttle { get; set; }
         public float TrainBrake { get; set; }
         public float IndBrake { get; set; }
+        public float BrakeCylinderPressure { get; set; }
         public float GearboxA { get; set; }
         public float GearboxB { get; set; }
 
@@ -142,6 +150,10 @@ namespace DriverAssist
             Ports = new();
             TractionMotors = "";
             Type = LocoType.DE2;
+        }
+
+        public void ReleaseBrakeCylinder()
+        {
         }
     }
 }

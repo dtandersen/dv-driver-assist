@@ -1,142 +1,211 @@
 using System;
 using System.Collections.Generic;
 using DriverAssist.Implementation;
-using DV.Logic.Job;
 
 namespace DriverAssist.ECS
 {
-    public delegate void UpdateTask(JobRow job);
-    public delegate void RemoveTask(string id);
+    public delegate void JobUpdated(JobRow job);
+    public delegate void JobRemoved(string id);
 
-    public struct JobTask
+    public class TaskBundle
     {
-        public JobWrapper Job;
+        // public Booklet Booklet;
         public List<TaskWrapper> Tasks;
-    }
+        public bool IsComplete;
 
-    public class JobSystem : BaseSystem
-    {
-        public Dictionary<string, JobTask> Jobs2 = new();
+        // private readonly Logger logger;
 
-        public UpdateTask? UpdateTask = delegate { };
-        public RemoveTask? RemoveTask = delegate { };
-
-        public override void OnUpdate()
+        public TaskBundle(List<TaskWrapper> tasks)
         {
-            List<JobTask> updates = new();
-            foreach (JobTask jobTask in Jobs2.Values)
-            {
-                if (IsAllComplete(jobTask.Tasks))
-                {
-                    JobWrapper job = jobTask.Job;
-                    List<TaskWrapper> tasks = NextTasks(job);
-                    logger.Info($"{job.ID}: Tasks completed");
-                    UpdateTask?.Invoke(MakeJob(job, tasks));
+            // logger = LogFactory.GetLogger(GetType().Name);
+            // Booklet = booklet;
+            Tasks = tasks;
 
-                    updates.Add(new JobTask()
-                    {
-                        Job = job,
-                        Tasks = tasks
-                    });
-
-                }
-            }
-
-            foreach (JobTask jobTask in updates)
-            {
-                Jobs2.Remove(jobTask.Job.ID);
-                Jobs2[jobTask.Job.ID] = jobTask;
-            }
+            // logger.Info("");
         }
 
-        private bool IsAllComplete(List<TaskWrapper> tasks)
+        internal bool Refresh()
+        {
+            bool newIsComplete = IsTasksComplete(Tasks);
+            bool statusChanged = newIsComplete != IsComplete;
+            IsComplete = newIsComplete;
+
+            return statusChanged;
+        }
+
+        private bool IsTasksComplete(List<TaskWrapper> tasks)
         {
             foreach (TaskWrapper task in tasks)
             {
-                if (!task.IsComplete) return false;
+                if (!task.IsComplete)
+                {
+                    return false;
+                }
             }
             return true;
         }
 
-        public JobRow MakeJob(JobWrapper job, List<TaskWrapper> tasks)
+        public override string ToString()
         {
-            List<TaskRow> taskrows = new();
+            return $"TaskBundle[Tasks=[{string.Join(",", Tasks)}]]";
+        }
+    }
+
+    public class Booklet
+    {
+        private readonly List<TaskBundle> taskBundles;
+        private readonly JobWrapper job;
+        // private readonly Logger logger;
+
+        private int current = 0;
+
+        public string ID { get { return job.ID; } }
+
+        public TaskBundle CurrentTasks { get; set; }
+
+        public Booklet(JobWrapper job)
+        {
+            // logger = LogFactory.GetLogger(this.GetType().Name);
+            taskBundles = new();
+            this.job = job;
+            Generate(job.Tasks, false);
+            Refresh();
+            CurrentTasks = taskBundles[current];
+        }
+
+        public bool Refresh()
+        {
+            bool refresh = false;
+
+            foreach (TaskBundle taskBundle in taskBundles)
+            {
+                if (taskBundle.Refresh())
+                {
+                    refresh = true;
+                }
+            }
+
+            if (refresh)
+            {
+                current = FirstIncomplete();
+                CurrentTasks = taskBundles[current];
+            }
+
+            return refresh;
+        }
+
+        public override string ToString()
+        {
+            return $"Booklet[taskBundles=[{string.Join(",", taskBundles)}], currenttasks={this.CurrentTasks}]";
+        }
+
+        private void Generate(List<TaskWrapper> tasks, bool parentIsParallel)
+        {
+            if (parentIsParallel)
+            {
+                AddTasks(tasks);
+                return;
+            }
+
             foreach (TaskWrapper task in tasks)
             {
-                taskrows.Add(new TaskRow()
+                if (task.IsSingular)
                 {
-                    Origin = task.Source,
-                    Destination = task.Destination
-                });
+                    AddTasks(new List<TaskWrapper>() { task });
+                    continue;
+                }
+                else
+                {
+                    Generate(task.Tasks, task.IsParallel);
+                }
             }
-            return new JobRow()
+        }
+
+        private int FirstIncomplete()
+        {
+            int i = 0;
+            foreach (TaskBundle taskBundle in taskBundles)
             {
-                ID = job.ID,
+                if (!taskBundle.IsComplete)
+                {
+                    current = i;
+                    return i;
+                }
+                i++;
+            }
+            current = taskBundles.Count - 1;
+            return current;
+        }
+
+        private void AddTasks(List<TaskWrapper> tasks)
+        {
+            // logger.Info($"tasks[{taskBundles.Count}]={string.Join(",", tasks)}");
+            taskBundles.Add(new TaskBundle(tasks));
+        }
+    }
+
+    public struct JobTask
+    {
+        public Booklet Booklet { get; internal set; }
+    }
+
+    public class JobSystem : BaseSystem
+    {
+        public Dictionary<string, JobTask> Jobs = new();
+        public JobUpdated? JobUpdated = delegate { };
+        public JobRemoved? JobRemoved = delegate { };
+
+        public override void OnUpdate()
+        {
+            foreach (JobTask jobTask in Jobs.Values)
+            {
+                Booklet booklet = jobTask.Booklet;
+                if (booklet.Refresh())
+                {
+                    logger.Info($"Booklet refreshed {booklet}");
+                    NotifyObservers(booklet);
+                }
+            }
+        }
+
+        public void NotifyObservers(Booklet booklet)
+        {
+            List<TaskRow> taskrows = booklet.CurrentTasks.Tasks.ConvertAll(new Converter<TaskWrapper, TaskRow>(TaskToTaskRow));
+            var jobRow = new JobRow()
+            {
+                ID = booklet.ID,
                 Tasks = taskrows
             };
+
+            JobUpdated?.Invoke(jobRow);
         }
 
         public void AddJob(JobWrapper job)
         {
             logger.Info($"AddJob {job.ID}");
-            // TaskWrapper? task = job.GetNextTask();
-            List<TaskWrapper> tasks = NextTasks(job);
-            Jobs2[job.ID] = new JobTask()
+            Booklet booklet = new Booklet(job);
+            Jobs[job.ID] = new JobTask()
             {
-                Job = job,
-                Tasks = tasks
+                Booklet = booklet
             };
-            UpdateTask?.Invoke(MakeJob(job, tasks));
-        }
-
-        public List<TaskWrapper> NextTasks(JobWrapper job)
-        {
-            logger.Info($"NextTasks {job.ID}");
-            return NextTasks(job.Tasks, false);
-        }
-
-        public List<TaskWrapper> NextTasks(List<TaskWrapper> tasks, bool parentIsParallel)
-        {
-            logger.Info($"NextTasks {string.Join(",", tasks)} {parentIsParallel}");
-            if (parentIsParallel && !IsAllComplete(tasks))
-            {
-                logger.Info($"Parallel parent");
-                return tasks;
-            }
-            foreach (TaskWrapper task in tasks)
-            {
-                logger.Info($"evaluating {task}");
-                if (task.IsComplete)
-                {
-                    logger.Info($"{task} is complete");
-                    continue;
-                }
-                else if (!task.IsComplete && task.IsSingular)
-                {
-                    logger.Info($"Selected {task}");
-                    return new List<TaskWrapper>() { task };
-                }
-                else if (task.IsComplete && task.IsSingular)
-                {
-                    continue;
-                }
-
-                List<TaskWrapper> nextTasks = NextTasks(task.Tasks, task.IsParallel);
-                if (IsAllComplete(nextTasks))
-                {
-                    continue;
-                }
-                return nextTasks;
-            }
-
-            return new();
+            NotifyObservers(booklet);
         }
 
         public void RemoveJob(string id)
         {
             logger.Info($"RemoveJob {id}");
-            Jobs2.Remove(id);
-            RemoveTask?.Invoke(id);
+            Jobs.Remove(id);
+            JobRemoved?.Invoke(id);
+        }
+
+        private TaskRow TaskToTaskRow(TaskWrapper task)
+        {
+            return new TaskRow()
+            {
+                Origin = task.Source,
+                Destination = task.Destination,
+                Complete = task.IsComplete
+            };
         }
     }
 }

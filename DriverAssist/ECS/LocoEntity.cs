@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DriverAssist.Cruise;
 
@@ -275,6 +276,8 @@ namespace DriverAssist.ECS
 
         public bool IsWheelsSlipping { get { return trainCar.IsWheelSlipping; } }
 
+        public float BrakeCylinderPressure { get { return trainCar.BrakeCylinderPressure; } }
+
         public void UpdateStats(float deltaTime)
         {
             if (!trainCar.IsLoco) return;
@@ -326,6 +329,11 @@ namespace DriverAssist.ECS
             }
             Components.GearChangeRequest = gearChangeRequest;
             logger.Info($"Requesting gear change RequestedGear={gearChangeRequest.RequestedGear} RestoreThrottle={gearChangeRequest.RestoreThrottle ?? -1}");
+        }
+
+        internal void ReleaseBrakeCylinder()
+        {
+            trainCar.ReleaseBrakeCylinder();
         }
     }
 
