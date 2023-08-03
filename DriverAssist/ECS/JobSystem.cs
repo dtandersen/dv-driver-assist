@@ -9,40 +9,47 @@ namespace DriverAssist.ECS
 
     public class TaskBundle
     {
-        // public Booklet Booklet;
         public List<TaskWrapper> Tasks;
         public bool IsComplete;
-
-        // private readonly Logger logger;
+        private int completedTasks;
 
         public TaskBundle(List<TaskWrapper> tasks)
         {
-            // logger = LogFactory.GetLogger(GetType().Name);
-            // Booklet = booklet;
             Tasks = tasks;
-
-            // logger.Info("");
         }
 
         internal bool Refresh()
         {
-            bool newIsComplete = IsTasksComplete(Tasks);
-            bool statusChanged = newIsComplete != IsComplete;
-            IsComplete = newIsComplete;
+            int newCompleted = CompletedTaskCount(Tasks);
+            // bool newIsComplete = IsTasksComplete(Tasks);
+            // bool statusChanged = newIsComplete != IsComplete;
+            bool statusChanged = completedTasks != newCompleted;
+            completedTasks = newCompleted;
+            IsComplete = completedTasks == Tasks.Count;
 
             return statusChanged;
         }
 
-        private bool IsTasksComplete(List<TaskWrapper> tasks)
+        // private bool IsTasksComplete(List<TaskWrapper> tasks)
+        // {
+        //     foreach (TaskWrapper task in tasks)
+        //     {
+        //         if (!task.IsComplete)
+        //         {
+        //             return false;
+        //         }
+        //     }
+        //     return true;
+        // }
+
+        private int CompletedTaskCount(List<TaskWrapper> tasks)
         {
+            int count = 0;
             foreach (TaskWrapper task in tasks)
             {
-                if (!task.IsComplete)
-                {
-                    return false;
-                }
+                if (task.IsComplete) count++;
             }
-            return true;
+            return count;
         }
 
         public override string ToString()

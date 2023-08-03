@@ -16,6 +16,7 @@ namespace DriverAssist.ECS
         const int SEQUENTIAL = 2;
         const int PARALLEL = 3;
         protected Logger logger;
+        FakeJobView view;
 
 
         public JobSystemTest(ITestOutputHelper output)
@@ -24,6 +25,9 @@ namespace DriverAssist.ECS
             logger = LogFactory.GetLogger(this.GetType().Name);
 
             system = new JobSystem();
+            view = new FakeJobView();
+            system.JobUpdated += view.OnAddJob;
+            system.JobRemoved += view.OnRemoveJob;
         }
 
         /// <summary>
@@ -67,32 +71,23 @@ namespace DriverAssist.ECS
         [Fact]
         public void JobNext()
         {
-            FakeTask fakeTask1 = new FakeTask()
+            FakeJob job = new FakeJob()
+            {
+                ID = "SM-SU-33"
+            };
+            FakeTask task1 = job.AddTask(new FakeTask()
             {
                 Type = WAREHOUSE,
                 Source = "SM-A6I",
                 Destination = "SM-A7L",
-                IsComplete = false
-            };
-            FakeTask fakeTask2 = new FakeTask()
+            });
+            FakeTask task2 = job.AddTask(new FakeTask()
             {
                 Type = TRANSPORT,
                 Source = "SM-A7L",
                 Destination = "SM-B50",
-                IsComplete = false
-            };
+            });
 
-            FakeJob job = new FakeJob()
-            {
-                ID = "SM-SU-33",
-                Tasks = { fakeTask1, fakeTask2 }
-            };
-            // logger.Info($"{fakeTask1}");
-            // logger.Info($"{fakeTask2}");
-
-            FakeJobView view = new FakeJobView();
-            system.JobUpdated += view.OnAddJob;
-            system.JobRemoved += view.OnRemoveJob;
             system.AddJob(job);
 
             Assert.Equal(new List<JobRow> {
@@ -107,11 +102,9 @@ namespace DriverAssist.ECS
                 }
             }, new List<JobRow>(view.Rows.Values));
 
-            // job.Tasks = { fakeTask2};
-            fakeTask1.IsComplete = true;
+            task1.IsComplete = true;
             system.OnUpdate();
 
-            // Assert.Equal(system.Jobs["SM-SU-33"], job);
             Assert.Equal(new List<JobRow> {
                 new JobRow() {
                     ID = "SM-SU-33",
@@ -128,6 +121,56 @@ namespace DriverAssist.ECS
             Assert.Empty(view.Rows);
         }
 
+        /// The job has two tasks.
+        /// When the first task is completed,
+        /// Then the view should update.
+        [Fact]
+        public void FirstJobUpdates()
+        {
+            FakeJob job = new FakeJob()
+            {
+                ID = "MF-SU-53"
+            };
+            FakeTask parallelTask = job.AddTask(new FakeTask()
+            {
+                Type = PARALLEL,
+            });
+            FakeTask task1 = parallelTask.AddTask(new FakeTask()
+            {
+                Type = TRANSPORT,
+                Source = "MF-C1L",
+                Destination = "MF-C2S",
+            });
+
+            parallelTask.AddTask(new FakeTask()
+            {
+                Type = TRANSPORT,
+                Source = "MF-C1L",
+                Destination = "MF-B1S",
+            });
+
+            system.AddJob(job);
+            task1.IsComplete = true;
+            system.OnUpdate();
+
+            Assert.Equal(new List<JobRow> {
+                new JobRow() {
+                    ID = "MF-SU-53",
+                    Tasks = {
+                        new TaskRow() {
+                            Origin = "MF-C1L",
+                            Destination = "MF-C2S",
+                            Complete=true
+                        },
+                        new TaskRow() {
+                            Origin = "MF-C1L",
+                            Destination = "MF-B1S",
+                            Complete=false
+                        }
+                    }
+                }
+            }, new List<JobRow>(view.Rows.Values));
+        }
 
         /// Job has multiple parallel tasks.
         /// Print them all.
@@ -140,7 +183,7 @@ namespace DriverAssist.ECS
                 Type = SEQUENTIAL,
             };
             // 1.1
-            parent.AddSubTask(new FakeTask()
+            parent.AddTask(new FakeTask()
             {
                 Type = TRANSPORT,
                 Source = "SM-A6I",
@@ -148,7 +191,7 @@ namespace DriverAssist.ECS
                 IsComplete = true,
             });
             // 1.2
-            FakeTask task12 = parent.AddSubTask(new FakeTask()
+            FakeTask task12 = parent.AddTask(new FakeTask()
             {
                 Type = PARALLEL,
                 Source = "SM-A6I",
@@ -156,34 +199,34 @@ namespace DriverAssist.ECS
                 IsComplete = true
             });
             // 1.2.1
-            task12.AddSubTask(new FakeTask()
+            task12.AddTask(new FakeTask()
             {
                 Type = WAREHOUSE,
                 Destination = "SM-A7L",
                 IsComplete = true
             });
             // 1.3
-            FakeTask task13 = parent.AddSubTask(new FakeTask()
+            FakeTask task13 = parent.AddTask(new FakeTask()
             {
                 Type = PARALLEL,
                 IsComplete = false
             });
             // 1.3.1
-            task13.AddSubTask(new FakeTask()
+            task13.AddTask(new FakeTask()
             {
                 Type = TRANSPORT,
                 Source = "SM-A7L",
                 Destination = "SM-B7S",
             });
             // 1.3.2
-            task13.AddSubTask(new FakeTask()
+            task13.AddTask(new FakeTask()
             {
                 Type = TRANSPORT,
                 Source = "SM-A7L",
                 Destination = "SM-A5S",
             });
             // 1.3.3
-            task13.AddSubTask(new FakeTask()
+            task13.AddTask(new FakeTask()
             {
                 Type = TRANSPORT,
                 Source = "SM-A7L",
@@ -361,7 +404,7 @@ namespace DriverAssist.ECS
 
         public List<TaskWrapper> Tasks { get; set; } = new();
 
-        public FakeTask AddSubTask(FakeTask task)
+        public FakeTask AddTask(FakeTask task)
         {
             Tasks.Add(task);
             return task;
