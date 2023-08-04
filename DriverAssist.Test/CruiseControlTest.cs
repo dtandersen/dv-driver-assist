@@ -16,6 +16,7 @@ namespace DriverAssist.Cruise
         private readonly LocoSettings dh4settings;
         private readonly FakeTrainCarWrapper train;
         private readonly FakeClock clock;
+        private readonly EntityManager entityManager;
 
         public CruiseControlTest(ITestOutputHelper output)
         {
@@ -40,10 +41,15 @@ namespace DriverAssist.Cruise
             train.Type = LocoType.DE2;
             loco.Reverser = 1;
             clock = new FakeClock();
-            cruiseControl = new CruiseControl(loco, config, clock)
+            entityManager = new EntityManager
+            {
+                Loco = loco
+            };
+            cruiseControl = new CruiseControl(config, clock, entityManager)
             {
                 Enabled = true
             };
+            loco.Components.LocoSettings = config.LocoSettings[LocoType.DE2];
         }
 
         [Fact]
@@ -372,6 +378,8 @@ namespace DriverAssist.Cruise
         public void UseTheSettingsForTheLocoType()
         {
             train.Type = LocoType.DH4;
+            loco.Components.LocoSettings = config.LocoSettings[LocoType.DH4];
+
             cruiseControl.DesiredSpeed = 10;
             train.SpeedKmh = 0;
 
@@ -384,6 +392,7 @@ namespace DriverAssist.Cruise
         public void ReportIfLocoHasNoSettings()
         {
             train.Type = LocoType.DE6;
+            loco.Components.LocoSettings = null;//config.LocoSettings[LocoType.DE2];
 
             WhenCruise();
 
@@ -394,6 +403,7 @@ namespace DriverAssist.Cruise
         public void PassTimeToContext()
         {
             train.Type = LocoType.DH4;
+            loco.Components.LocoSettings = config.LocoSettings[LocoType.DH4];
             cruiseControl.DesiredSpeed = 10;
             train.SpeedKmh = 0;
             clock.Time2 = 5;

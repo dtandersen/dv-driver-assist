@@ -11,18 +11,15 @@ namespace DriverAssist.ECS
     public class JobSystemTest
     {
         private readonly JobSystem system;
-        const int TRANSPORT = 0;
-        const int WAREHOUSE = 1;
-        const int SEQUENTIAL = 2;
-        const int PARALLEL = 3;
-        protected Logger logger;
-        FakeJobView view;
-
+        private const int TRANSPORT = 0;
+        private const int WAREHOUSE = 1;
+        private const int SEQUENTIAL = 2;
+        private const int PARALLEL = 3;
+        private readonly FakeJobView view;
 
         public JobSystemTest(ITestOutputHelper output)
         {
             XunitLogger.Init(output);
-            logger = LogFactory.GetLogger(this.GetType().Name);
 
             system = new JobSystem();
             view = new FakeJobView();
@@ -47,12 +44,8 @@ namespace DriverAssist.ECS
                     Destination = "SM-A7L",
                 }}
             };
-            FakeJobView view = new FakeJobView();
-            system.JobUpdated += view.OnAddJob;
-            system.JobRemoved += view.OnRemoveJob;
             system.AddJob(job);
 
-            // Assert.Equal(system.Jobs2["SM-SU-33"].Job, job);
             Assert.Equal(new List<JobRow>(view.Rows.Values), new List<JobRow> {
                 new JobRow() {
                     ID = "SM-SU-33",
@@ -81,7 +74,7 @@ namespace DriverAssist.ECS
                 Source = "SM-A6I",
                 Destination = "SM-A7L",
             });
-            FakeTask task2 = job.AddTask(new FakeTask()
+            job.AddTask(new FakeTask()
             {
                 Type = TRANSPORT,
                 Source = "SM-A7L",
@@ -240,9 +233,6 @@ namespace DriverAssist.ECS
                 Destination = "",
                 Tasks = { parent }
             };
-            FakeJobView view = new FakeJobView();
-            system.JobUpdated += view.OnAddJob;
-            // system.RemoveTask += view.OnRemoveJob;
             system.AddJob(job);
             Assert.Equal(new List<JobRow> {
                 new JobRow() {
@@ -264,10 +254,7 @@ namespace DriverAssist.ECS
                 }
             }, new List<JobRow>(view.Rows.Values));
 
-            // job.Tasks = { fakeTask2};
-            // fakeTask1.IsComplete = true;
             system.OnUpdate();
-            // Assert.Equal(system.Jobs["SM-SU-33"], job);
             Assert.Equal(new List<JobRow> {
                 new JobRow() {
                     ID = "SM-SU-33",
@@ -287,9 +274,6 @@ namespace DriverAssist.ECS
                     }
                 }
             }, new List<JobRow>(view.Rows.Values));
-
-            // system.RemoveJob(job.ID);
-            // Assert.Empty(view.Rows);
         }
 
         /// Job has multiple parallel tasks.
@@ -310,9 +294,6 @@ namespace DriverAssist.ECS
                 Destination = "SM-A7L",
                 IsComplete = false,
             });
-            FakeJobView view = new FakeJobView();
-            system.JobUpdated += view.OnAddJob;
-            system.JobRemoved += view.OnRemoveJob;
             system.AddJob(job);
             Assert.Equal(new List<JobRow> {
                 new JobRow() {
@@ -327,10 +308,8 @@ namespace DriverAssist.ECS
                 }
             }, new List<JobRow>(view.Rows.Values));
 
-            // job.Tasks = { fakeTask2};
             task.IsComplete = true;
             system.OnUpdate();
-            // Assert.Equal(system.Jobs["SM-SU-33"], job);
             Assert.Equal(new List<JobRow> {
                 new JobRow() {
                     ID = "SM-SU-33",
@@ -343,14 +322,7 @@ namespace DriverAssist.ECS
                     }
                 }
             }, new List<JobRow>(view.Rows.Values));
-
-            // system.RemoveJob(job.ID);
-            // Assert.Empty(view.Rows);
         }
-        // private void WhenSystemUpdates()
-        // {
-        //     system.OnUpdate();
-        // }
     }
 
     class FakeJob : JobWrapper

@@ -4,6 +4,7 @@ using DriverAssist.Cruise;
 using DriverAssist.ECS;
 using DV.Logic.Job;
 using DV.Utils;
+using Unity.Entities;
 using UnityEngine;
 
 namespace DriverAssist.Implementation
@@ -158,8 +159,9 @@ namespace DriverAssist.Implementation
             PlayerManager.CarChanged += OnCarChanged;
 
             locoController = new LocoEntity(Time.fixedDeltaTime);
+            EntityManager.Instance.Loco = locoController;
 
-            cruiseControl = new CruiseControl(locoController, config, new UnityClock())
+            cruiseControl = new CruiseControl(config, new UnityClock(), EntityManager.Instance)
             {
                 Accelerator = new PredictiveAcceleration(),
                 Decelerator = new PredictiveDeceleration()
@@ -252,6 +254,7 @@ namespace DriverAssist.Implementation
                 {
                     locoController.UpdateLocomotive(NullTrainCarWrapper.Instance);
                     locoController.Components.LocoSettings = null;
+
                 }
                 logger.Info($"Exited train car");
                 if (cruiseControl != null)

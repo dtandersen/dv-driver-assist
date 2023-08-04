@@ -49,9 +49,10 @@ namespace DriverAssist.ECS
             logger.Info($"{fixedDeltaTime} {size} {size2}");
         }
 
-        public void UpdateLocomotive(TrainCarWrapper newloco)
+        public TrainCarWrapper UpdateLocomotive(TrainCarWrapper newloco)
         {
             this.trainCar = newloco;
+            return this.trainCar;
         }
 
         public float SpeedKmh
