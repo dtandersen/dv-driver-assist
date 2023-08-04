@@ -85,4 +85,4 @@ Use `dotnet test` to run the unit tests.
 
 # Translation
 
-The mod is translated to English and partially to Deutsch (thanks 𝓩𝓮𝓬𝓴𝓮_𝓓𝓲𝓻𝓴). If you would like to provide a translation for another language please join the Discord server.
+The mod is translated to to Deutsch (thanks 𝓩𝓮𝓬𝓴𝓮_𝓓𝓲𝓻𝓴) and Français (thanks Kronos). If you would like to provide a translation for another language please join the Discord server.

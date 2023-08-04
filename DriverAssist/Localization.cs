@@ -73,10 +73,9 @@ namespace DriverAssist.Localization
         {
             Translation translation = language switch
             {
-                "en" => new TranslationEN(),
                 "English" => new TranslationEN(),
-                "de" => new TranslationDE(),
                 "German" => new TranslationDE(),
+                "French" => new TranslationFR(),
                 _ => new TranslationEN(),
             };
 
@@ -162,5 +161,45 @@ namespace DriverAssist.Localization
         public string JOB_ID => "Arbeit";
         public string JOB_ORIGIN => "Herkunft";
         public string JOB_DESTINATION => "Ziel";
+    }
+
+    public class TranslationFR : Translation
+    {
+        public string CC_SETPOINT => "Point de départ";
+        public string CC_STATUS => "Status";
+        public string CC_COASTING => "Roue libre";
+        public string CC_DECELERATING => "Décéleration à {0} km/h";
+        public string CC_ACCELERATING => "Accélération à {0} km/h";
+        public string CC_CHANGING_DIRECTION => "Changement de direction";
+        public string CC_STOPPING => "Arrêt";
+        public string CC_WARNING_NEUTRAL => "Neutre : le levier de direction est au point mort";
+        public string CC_DISABLED => "Désactivé";
+        public string CC_UNSUPPORTED => "Neutre: {0} n'est pas supporté";
+
+        public string STAT_LOCOMOTIVE => "Locomotive";
+        public string STAT_MASS => "Masse";
+        public string STAT_SPEED => "Vitesse (km/h)";
+        public string STAT_ACCELERATION => "Accéleration (m/s^2)";
+        public string STAT_TORQUE => "Couple";
+        public string STAT_POWER => "Puissance (kW)";
+        public string STAT_HORSEPOWER => "Cheveaux";
+        public string STAT_THROTTLE => "Accélérateur";
+        public string STAT_TEMPERATURE => "Température";
+        public string STAT_TEMPERATURE_CHANGE => "Changement de température";
+        public string STAT_AMPS => "Ampères";
+        public string STAT_RPM => "Tr/min";
+
+        public string LOCOMOTIVE => "Locomotive";
+        public string CARGO => "Chargement";
+
+        public string STAT_CURRENT => "Courant";
+        public string STAT_CHANGE => "Δ";
+        public string TRAIN => "Train";
+        public string LOCO_ABBV => "Loco";
+
+        public string JOB_TITLE => "Emploi";
+        public string JOB_ID => "Travail";
+        public string JOB_ORIGIN => "Origine";
+        public string JOB_DESTINATION => "Destination";
     }
 }

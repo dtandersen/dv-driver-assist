@@ -1,3 +1,7 @@
+0.9.4 - 8/3/2023
+
+- French translation. Thanks Kronos!
+
 0.9.3 - 7/29/2023
 
 - Fixed an issue that prevented shift completion when the throttle was applied after shifting.
