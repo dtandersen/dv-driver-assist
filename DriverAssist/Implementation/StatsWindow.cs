@@ -9,7 +9,7 @@ namespace DriverAssist.Implementation
 {
     class StatsWindow : MonoBehaviour
     {
-        public CruiseControl? CruiseControl { get; internal set; }
+        // public CruiseControl? CruiseControl { get; internal set; }
         public UnifiedSettings? Config { get; internal set; }
 
         private Rect windowRect;
@@ -17,6 +17,7 @@ namespace DriverAssist.Implementation
         private readonly Logger logger = LogFactory.GetLogger(typeof(StatsWindow));
         private LocoEntity? locoController;
         private bool photoMode;
+        private double frameTime;
 
         public void Awake()
         {
@@ -52,7 +53,7 @@ namespace DriverAssist.Implementation
         protected void Window()
         {
             if (Config == null) return;
-            if (CruiseControl == null) return;
+            // if (CruiseControl == null) return;
             if (locoController == null) return;
 
             Translation localization = TranslationManager.Current;
@@ -185,6 +186,11 @@ namespace DriverAssist.Implementation
             GUILayout.Label("Speed", GUILayout.Width(labelwidth));
             GUILayout.TextField($"{speed2:N1}", GUILayout.Width(width));
             GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Frame Time (µs)", GUILayout.Width(labelwidth));
+            GUILayout.TextField($"{frameTime * 1000d:N0}", GUILayout.Width(width));
+            GUILayout.EndHorizontal();
             // }
         }
 
@@ -211,6 +217,11 @@ namespace DriverAssist.Implementation
         {
             logger.Info($"OnPhotoModeChanged photoMode={photoMode}");
             this.photoMode = photoMode;
+        }
+
+        internal void OnFrameTime(double elapsed)
+        {
+            frameTime = elapsed;
         }
     }
 }

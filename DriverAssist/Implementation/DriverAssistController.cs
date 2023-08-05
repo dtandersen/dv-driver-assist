@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using DriverAssist.Cruise;
 using DriverAssist.ECS;
+using DriverAssist.Localization;
 using DV.Logic.Job;
 using DV.Utils;
-using Unity.Entities;
+using I2.Loc;
 using UnityEngine;
 
 namespace DriverAssist.Implementation
@@ -16,10 +18,9 @@ namespace DriverAssist.Implementation
     {
         private const int CC_SPEED_STEP = 5;
 
-        private LocoEntity? locoController;
+        private LocoEntity? locoEntity;
         private CruiseControl? cruiseControl;
         private readonly UnifiedSettings config;
-        private float updateAccumulator;
         private bool loaded = false;
         private GameObject? gameObject;
         private CruiseControlWindow? cruiseControlWindow;
@@ -59,78 +60,11 @@ namespace DriverAssist.Implementation
             }
         }
 
-        public void OnDestroy()
-        {
-            logger.Info("OnDestroy");
-            if (!loaded)
-            {
-                logger.Warn("Called OnDestroy before Unload");
-            }
-
-            WorldStreamingInit.LoadingFinished -= OnLoadingFinished;
-            UnloadWatcher.UnloadRequested -= OnUnloadRequested;
-        }
-
-        public void OnFixedUpdate()
-        {
-            if (!loaded) return;
-
-            systemManager?.Update();
-
-            if (locoController?.IsLoco ?? false)
-            {
-                locoController.UpdateStats(Time.fixedDeltaTime);
-                updateAccumulator += Time.fixedDeltaTime;
-                if (updateAccumulator > config.UpdateInterval)
-                {
-                    cruiseControl?.Tick();
-                    updateAccumulator = 0;
-                }
-            }
-        }
-
-        public void OnUpdate()
-        {
-            if (!loaded) return;
-
-            if (cruiseControl != null)
-            {
-                if (IsKeyPressed(config.ToggleKeys))
-                {
-                    cruiseControl.Enabled = !cruiseControl.Enabled;
-                }
-                if (IsKeyPressed(config.AccelerateKeys))
-                {
-                    cruiseControl.DesiredSpeed += CC_SPEED_STEP;
-                }
-                if (IsKeyPressed(config.DecelerateKeys))
-                {
-                    cruiseControl.DesiredSpeed -= CC_SPEED_STEP;
-                }
-            }
-
-            if (locoController != null)
-            {
-                if (IsKeyPressed(config.Upshift))
-                {
-                    locoController.Upshift();
-                }
-                if (IsKeyPressed(config.Downshift))
-                {
-                    locoController.Downshift();
-                }
-                if (IsKeyPressed(config.DumpPorts))
-                {
-                    foreach (var port in locoController.Ports)
-                    {
-                        logger.Info($"{port}");
-                    }
-                }
-            }
-        }
 
         internal void Load()
         {
+            TranslationManager.SetLangage(LocalizationManager.CurrentLanguage);
+
             logger.Info("Register jobs");
             loaded = true;
             logger.Info("Load");
@@ -158,8 +92,8 @@ namespace DriverAssist.Implementation
 
             PlayerManager.CarChanged += OnCarChanged;
 
-            locoController = new LocoEntity(Time.fixedDeltaTime);
-            EntityManager.Instance.Loco = locoController;
+            locoEntity = new LocoEntity(Time.fixedDeltaTime);
+            EntityManager.Instance.Loco = locoEntity;
 
             cruiseControl = new CruiseControl(config, new UnityClock(), EntityManager.Instance)
             {
@@ -168,8 +102,8 @@ namespace DriverAssist.Implementation
             };
 
             systemManager = new SystemManager();
-            ShiftSystem shiftSystem = new ShiftSystem(locoController);
-            LocoStatsSystem locoStatsSystem = new LocoStatsSystem(locoController, 0.5f, Time.fixedDeltaTime);
+            ShiftSystem shiftSystem = new ShiftSystem(locoEntity);
+            LocoStatsSystem locoStatsSystem = new LocoStatsSystem(locoEntity, 0.5f, Time.fixedDeltaTime);
             jobSystem = new JobSystem();
             jobSystem.JobUpdated += jobWindow.OnAddJob;
             jobSystem.JobRemoved += jobWindow.OnRemoveJob;
@@ -180,13 +114,15 @@ namespace DriverAssist.Implementation
                 OnRegisterJob(job);
             }
 
+            systemManager.AddSystem(new ControlsChangedSystem(EntityManager.Instance));
             systemManager.AddSystem(shiftSystem);
             systemManager.AddSystem(locoStatsSystem);
             systemManager.AddSystem(jobSystem);
+            systemManager.AddSystem(new DelayedSystem(cruiseControl, 1, 1f / 60f));
+            systemManager.AddSystem(new LastControlsSystem(EntityManager.Instance));
 
-            updateAccumulator = 0;
+            // updateAccumulator = 0;
             Loaded?.Invoke(this, null);
-            statsWindow.CruiseControl = cruiseControl;
             cruiseControlWindow.CruiseControl = cruiseControl;
         }
 
@@ -242,6 +178,88 @@ namespace DriverAssist.Implementation
             }
         }
 
+        public void OnDestroy()
+        {
+            logger.Info("OnDestroy");
+            if (!loaded)
+            {
+                logger.Warn("Called OnDestroy before Unload");
+            }
+
+            WorldStreamingInit.LoadingFinished -= OnLoadingFinished;
+            UnloadWatcher.UnloadRequested -= OnUnloadRequested;
+        }
+
+        public void OnFixedUpdate()
+        {
+            if (!loaded) return;
+
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            systemManager?.Update();
+
+            if (locoEntity?.IsLoco ?? false)
+            {
+                locoEntity.UpdateStats(Time.fixedDeltaTime);
+            }
+            stopWatch.Stop();
+            if (new System.Random().NextDouble() > .9f)
+                statsWindow?.OnFrameTime(stopWatch.Elapsed.TotalMilliseconds);
+        }
+
+        public void OnUpdate()
+        {
+            if (!loaded) return;
+
+            if (IsKeyPressed(config.ToggleKeys))
+            {
+                if (locoEntity == null) return;
+                if (locoEntity.Components.CruiseControl == null)
+                {
+                    locoEntity.Components.CruiseControl = CruiseControlComponent.Make(0, config.Diff, config.Offset);
+                }
+                else
+                {
+                    locoEntity.Components.CruiseControl = null;
+                }
+            }
+            if (IsKeyPressed(config.AccelerateKeys))
+            {
+                if (locoEntity == null) return;
+                if (!locoEntity.Components.CruiseControl.HasValue) return;
+
+                CruiseControlComponent c = locoEntity.Components.CruiseControl.Value;
+                locoEntity.Components.CruiseControl = CruiseControlComponent.Make((int)(c.DesiredSpeed + CC_SPEED_STEP), config.Diff, config.Offset);
+            }
+            if (IsKeyPressed(config.DecelerateKeys))
+            {
+                if (locoEntity == null) return;
+                if (!locoEntity.Components.CruiseControl.HasValue) return;
+
+                CruiseControlComponent c = locoEntity.Components.CruiseControl.Value;
+                locoEntity.Components.CruiseControl = CruiseControlComponent.Make((int)(c.DesiredSpeed - CC_SPEED_STEP), config.Diff, config.Offset);
+            }
+
+            if (locoEntity != null)
+            {
+                if (IsKeyPressed(config.Upshift))
+                {
+                    locoEntity.Upshift();
+                }
+                if (IsKeyPressed(config.Downshift))
+                {
+                    locoEntity.Downshift();
+                }
+                if (IsKeyPressed(config.DumpPorts))
+                {
+                    foreach (var port in locoEntity.Ports)
+                    {
+                        logger.Info($"{port}");
+                    }
+                }
+            }
+        }
+
         public void ChangeCar(TrainCar? trainCar)
         {
             logger.Info($"ChangeCar {trainCar?.carType.ToString() ?? "null"}");
@@ -250,32 +268,29 @@ namespace DriverAssist.Implementation
             if (trainCar == null || !trainCar.IsLoco)
             {
                 ExitLoco.Invoke();
-                if (locoController != null)
+                if (locoEntity != null)
                 {
-                    locoController.UpdateLocomotive(NullTrainCarWrapper.Instance);
-                    locoController.Components.LocoSettings = null;
+                    locoEntity.UpdateLocomotive(NullTrainCarWrapper.Instance);
+                    locoEntity.Components.LocoSettings = null;
 
                 }
                 logger.Info($"Exited train car");
-                if (cruiseControl != null)
-                {
-                    cruiseControl.Enabled = false;
-                }
+                if (locoEntity != null) locoEntity.Components.CruiseControl = null;
             }
             else
             {
                 DVTrainCarWrapper train = new(trainCar);
                 logger.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
-                LocoSettings settings = config.LocoSettings[locoController?.Type ?? ""];
-                if (locoController != null)
+                LocoSettings settings = config.LocoSettings[locoEntity?.Type ?? ""];
+                if (locoEntity != null)
                 {
-                    locoController.UpdateLocomotive(train);
-                    locoController.Components.LocoSettings = null;
+                    locoEntity.UpdateLocomotive(train);
+                    locoEntity.Components.LocoSettings = null;
                     if (settings != null)
                     {
-                        locoController.Components.LocoSettings = settings;
+                        locoEntity.Components.LocoSettings = settings;
                     }
-                    EnterLoco.Invoke(locoController);
+                    EnterLoco.Invoke(locoEntity);
                 }
             }
         }
@@ -338,26 +353,6 @@ namespace DriverAssist.Implementation
         {
             logger.Info($"OnUnregisterJob {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
             jobSystem?.RemoveJob(job.ID);
-        }
-    }
-
-    class UnityLogger : Logger
-    {
-        private readonly string prefix;
-
-        UnityLogger()
-        {
-            prefix = "";
-        }
-
-        public void Info(string message)
-        {
-            Debug.Log($"{prefix}{message}");
-        }
-
-        public void Warn(string message)
-        {
-            Debug.Log($"{prefix}{message}");
         }
     }
 }

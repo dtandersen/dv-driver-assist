@@ -47,9 +47,10 @@ namespace DriverAssist.Cruise
             };
             cruiseControl = new CruiseControl(config, clock, entityManager)
             {
-                Enabled = true
+                // Enabled = true
             };
             loco.Components.LocoSettings = config.LocoSettings[LocoType.DE2];
+            loco.Components.CruiseControl = new CruiseControlComponent();
         }
 
         [Fact]
@@ -57,7 +58,8 @@ namespace DriverAssist.Cruise
         {
             loco.Throttle = 0;
 
-            cruiseControl.DesiredSpeed = 30;
+            // cruiseControl.DesiredSpeed = 30;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(30, config.Diff, config.Offset);
 
             train.SpeedKmh = 29.9f;
             WhenCruise();
@@ -100,7 +102,9 @@ namespace DriverAssist.Cruise
         {
             config.Offset = 0;
             config.Diff = 2.5f;
-            cruiseControl.DesiredSpeed = 5;
+            // cruiseControl.DesiredSpeed = 5;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(5, config.Diff, config.Offset);
+
 
             train.SpeedKmh = 0;
             WhenCruise();
@@ -112,7 +116,8 @@ namespace DriverAssist.Cruise
         public void ShouldDecelerate()
         {
             loco.TrainBrake = 0;
-            cruiseControl.DesiredSpeed = 20;
+            // cruiseControl.DesiredSpeed = 20;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(20, config.Diff, config.Offset);
 
             train.SpeedKmh = 20.1f;
             WhenCruise();
@@ -145,7 +150,9 @@ namespace DriverAssist.Cruise
         [Fact]
         public void ApplyBrakesWhenZeroSetpoint()
         {
-            cruiseControl.DesiredSpeed = 0;
+            // cruiseControl.DesiredSpeed = 0;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(0, config.Diff, config.Offset);
+
             train.SpeedKmh = 20;
             loco.Throttle = 1;
 
@@ -156,35 +163,22 @@ namespace DriverAssist.Cruise
             Assert.Equal(localization.CC_STOPPING, cruiseControl.Status);
         }
 
+        /// When the controls change
+        /// Disable cruise control
         [Fact]
-        public void DisableWhenTrainBrakeAdjusted()
+        public void DisableWhenControlsChange()
         {
-            cruiseControl.DesiredSpeed = 10;
-            train.SpeedKmh = 20;
+            loco.Components.ControlsChanged = true;
             WhenCruise();
-            Assert.True(cruiseControl.Enabled);
-            loco.TrainBrake = 0;
-            WhenCruise();
-            Assert.False(cruiseControl.Enabled);
-        }
-
-        [Fact]
-        public void DisableWhenIndBrakeAdjusted()
-        {
-            cruiseControl.DesiredSpeed = 10;
-            train.SpeedKmh = 20;
-            WhenCruise();
-            Assert.True(cruiseControl.Enabled);
-            loco.IndBrake = 0;
-            WhenCruise();
-            Assert.False(cruiseControl.Enabled);
+            Assert.Null(loco.Components.CruiseControl);
         }
 
         [Fact]
         public void DontDoAnythingIfDisabled()
         {
-            cruiseControl.Enabled = false;
-            cruiseControl.DesiredSpeed = 10;
+            loco.Components.CruiseControl = null;
+            // cruiseControl.DesiredSpeed = 10;
+            // loco.Components.CruiseControl = CruiseControlComponent.Make(10, config.Diff, config.Offset);
             train.SpeedKmh = 20;
             WhenCruise();
             Assert.Equal(0, loco.IndBrake);
@@ -194,53 +188,48 @@ namespace DriverAssist.Cruise
         [Fact]
         public void HaltTrainIfDesiredSpeedIsNegativeAndTrainIsInForwardGear()
         {
-            cruiseControl.DesiredSpeed = -10;
-            // loco.Reverser=1;
+            // cruiseControl.DesiredSpeed = -10;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(-10, config.Diff, config.Offset);
+            loco.Reverser = 1;
             loco.Throttle = 0.5f;
-            // cruiseControl.Enabled = true;
             WhenCruise();
-            // Assert.True(cruiseControl.Enabled);
             Assert.Equal(0, loco.Throttle);
             Assert.Equal(1, loco.TrainBrake);
             Assert.Equal(localization.CC_CHANGING_DIRECTION, cruiseControl.Status);
 
             WhenCruise();
-            Assert.True(cruiseControl.Enabled);
+            Assert.NotNull(loco.Components.CruiseControl);
         }
 
         [Fact]
         public void HaltTrainIfDesiredSpeedIsPositiveAndTrainIsInReverse()
         {
-            cruiseControl.DesiredSpeed = 10;
+            // cruiseControl.DesiredSpeed = 10;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(10, config.Diff, config.Offset);
+
             loco.Reverser = 0;
             loco.Throttle = 0.5f;
-            // cruiseControl.Enabled = true;
             WhenCruise();
-            // Assert.True(cruiseControl.Enabled);
             Assert.Equal(0, loco.Throttle);
             Assert.Equal(1, loco.TrainBrake);
             Assert.Equal(localization.CC_CHANGING_DIRECTION, cruiseControl.Status);
 
             WhenCruise();
-            Assert.True(cruiseControl.Enabled);
+            Assert.NotNull(loco.Components.CruiseControl);
         }
 
         [Fact]
         public void ChangeFromReverseToForward()
         {
-            cruiseControl.DesiredSpeed = 10;
+            // cruiseControl.DesiredSpeed = 10;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(10, config.Diff, config.Offset);
+
             loco.Reverser = 0;
-            // loco.Throttle = 0.5f;
-            // cruiseControl.Enabled = true;
             WhenCruise();
-            // Assert.True(cruiseControl.Enabled);
             Assert.Equal(1, loco.Reverser);
             Assert.Equal(0, loco.Throttle);
             Assert.Equal(1, loco.TrainBrake);
             Assert.Equal(localization.CC_CHANGING_DIRECTION, cruiseControl.Status);
-
-            // WhenCruise();
-            // Assert.True(cruiseControl.Enabled);
         }
 
         /// In this case the train skips the coasting state
@@ -250,7 +239,9 @@ namespace DriverAssist.Cruise
             config.Offset = 0;
             train.SpeedKmh = 0;
             train.Reverser = 0;
-            cruiseControl.DesiredSpeed = -5;
+            // cruiseControl.DesiredSpeed = -5;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(-5, config.Diff, config.Offset);
+
             WhenCruise();
             Assert.Equal(string.Format(localization.CC_ACCELERATING, 5), cruiseControl.Status);
 
@@ -274,7 +265,9 @@ namespace DriverAssist.Cruise
             config.Offset = 0;
             train.SpeedKmh = 10;
             train.Reverser = 1;
-            cruiseControl.DesiredSpeed = 5;
+            // cruiseControl.DesiredSpeed = 5;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(5, config.Diff, config.Offset);
+
             WhenCruise();
             Assert.Equal(string.Format(localization.CC_DECELERATING, 5), cruiseControl.Status);
 
@@ -294,7 +287,9 @@ namespace DriverAssist.Cruise
         [Fact]
         public void AccelerateInReverse()
         {
-            cruiseControl.DesiredSpeed = -10;
+            // cruiseControl.DesiredSpeed = -10;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(-10, config.Diff, config.Offset);
+
             train.SpeedKmh = -4;
             loco.Reverser = 0;
             WhenCruise();
@@ -321,7 +316,9 @@ namespace DriverAssist.Cruise
         [Fact]
         public void DecelerateInReverse()
         {
-            cruiseControl.DesiredSpeed = -10;
+            // cruiseControl.DesiredSpeed = -10;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(-10, config.Diff, config.Offset);
+
             loco.Reverser = 0;
 
             train.SpeedKmh = -10f;
@@ -363,12 +360,12 @@ namespace DriverAssist.Cruise
         [Fact]
         public void ZeroThrottleIfInNeutral()
         {
-            cruiseControl.DesiredSpeed = 10;
+            // cruiseControl.DesiredSpeed = 10;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(10, config.Diff, config.Offset);
+
             train.SpeedKmh = 0;
             loco.Throttle = 1;
             loco.Reverser = .5f;
-            // loco.Throttle = 1;
-            // cruiseControl.Enabled = true;
             WhenCruise();
             Assert.Equal(0, loco.Throttle);
             Assert.Equal("Idle: Engage reverser to start", cruiseControl.Status);
@@ -380,7 +377,9 @@ namespace DriverAssist.Cruise
             train.Type = LocoType.DH4;
             loco.Components.LocoSettings = config.LocoSettings[LocoType.DH4];
 
-            cruiseControl.DesiredSpeed = 10;
+            // cruiseControl.DesiredSpeed = 10;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(10, config.Diff, config.Offset);
+
             train.SpeedKmh = 0;
 
             WhenCruise();
@@ -392,7 +391,7 @@ namespace DriverAssist.Cruise
         public void ReportIfLocoHasNoSettings()
         {
             train.Type = LocoType.DE6;
-            loco.Components.LocoSettings = null;//config.LocoSettings[LocoType.DE2];
+            loco.Components.LocoSettings = null;
 
             WhenCruise();
 
@@ -404,7 +403,9 @@ namespace DriverAssist.Cruise
         {
             train.Type = LocoType.DH4;
             loco.Components.LocoSettings = config.LocoSettings[LocoType.DH4];
-            cruiseControl.DesiredSpeed = 10;
+            // cruiseControl.DesiredSpeed = 10;
+            loco.Components.CruiseControl = CruiseControlComponent.Make(10, config.Diff, config.Offset);
+
             train.SpeedKmh = 0;
             clock.Time2 = 5;
 
@@ -415,7 +416,7 @@ namespace DriverAssist.Cruise
 
         void WhenCruise()
         {
-            cruiseControl.Tick();
+            cruiseControl.OnUpdate();
         }
 
         //     public class FakeLocoController : LocoController

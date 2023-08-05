@@ -525,11 +525,38 @@ namespace DriverAssist.ECS
         public float? RestoreThrottle;
     }
 
+    public struct LastControls
+    {
+        public float TrainBrake;
+        public float IndBrake;
+    }
+
+    public struct CruiseControlComponent
+    {
+        public float DesiredSpeed;
+        public float MinSpeed;
+        public float MaxSpeed;
+
+        public static CruiseControlComponent Make(int desiredSpeed, float diff, float offset)
+        {
+            float pos = Math.Abs(desiredSpeed);
+            return new CruiseControlComponent()
+            {
+                DesiredSpeed = desiredSpeed,
+                MinSpeed = pos + offset - diff,
+                MaxSpeed = pos + offset + diff
+            };
+        }
+    }
+
     public class LocoComponents
     {
         public GearChangeRequest? GearChangeRequest { get; set; }
         public LocoStats LocoStats { get; set; }
         public float LocoStatsCooldown { get; set; }
         public LocoSettings? LocoSettings { get; set; }
+        public LastControls? LastControls { get; set; }
+        public bool? ControlsChanged { get; set; }
+        public CruiseControlComponent? CruiseControl { get; set; }
     }
 }

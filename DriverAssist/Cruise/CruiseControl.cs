@@ -4,56 +4,18 @@ using DriverAssist.Localization;
 
 namespace DriverAssist.Cruise
 {
-#pragma warning disable IDE1006
     public interface Clock
-#pragma warning restore IDE1006
     {
         public float Time2 { get; }
     }
 
-    public class CruiseControl
+    public class CruiseControl : BaseSystem
     {
-        private readonly Logger logger;
-        private float desiredSpeed = 0;
-        public float DesiredSpeed
-        {
-            get { return desiredSpeed; }
-            set
-            {
-                desiredSpeed = value;
-                positiveDesiredSpeed = Math.Abs(value);
-                minSpeed = positiveDesiredSpeed + config.Offset - config.Diff;
-                maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
-            }
-        }
-
+        public string Status { get; internal set; }
         public CruiseControlAlgorithm Accelerator { get; set; }
         public CruiseControlAlgorithm Decelerator { get; set; }
 
-        bool enabled;
-        public bool Enabled
-        {
-            get { return enabled; }
-            set
-            {
-                enabled = value;
-                if (entityManager.Loco == null) return;
-
-                LocoEntity loco = entityManager.Loco;
-                lastThrottle = loco.Throttle;
-                lastTrainBrake = loco.TrainBrake;
-                lastIndBrake = loco.IndBrake;
-            }
-        }
-
-        public string Status { get; internal set; }
-
-        private float minSpeed;
-        private float maxSpeed;
-        private float positiveDesiredSpeed;
-        private float lastThrottle;
-        private float lastTrainBrake;
-        private float lastIndBrake;
+        // private readonly Logger logger;
         private readonly CruiseControlSettings config;
         private readonly Translation localization;
         private readonly Clock clock;
@@ -78,7 +40,7 @@ namespace DriverAssist.Cruise
             return instance;
         }
 
-        public void Tick()
+        override public void OnUpdate()
         {
             if (entityManager.Loco == null) return;
             LocoEntity loco = entityManager.Loco;
@@ -87,7 +49,6 @@ namespace DriverAssist.Cruise
             {
                 Status = string.Format(localization.CC_UNSUPPORTED, loco.Type);
                 return;
-
             }
             CruiseControlContext context = new CruiseControlContext(loco.Components.LocoSettings, loco)
             {
@@ -96,15 +57,21 @@ namespace DriverAssist.Cruise
 
             if (IsControlsChanged(context))
             {
-                logger.Info($"Disabled cruise control lastThrottle={lastThrottle} loco.Throttle={loco.Throttle} lastTrainBrake={lastTrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={lastIndBrake} loco.IndBrake={loco.IndBrake}");
-                Enabled = false;
+                loco.Components.CruiseControl = null;
+                if (loco.Components.LastControls == null) return;
+                logger.Info($"Disabled cruise control lastTrainBrake={loco.Components.LastControls.Value.TrainBrake} loco.TrainBrake={loco.TrainBrake} lastIndBrake={loco.Components.LastControls.Value.IndBrake} loco.IndBrake={loco.IndBrake}");
             }
 
-            if (!Enabled)
+            if (loco.Components.CruiseControl == null)
             {
                 Status = string.Format(localization.CC_DISABLED);
                 return;
             }
+
+            float desiredSpeed = loco.Components.CruiseControl.Value.DesiredSpeed;
+            float positiveDesiredSpeed = Math.Abs(desiredSpeed);
+            float minSpeed = loco.Components.CruiseControl.Value.MinSpeed;
+            float maxSpeed = loco.Components.CruiseControl.Value.MaxSpeed;
 
             if (loco.Reverser == 0.5f)
             {
@@ -124,7 +91,7 @@ namespace DriverAssist.Cruise
                 else
                     loco.TrainBrake = .666f;
             }
-            else if (IsWrongDirection(context))
+            else if (IsWrongDirection(context, desiredSpeed))
             {
                 Status = string.Format(localization.CC_CHANGING_DIRECTION);
                 loco.Throttle = 0;
@@ -132,18 +99,18 @@ namespace DriverAssist.Cruise
                     loco.TrainBrake = 1;
                 else
                     loco.TrainBrake = .666f;
-                if (loco.Reverser == 0 && DesiredSpeed > 0 && Math.Abs(loco.SpeedKmh) < 0.1f)
+                if (loco.Reverser == 0 && desiredSpeed > 0 && Math.Abs(loco.SpeedKmh) < 0.1f)
                 {
                     loco.Reverser = 1f;
                 }
-                if (loco.Reverser == 1 && DesiredSpeed < 0 && Math.Abs(loco.SpeedKmh) < 0.1f)
+                if (loco.Reverser == 1 && desiredSpeed < 0 && Math.Abs(loco.SpeedKmh) < 0.1f)
                 {
                     loco.Reverser = 0f;
                 }
             }
             else if (loco.RelativeSpeedKmh + estspeed < minSpeed)
             {
-                context.DesiredSpeed = Math.Abs(DesiredSpeed);
+                context.DesiredSpeed = Math.Abs(desiredSpeed);
                 Accelerator.Tick(context);
                 minSpeed = positiveDesiredSpeed + config.Offset;
                 maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
@@ -168,26 +135,24 @@ namespace DriverAssist.Cruise
                 maxSpeed = positiveDesiredSpeed + config.Offset + config.Diff;
             }
 
-            lastThrottle = loco.Throttle;
-            lastTrainBrake = loco.TrainBrake;
-            lastIndBrake = loco.IndBrake;
+            loco.Components.CruiseControl = new CruiseControlComponent()
+            {
+                DesiredSpeed = desiredSpeed,
+                MinSpeed = minSpeed,
+                MaxSpeed = maxSpeed
+            };
         }
 
-        private bool IsWrongDirection(CruiseControlContext context)
+        private bool IsWrongDirection(CruiseControlContext context, float desiredSpeed)
         {
-            return context.LocoController.Reverser == 1 && DesiredSpeed < 0 || context.LocoController.Reverser == 0 && DesiredSpeed > 0;
+            return context.LocoController.Reverser == 1 && desiredSpeed < 0 || context.LocoController.Reverser == 0 && desiredSpeed > 0;
         }
 
         private bool IsControlsChanged(CruiseControlContext context)
         {
-            return
-                Changed(lastTrainBrake, context.LocoController.TrainBrake, 1f / 11f) ||
-                Changed(lastIndBrake, context.LocoController.IndBrake, 1f / 11f);
-        }
+            if (context.LocoController.Components.ControlsChanged == null) return false;
 
-        private bool Changed(float v1, float v2, float amount)
-        {
-            return Math.Abs(v1 - v2) > amount;
+            return context.LocoController.Components.ControlsChanged.Value;
         }
     }
 }

@@ -82,9 +82,13 @@ namespace DriverAssist.Implementation
             GUILayout.Label(localization.CC_STATUS, header, GUILayout.Width(col2));
             GUILayout.EndHorizontal();
 
+            string desiredSpeed = "";
+            if (locoEntity.Components.CruiseControl != null)
+                desiredSpeed = locoEntity.Components.CruiseControl.Value.DesiredSpeed + "";
+
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            GUILayout.Label($"{CruiseControl.DesiredSpeed}", centered, GUILayout.Width(col1));
+            GUILayout.Label($"{desiredSpeed}", centered, GUILayout.Width(col1));
             GUILayout.FlexibleSpace();
             GUILayout.Label($"{CruiseControl.Status}", left, GUILayout.Width(col2));
             GUILayout.EndHorizontal();
