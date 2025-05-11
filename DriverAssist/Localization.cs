@@ -76,6 +76,7 @@ namespace DriverAssist.Localization
                 "English" => new TranslationEN(),
                 "German" => new TranslationDE(),
                 "French" => new TranslationFR(),
+                "Polish" => new TranslationPL(),
                 _ => new TranslationEN(),
             };
 
@@ -201,5 +202,45 @@ namespace DriverAssist.Localization
         public string JOB_ID => "Travail";
         public string JOB_ORIGIN => "Origine";
         public string JOB_DESTINATION => "Destination";
+    }
+
+    public class TranslationPL : Translation
+    {
+        public string CC_SETPOINT => "Punkt wyjścia";
+        public string CC_STATUS => "Status";
+        public string CC_COASTING => "Jazda na luzie";
+        public string CC_DECELERATING => "Zwalnianie do {0} km/h";
+        public string CC_ACCELERATING => "Przyspieszanie do {0} km/h";
+        public string CC_CHANGING_DIRECTION => "Zmienianie kierunku";
+        public string CC_STOPPING => "Zatrzymywanie";
+        public string CC_WARNING_NEUTRAL => "Neutralny: Nastawnik kierunkowy znajdue się w położeniu neutralnym";
+        public string CC_DISABLED => "Wyłączony";
+        public string CC_UNSUPPORTED => "Neutralny: {0} nie jest wspierane";
+
+        public string STAT_LOCOMOTIVE => "Lokomotywa";
+        public string STAT_MASS => "Masa";
+        public string STAT_SPEED => "Prędkość (km/h)";
+        public string STAT_ACCELERATION => "Przyspieszenie (m/s^2)";
+        public string STAT_TORQUE => "Moment obrotowy";
+        public string STAT_POWER => "Moc (kW)";
+        public string STAT_HORSEPOWER => "Konie mechaniczne";
+        public string STAT_THROTTLE => "Nastawnik jazdy";
+        public string STAT_TEMPERATURE => "Temperatura";
+        public string STAT_TEMPERATURE_CHANGE => "Zmiana temperatury";
+        public string STAT_AMPS => "Ampery";
+        public string STAT_RPM => "Obr/Min";
+
+        public string LOCOMOTIVE => "Lokomotywa";
+        public string CARGO => "Ładunek";
+
+        public string STAT_CURRENT => "Aktualny";
+        public string STAT_CHANGE => "Δ";
+        public string TRAIN => "Pociąg";
+        public string LOCO_ABBV => "Loka";
+
+        public string JOB_TITLE => "Zlecenia";
+        public string JOB_ID => "Zlecenie";
+        public string JOB_ORIGIN => "Pochodzenie";
+        public string JOB_DESTINATION => "Miejsce docelowe";
     }
 }
