@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using DriverAssist.Cruise;
 using DriverAssist.ECS;
 using DV.HUD;
 using DV.Simulation.Brake;
 using DV.Simulation.Cars;
+using DV.Wheels;
 using LocoSim.Implementations;
 using UnityEngine;
 
@@ -223,9 +224,27 @@ namespace DriverAssist.Implementation
             get { return IndicatorReader?.engineRpm?.Value ?? 0; }
         }
 
-        public bool IsWheelSlipping { get { return trainCar?.adhesionController?.wheelslipController?.IsWheelslipping ?? false; } }
+        public bool IsWheelSlipping
+        {
+            get
+            {
+                WheelslipController wheelSlipController = new();
+                if (!trainCar.adhesionController?.wheelslipController.IsSome(out wheelSlipController) ?? false) return false;
 
-        public float WheelSlip { get { return trainCar?.adhesionController?.wheelslipController?.wheelslip ?? 0; } }
+                return wheelSlipController.IsWheelslipping;
+            }
+        }
+
+        public float WheelSlip
+        {
+            get
+            {
+                WheelslipController wheelSlipController = new();
+                if (!trainCar.adhesionController?.wheelslipController.IsSome(out wheelSlipController) ?? false) return 0f;
+
+                return wheelSlipController.wheelslip;
+            }
+        }
 
         public string Type
         {
@@ -347,7 +366,7 @@ namespace DriverAssist.Implementation
                 if (SimFlow == null) return new();
 
                 List<string> portstrings = new();
-                foreach (SimComponent x in SimFlow.orderedSimComps)
+                foreach (SimComponent x in SimFlow.OrderedSimComps)
                 {
                     List<Port> ports = x.GetAllPorts();
                     foreach (Port p in ports)
