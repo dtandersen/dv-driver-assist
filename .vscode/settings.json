@@ -10,7 +10,9 @@
             //     "-file",
             //     "${env:APPDATA}\\PowerShell\\custom-init.ps1"
             // ]
-            "env": { "DERAIL_VALLEY_HOME": "D:\\SteamLibrary\\steamapps\\common\\Derail Valley" }
+            "env": {
+                "DERAIL_VALLEY_HOME": "D:\\SteamLibrary\\steamapps\\common\\Derail Valley"
+            }
         }
     },
     "terminal.integrated.defaultProfile.windows": "Command Prompt"
