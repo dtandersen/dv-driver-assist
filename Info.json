@@ -2,9 +2,9 @@
   "Id": "DriverAssist",
   "DisplayName": "Driver Assist",
   "Author": "onebit",
-  "Version": "0.9.2",
+  "Version": "0.10.0",
   "AssemblyName": "DriverAssist.dll",
-  "ManagerVersion": "0.27.5",
+  "ManagerVersion": "0.32.4",
   "EntryMethod": "DriverAssist.UMM.DriverAssistUmmMod.Load",
   "HomePage": "https://www.nexusmods.com/derailvalley/mods/663",
   "Repository": "https://raw.githubusercontent.com/dtandersen/dv-driver-assist/main/repository.json"
