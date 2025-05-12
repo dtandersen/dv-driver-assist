@@ -1,3 +1,8 @@
+0.10.0 - May 11, 2025
+
+- Update to build 99.4 courtesy of Kotenuki.
+- Polish translation courtesy of FemboyGaymer.
+
 0.9.4 - 8/3/2023
 
 - French translation. Thanks Kronos!

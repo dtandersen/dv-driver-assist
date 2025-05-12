@@ -1,6 +1,6 @@
 del /q build
 dotnet build
 dotnet test
-del "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\BepInEx\scripts\DriverAssist.*"
-copy /Y DriverAssist\bin\Debug\netframework4.8\DriverAssist.dll "c:\Program Files (x86)\Steam\steamapps\common\Derail Valley\BepInEx\plugins"
+rem del "%DERAIL_VALLEY_HOME%\Mods\DriverAssist.*"
+rem copy /Y DriverAssist\bin\Debug\netframework4.8\DriverAssist.dll "%DERAIL_VALLEY_HOME%\Mods"
 powershell -executionpolicy bypass .\package.ps1

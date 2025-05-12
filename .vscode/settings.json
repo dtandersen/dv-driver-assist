@@ -1,0 +1,19 @@
+{
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": true,
+    "terminal.integrated.profiles.windows": {
+        "Derail Valley": {
+            // "source": "Command Prompt",
+            "path": "cmd",
+            // "args": [
+            //     "-noexit",
+            //     "-file",
+            //     "${env:APPDATA}\\PowerShell\\custom-init.ps1"
+            // ]
+            "env": {
+                "DERAIL_VALLEY_HOME": "D:\\SteamLibrary\\steamapps\\common\\Derail Valley"
+            }
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt"
+}

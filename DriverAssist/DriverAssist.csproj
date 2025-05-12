@@ -5,6 +5,7 @@
 
     <ReferencePath>
       C:\Program Files (x86)\Steam\steamapps\common\Derail Valley\DerailValley_Data\Managed\;
+      D:\SteamLibrary\steamapps\common\Derail Valley\DerailValley_Data\Managed\;
     </ReferencePath>
     <AssemblySearchPaths>$(AssemblySearchPaths);$(ReferencePath);</AssemblySearchPaths>
   </PropertyGroup>
@@ -62,4 +63,4 @@
     <Exec Condition="'$(ConfigurationName)' == 'Release' And '$(OS)' == 'Windows_NT'" Command="powershell -executionpolicy bypass -Command &quot;(../package.ps1)&quot;" />
     <Exec Condition="'$(ConfigurationName)' == 'Release' And '$(OS)' != 'Windows_NT'" Command="pwsh  -Command &quot;(../package.ps1)&quot;" />
   </Target>
-</Project>
+</Project> 

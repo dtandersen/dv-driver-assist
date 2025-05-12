@@ -4,29 +4,25 @@ param (
 )
 
 Set-Location "$PSScriptRoot"
+$FilesToInclude = "info.json","build/*","LICENSE"
+
+$modInfo = Get-Content -Raw -Path "info.json" | ConvertFrom-Json
+$modId = $modInfo.Id
+$modVersion = $modInfo.Version
 
 $DistDir = "$OutputDirectory/dist"
-if ($NoArchive)
-{
+if ($NoArchive) {
 	$ZipWorkDir = "$OutputDirectory"
-}
-else
-{
+} else {
 	$ZipWorkDir = "$DistDir/tmp"
 }
-$ZipRootDir = "$ZipWorkDir/BepInEx"
-$ZipInnerDir = "$ZipRootDir/plugins/DriverAssist/"
-$BuildDir = "build"
-$LicenseFile = "LICENSE"
-$AssemblyFile = "$BuildDir/DriverAssist.dll"
+$ZipOutDir = "$ZipWorkDir/$modId"
 
-New-Item "$ZipInnerDir" -ItemType Directory -Force
-Copy-Item -Force -Path "$LicenseFile", "$AssemblyFile" -Destination "$ZipInnerDir"
+New-Item "$ZipOutDir" -ItemType Directory -Force
+Copy-Item -Force -Path $FilesToInclude -Destination "$ZipOutDir"
 
 if (!$NoArchive)
 {
-	$VERSION = (Select-String -Pattern '<Version>([0-9]+\.[0-9]+\.[0-9]+)</Version>' -Path DriverAssist/DriverAssist.csproj).Matches.Groups[1]
-	$FILE_NAME = "$DistDir/DriverAssist_v$VERSION.zip"
-	Compress-Archive -Update -CompressionLevel Fastest -Path "$ZipRootDir" -DestinationPath "$FILE_NAME"
-	Remove-Item -LiteralPath "$ZipWorkDir" -Force -Recurse
+	$FILE_NAME = "$DistDir/${modId}_v$modVersion.zip"
+	Compress-Archive -Update -CompressionLevel Fastest -Path "$ZipOutDir/*" -DestinationPath "$FILE_NAME"
 }
