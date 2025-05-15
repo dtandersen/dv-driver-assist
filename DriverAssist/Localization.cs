@@ -256,7 +256,7 @@ namespace DriverAssist.Localization
         public string CC_STOPPING => "Zastavuje";
         public string CC_WARNING_NEUTRAL => "Reverzér: Zaraďte smer.";
         public string CC_DISABLED => "Vypnutý";
-        public string CC_UNSUPPORTED => "Idle: {0} is not supported";
+        public string CC_UNSUPPORTED => "Neutrál: {0} nie je podporovaný";
 
         public string STAT_LOCOMOTIVE => "Lokomotíva";
         public string STAT_MASS => "Hmotnosť";
