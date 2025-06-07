@@ -16,6 +16,11 @@ namespace DriverAssist.Test
             this.output = output;
         }
 
+        public void Debug(string message)
+        {
+            WriteLog(message, "DEBUG");
+        }
+
         public void Info(string message)
         {
             WriteLog(message, "INFO");

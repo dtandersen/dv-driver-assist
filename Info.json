@@ -2,7 +2,7 @@
   "Id": "DriverAssist",
   "DisplayName": "Driver Assist",
   "Author": "onebit",
-  "Version": "0.10.0",
+  "Version": "0.11.0",
   "AssemblyName": "DriverAssist.dll",
   "ManagerVersion": "0.32.4",
   "EntryMethod": "DriverAssist.UMM.DriverAssistUmmMod.Load",

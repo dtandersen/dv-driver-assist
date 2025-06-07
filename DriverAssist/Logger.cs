@@ -9,6 +9,7 @@ namespace DriverAssist
     {
         public void Info(string message);
         public void Warn(string message);
+        public void Debug(string message);
     }
 
     public class LogFactory
@@ -37,6 +38,8 @@ namespace DriverAssist
 
     public class NullLogger : Logger
     {
+        public void Debug(string message) { }
+
         public void Info(string message) { }
 
         public void Warn(string message) { }

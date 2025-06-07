@@ -13,12 +13,17 @@ namespace DriverAssist.Implementation
 
         public void Info(string message)
         {
-            Debug.Log($"{prefix}{message}");
+            UnityEngine.Debug.Log($"{prefix}{message}");
         }
 
         public void Warn(string message)
         {
-            Debug.Log($"{prefix}{message}");
+            UnityEngine.Debug.Log($"{prefix}{message}");
+        }
+
+        public void Debug(string message)
+        {
+            UnityEngine.Debug.Log($"{prefix}{message}");
         }
     }
 }

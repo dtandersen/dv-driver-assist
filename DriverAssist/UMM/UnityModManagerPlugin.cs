@@ -125,7 +125,7 @@ namespace DriverAssist.UMM
         [Draw("Minimum Torque", Min = 0)]
         public int De6MinTorque = 50000;
         [Draw("Maximum Amps", Min = 0)]
-        public int De6MaxAmps = 435;
+        public int De6MaxAmps = 1450;
         [Draw("Operating Temperature", Min = 0)]
         public int De6MaxTemperature = 105;
         [Draw("Maximum Temperature", Min = 0)]
@@ -373,6 +373,11 @@ namespace DriverAssist.UMM
         {
             this.logger = logger;
             this.scope = scope;
+        }
+
+        public void Debug(string message)
+        {
+            logger.Log($"{scope,-25} DEBUG {message}");
         }
 
         public void Info(string message)

@@ -1,6 +1,7 @@
 {
     "editor.formatOnSave": true,
     "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
     "terminal.integrated.profiles.windows": {
         "Derail Valley": {
             // "source": "Command Prompt",

@@ -77,20 +77,22 @@ Put the reverser into neutral to avoid speeding away. Press `PAGE UP` to increas
 
 # Development
 
-Open the browser to [91X](https://player.listenlive.co/36281).
-
-Run `build.bat` to build and install the mod. This builds the solution with `dotnet build` and copies the DLL to the `Mods` folder.
-
-Use `dotnet test` to run the unit tests.
-
-# Translation
-
-If you would like to provide a translation for another language please join the Discord server.
-
-* Deutsch - 𝓩𝓮𝓬𝓴𝓮_𝓓𝓲𝓻𝓴
-* Français - Kronos. 
-* Polish - FemboyGaymer
+See [DEVELOPMENT.md](DEVELOPMENT.md).
 
 # Credits
 
+**Development**
+
 * Kotenuki - b99.4 conversion
+* Ajurna - settings debugging
+
+**Translation**
+
+The mod is translated into several languages. It uses the language selected in the game settings. If you would like to provide a translation for another language please join the Discord server. You may also submit a LANGUAGE.md file for instructions.
+
+* Deutsch - 𝓩𝓮𝓬𝓴𝓮_𝓓𝓲𝓻𝓴
+* English - onebit
+* Français - Kronos
+* Nederlands - NicoLodbrok
+* Polski - FemboyGaymer
+* Slovenčina - OndikSBG

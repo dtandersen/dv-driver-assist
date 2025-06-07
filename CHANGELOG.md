@@ -1,7 +1,13 @@
+0.11.0 - June 7, 2025
+
+- Locomotive settings now load correctly.
+- Added Dutch translation, courtesy of NicoLodbrok.
+- Added Slovak translation, courtesy of OndikSBG.
+
 0.10.0 - May 11, 2025
 
-- Update to build 99.4 courtesy of Kotenuki.
-- Polish translation courtesy of FemboyGaymer.
+- Update to build 99.4, courtesy of Kotenuki.
+- Polish translation, courtesy of FemboyGaymer.
 
 0.9.4 - 8/3/2023
 
