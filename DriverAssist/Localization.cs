@@ -77,6 +77,7 @@ namespace DriverAssist.Localization
                 "German" => new TranslationDE(),
                 "French" => new TranslationFR(),
                 "Polish" => new TranslationPL(),
+                "Slovak" => new TranslationSK(),
                 "Dutch" => new TranslationNL(),
                 _ => new TranslationEN(),
             };
@@ -282,5 +283,45 @@ namespace DriverAssist.Localization
         public string JOB_ID => "Zlecenie";
         public string JOB_ORIGIN => "Pochodzenie";
         public string JOB_DESTINATION => "Miejsce docelowe";
+    }
+
+    public class TranslationSK : Translation
+    {
+        public string CC_SETPOINT => "Setpoint";
+        public string CC_STATUS => "Stav";
+        public string CC_COASTING => "Voľnobeh";
+        public string CC_DECELERATING => "Spomaľovanie na {0} km/h";
+        public string CC_ACCELERATING => "Zrýchľovanie na {0} km/h";
+        public string CC_CHANGING_DIRECTION => "Zmena smeru";
+        public string CC_STOPPING => "Zastavuje";
+        public string CC_WARNING_NEUTRAL => "Reverzér: Zaraďte smer.";
+        public string CC_DISABLED => "Vypnutý";
+        public string CC_UNSUPPORTED => "Neutrál: {0} nie je podporovaný";
+
+        public string STAT_LOCOMOTIVE => "Lokomotíva";
+        public string STAT_MASS => "Hmotnosť";
+        public string STAT_SPEED => "Rýchlosť (km/h)";
+        public string STAT_ACCELERATION => "Zrýchlenie (m/s^2)";
+        public string STAT_TORQUE => "Krútiaci moment";
+        public string STAT_POWER => "Výkon (kW)";
+        public string STAT_HORSEPOWER => "Konské sily";
+        public string STAT_THROTTLE => "Výkonový stupeň";
+        public string STAT_TEMPERATURE => "Teplota";
+        public string STAT_TEMPERATURE_CHANGE => "Zmena teploty";
+        public string STAT_AMPS => "Amp.";
+        public string STAT_RPM => "ot./min.";
+
+        public string LOCOMOTIVE => "Lokomotíva";
+        public string CARGO => "Náklad";
+
+        public string STAT_CURRENT => "Aktuálne";
+        public string STAT_CHANGE => "Δ";
+        public string TRAIN => "Vlak";
+        public string LOCO_ABBV => "Lok.";
+
+        public string JOB_TITLE => "Práce";
+        public string JOB_ID => "Práca";
+        public string JOB_ORIGIN => "Východzia";
+        public string JOB_DESTINATION => "Konečná";
     }
 }
