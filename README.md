@@ -93,4 +93,4 @@ If you would like to provide a translation for another language please join the 
 * Nederlands - NicoLodbrok
 * Français - Kronos
 * Polski - FemboyGaymer
-* Slovak - OndikSBG
+* Slovenčina - OndikSBG
