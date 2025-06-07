@@ -90,7 +90,7 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
 If you would like to provide a translation for another language please join the Discord server.
 
 * Deutsch - 𝓩𝓮𝓬𝓴𝓮_𝓓𝓲𝓻𝓴
-* Dutch - NicoLodbrok 
+* Dutch - NicoLodbrok
 * Français - Kronos
 * Polish - FemboyGaymer
 * Slovak - OndikSBG
