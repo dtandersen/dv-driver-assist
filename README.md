@@ -79,7 +79,13 @@ Put the reverser into neutral to avoid speeding away. Press `PAGE UP` to increas
 
 See [DEVELOPMENT.md](DEVELOPMENT.md).
 
-# Translation
+# Credits
+
+**Development**
+
+* Kotenuki - b99.4 conversion
+
+**Translation**
 
 If you would like to provide a translation for another language please join the Discord server.
 
@@ -88,7 +94,3 @@ If you would like to provide a translation for another language please join the 
 * Français - Kronos
 * Polish - FemboyGaymer
 * Slovak - OndikSBG
-
-# Credits
-
-* Kotenuki - b99.4 conversion
