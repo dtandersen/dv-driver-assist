@@ -90,9 +90,9 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
 
 The mod is translated into several languages. It uses the language selected in the game settings. If you would like to provide a translation for another language please join the Discord server. You may also submit a LANGUAGE.md file for instructions.
 
-* English - onebit
 * Deutsch - 𝓩𝓮𝓬𝓴𝓮_𝓓𝓲𝓻𝓴
-* Nederlands - NicoLodbrok
+* English - onebit
 * Français - Kronos
+* Nederlands - NicoLodbrok
 * Polski - FemboyGaymer
 * Slovenčina - OndikSBG
