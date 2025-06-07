@@ -281,18 +281,39 @@ namespace DriverAssist.Implementation
             {
                 DVTrainCarWrapper train = new(trainCar);
                 log.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
-                LocoSettings settings = config.LocoSettings[locoEntity?.Type ?? ""];
-                log.Info("LocoSettings: " + settings);
-                if (locoEntity != null)
+                log.Debug($"trainCar.carType={trainCar?.carType.ToString()}");
+                if (locoEntity == null)
                 {
-                    locoEntity.UpdateLocomotive(train);
-                    locoEntity.Components.LocoSettings = null;
-                    if (settings != null)
-                    {
-                        locoEntity.Components.LocoSettings = settings;
-                    }
-                    EnterLoco.Invoke(locoEntity);
+                    log.Warn("locoEntity is null, cannot change car");
+                    return;
                 }
+
+                locoEntity.UpdateLocomotive(train);
+                locoEntity.Components.LocoSettings = null;
+                LocoSettings settings = config.LocoSettings[locoEntity.Type];
+                log.Debug($"locoEntity.Type={locoEntity.Type}");
+                log.Debug(
+                    $"MinTorque={settings.MinTorque}" +
+                    $", MaxAmps={settings.MaxAmps}" +
+                    $", OperatingTemp={settings.OperatingTemp}" +
+                    $", HillClimbTemp={settings.HillClimbTemp}" +
+                    $", BrakingTime={settings.BrakingTime}" +
+                    $", BrakeReleaseFactor={settings.BrakeReleaseFactor}" +
+                    $", MinBrake={settings.MinBrake}" +
+                    $", HillClimbAccel={settings.HillClimbAccel}" +
+                    $", CruiseAccel={settings.CruiseAccel}" +
+                    $", MaxAccel={settings.MaxAccel}"
+                        );
+                if (settings != null)
+                {
+                    log.Debug("Assigned settings to locoEntity");
+                    locoEntity.Components.LocoSettings = settings;
+                }
+                else
+                {
+                    log.Warn("No loco settings found for locoEntity");
+                }
+                EnterLoco.Invoke(locoEntity);
             }
         }
 
