@@ -77,11 +77,7 @@ Put the reverser into neutral to avoid speeding away. Press `PAGE UP` to increas
 
 # Development
 
-Open the browser to [91X](https://player.listenlive.co/36281).
-
-Run `build.bat` to build and install the mod. This builds the solution with `dotnet build` and copies the DLL to the `Mods` folder.
-
-Use `dotnet test` to run the unit tests.
+See [DEVELOPMENT.md](DEVELOPMENT.md).
 
 # Translation
 

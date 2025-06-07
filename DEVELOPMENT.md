@@ -5,6 +5,10 @@
 dotnet test
 ```
 
+# Dev Testing
+
+Run `build.bat` to build and install the mod. This builds the solution with `dotnet build` and copies the DLL to the `Mods` folder.
+
 ## Create release
 
 Update `repository.json`.
@@ -25,4 +29,3 @@ Run `release.bat`.
 Create a `v#.#.#` git tag and push the tag.
 
 Upload zip to github.
-
