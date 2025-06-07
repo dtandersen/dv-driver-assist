@@ -1,6 +1,11 @@
 # Driver Assist Development
 
+## Command Prompt
+
+Modify `.vscode/settings.json` with the path to the Derail Valley install.
+
 ## Run Tests
+
 ```
 dotnet test
 ```
