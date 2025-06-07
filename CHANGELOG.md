@@ -1,3 +1,7 @@
+0.11.0 - June 7, 2025
+
+- Locomotive settings now load correctly.
+
 0.10.0 - May 11, 2025
 
 - Update to build 99.4 courtesy of Kotenuki.

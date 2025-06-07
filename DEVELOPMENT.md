@@ -29,6 +29,23 @@ Update `repository.json`.
 }
 ```
 
+Update the version in `Info.json`.
+
+```
+{
+  "Id": "DriverAssist",
+  "DisplayName": "Driver Assist",
+  "Author": "onebit",
+  "Version": "0.10.0",
+  "AssemblyName": "DriverAssist.dll",
+  "ManagerVersion": "0.32.4",
+  "EntryMethod": "DriverAssist.UMM.DriverAssistUmmMod.Load",
+  "HomePage": "https://www.nexusmods.com/derailvalley/mods/663",
+  "Repository": "https://raw.githubusercontent.com/dtandersen/dv-driver-assist/main/repository.json"
+}
+
+```
+
 Run `release.bat`.
 
 Create a `v#.#.#` git tag and push the tag.
