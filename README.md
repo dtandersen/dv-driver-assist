@@ -84,11 +84,13 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
 **Development**
 
 * Kotenuki - b99.4 conversion
+* Ajurna - settings debugging
 
 **Translation**
 
-If you would like to provide a translation for another language please join the Discord server.
+The mod is translated into several languages. It uses the language selected in the game settings. If you would like to provide a translation for another language please join the Discord server. You may also submit a LANGUAGE.md file for instructions.
 
+* English - onebit
 * Deutsch - 𝓩𝓮𝓬𝓴𝓮_𝓓𝓲𝓻𝓴
 * Nederlands - NicoLodbrok
 * Français - Kronos
