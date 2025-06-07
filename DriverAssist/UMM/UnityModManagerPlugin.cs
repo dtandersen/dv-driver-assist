@@ -375,6 +375,11 @@ namespace DriverAssist.UMM
             this.scope = scope;
         }
 
+        public void Debug(string message)
+        {
+            logger.Log($"{scope,-25} DEBUG {message}");
+        }
+
         public void Info(string message)
         {
             logger.Log($"{scope,-25} INFO  {message}");
