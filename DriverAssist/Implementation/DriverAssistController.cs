@@ -26,7 +26,7 @@ namespace DriverAssist.Implementation
         private CruiseControlWindow? cruiseControlWindow;
         private StatsWindow? statsWindow;
         private JobWindow? jobWindow;
-        private readonly Logger logger = LogFactory.GetLogger(typeof(DriverAssistController));
+        private readonly Logger log = LogFactory.GetLogger(typeof(DriverAssistController));
         private SystemManager? systemManager;
         private JobSystem? jobSystem;
 
@@ -47,7 +47,7 @@ namespace DriverAssist.Implementation
         public void Init()
         {
             Instance = this;
-            logger.Info($"Init");
+            log.Info($"Init");
 
             WorldStreamingInit.LoadingFinished += OnLoadingFinished;
             UnloadWatcher.UnloadRequested += OnUnloadRequested;
@@ -55,7 +55,7 @@ namespace DriverAssist.Implementation
             // we might already be in a loco (reloaded mod)
             if (PlayerManager.PlayerTransform != null)
             {
-                logger.Info($"Player detected");
+                log.Info($"Player detected");
                 CheckForPlayer();
             }
         }
@@ -65,9 +65,9 @@ namespace DriverAssist.Implementation
         {
             TranslationManager.SetLangage(LocalizationManager.CurrentLanguage);
 
-            logger.Info("Register jobs");
+            log.Info("Register jobs");
             loaded = true;
-            logger.Info("Load");
+            log.Info("Load");
 
             gameObject = new GameObject("DriverAssistWindow");
             statsWindow = gameObject.AddComponent<StatsWindow>();
@@ -128,10 +128,10 @@ namespace DriverAssist.Implementation
 
         public void Unload()
         {
-            logger.Info("Unload");
+            log.Info("Unload");
             if (!loaded)
             {
-                logger.Warn("Tried to unload DriverAssist, but it's not loaded");
+                log.Warn("Tried to unload DriverAssist, but it's not loaded");
                 return;
             }
 
@@ -180,10 +180,10 @@ namespace DriverAssist.Implementation
 
         public void OnDestroy()
         {
-            logger.Info("OnDestroy");
+            log.Info("OnDestroy");
             if (!loaded)
             {
-                logger.Warn("Called OnDestroy before Unload");
+                log.Warn("Called OnDestroy before Unload");
             }
 
             WorldStreamingInit.LoadingFinished -= OnLoadingFinished;
@@ -254,7 +254,7 @@ namespace DriverAssist.Implementation
                 {
                     foreach (var port in locoEntity.Ports)
                     {
-                        logger.Info($"{port}");
+                        log.Info($"{port}");
                     }
                 }
             }
@@ -262,7 +262,7 @@ namespace DriverAssist.Implementation
 
         public void ChangeCar(TrainCar? trainCar)
         {
-            logger.Info($"ChangeCar {trainCar?.carType.ToString() ?? "null"}");
+            log.Info($"ChangeCar {trainCar?.carType.ToString() ?? "null"}");
 
             LoadIfNotLoaded();
             if (trainCar == null || !trainCar.IsLoco)
@@ -274,14 +274,15 @@ namespace DriverAssist.Implementation
                     locoEntity.Components.LocoSettings = null;
 
                 }
-                logger.Info($"Exited train car");
+                log.Info($"Exited train car");
                 if (locoEntity != null) locoEntity.Components.CruiseControl = null;
             }
             else
             {
                 DVTrainCarWrapper train = new(trainCar);
-                logger.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
+                log.Info($"Entered train car {trainCar?.carType.ToString() ?? "null"}");
                 LocoSettings settings = config.LocoSettings[locoEntity?.Type ?? ""];
+                log.Info("LocoSettings: " + settings);
                 if (locoEntity != null)
                 {
                     locoEntity.UpdateLocomotive(train);
@@ -303,13 +304,13 @@ namespace DriverAssist.Implementation
 
         public void OnLoadingFinished()
         {
-            logger.Info($"OnLoadingFinished");
+            log.Info($"OnLoadingFinished");
             ChangeCar(PlayerManager.Car);
         }
 
         public void OnUnloadRequested()
         {
-            logger.Info($"OnUnloadRequested");
+            log.Info($"OnUnloadRequested");
             Unload();
         }
 
@@ -321,25 +322,25 @@ namespace DriverAssist.Implementation
         /// Player has entered or exited a car
         public void OnCarChanged(TrainCar? enteredCar)
         {
-            logger.Info($"OnCarChanged {enteredCar?.carType.ToString() ?? "null"}");
+            log.Info($"OnCarChanged {enteredCar?.carType.ToString() ?? "null"}");
             ChangeCar(enteredCar);
         }
 
         internal void OnRegisterJob(Job job)
         {
-            logger.Info($"OnRegisterJob {job.ID} {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
+            log.Info($"OnRegisterJob {job.ID} {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
             JobWrapper jw = new DVJobWrapper(job);
             void LogTasks(List<TaskWrapper> tasks, string prefix)
             {
                 int i = 1;
                 foreach (TaskWrapper task in tasks)
                 {
-                    logger.Info($"{prefix}{i} - Type={(TaskType)task.Type} Source={task.Source} Dest={task.Destination}");
+                    log.Info($"{prefix}{i} - Type={(TaskType)task.Type} Source={task.Source} Dest={task.Destination}");
                     if (task.IsParallel || task.IsSequential)
                     {
-                        logger.Info($"--- BEGIN SUBTASKS ---");
+                        log.Info($"--- BEGIN SUBTASKS ---");
                         LogTasks(task.Tasks, $"{prefix}{i}.");
-                        logger.Info($"--- END SUBTASKS ---");
+                        log.Info($"--- END SUBTASKS ---");
                     }
                     i++;
                 }
@@ -351,7 +352,7 @@ namespace DriverAssist.Implementation
 
         internal void OnUnregisterJob(Job job)
         {
-            logger.Info($"OnUnregisterJob {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
+            log.Info($"OnUnregisterJob {job.chainData.chainOriginYardId} -> {job.chainData.chainDestinationYardId}");
             jobSystem?.RemoveJob(job.ID);
         }
     }

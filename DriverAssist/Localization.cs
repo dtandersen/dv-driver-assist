@@ -78,6 +78,7 @@ namespace DriverAssist.Localization
                 "French" => new TranslationFR(),
                 "Polish" => new TranslationPL(),
                 "Slovak" => new TranslationSK(),
+                "Dutch" => new TranslationNL(),
                 _ => new TranslationEN(),
             };
 
@@ -123,6 +124,45 @@ namespace DriverAssist.Localization
         public string JOB_ID => "Job";
         public string JOB_ORIGIN => "Origin";
         public string JOB_DESTINATION => "Destination";
+    }
+    public class TranslationNL : Translation
+    {
+        public string CC_SETPOINT => "Instelpunt";
+        public string CC_STATUS => "Status";
+        public string CC_COASTING => "Uitrollen";
+        public string CC_DECELERATING => "Vertragen naar {0} km/u";
+        public string CC_ACCELERATING => "Versnellen naar {0} km/u";
+        public string CC_CHANGING_DIRECTION => "Van richting aan het veranderen";
+        public string CC_STOPPING => "Aan het stoppen";
+        public string CC_WARNING_NEUTRAL => "Neutraal: Zet de locomotief in een versnelling";
+        public string CC_DISABLED => "Uitgeschakeld";
+        public string CC_UNSUPPORTED => "Neutraal: {0} is niet ondersteunt";
+
+        public string STAT_LOCOMOTIVE => "Locomotief";
+        public string STAT_MASS => "Massa";
+        public string STAT_SPEED => "Snelheid (km/u)";
+        public string STAT_ACCELERATION => "Acceleratie (m/s^2)";
+        public string STAT_TORQUE => "Koppel";
+        public string STAT_POWER => "Kracht (kW)";
+        public string STAT_HORSEPOWER => "PK";
+        public string STAT_THROTTLE => "Gas";
+        public string STAT_TEMPERATURE => "Temperatuur";
+        public string STAT_TEMPERATURE_CHANGE => "Temperatuur verandering";
+        public string STAT_AMPS => "Amperes";
+        public string STAT_RPM => "O/pm";
+
+        public string LOCOMOTIVE => "Locomotief";
+        public string CARGO => "Vracht";
+
+        public string STAT_CURRENT => "Huidig";
+        public string STAT_CHANGE => "Δ";
+        public string TRAIN => "Trein";
+        public string LOCO_ABBV => "Loco";
+
+        public string JOB_TITLE => "Taken";
+        public string JOB_ID => "Taak";
+        public string JOB_ORIGIN => "Oorsprong";
+        public string JOB_DESTINATION => "Bestemming";
     }
 
     public class TranslationDE : Translation
