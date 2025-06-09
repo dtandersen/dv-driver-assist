@@ -290,22 +290,21 @@ namespace DriverAssist.Implementation
 
                 locoEntity.UpdateLocomotive(train);
                 locoEntity.Components.LocoSettings = null;
-                LocoSettings settings = config.LocoSettings[locoEntity.Type];
-                log.Debug($"locoEntity.Type={locoEntity.Type}");
-                log.Debug(
-                    $"MinTorque={settings.MinTorque}" +
-                    $", MaxAmps={settings.MaxAmps}" +
-                    $", OperatingTemp={settings.OperatingTemp}" +
-                    $", HillClimbTemp={settings.HillClimbTemp}" +
-                    $", BrakingTime={settings.BrakingTime}" +
-                    $", BrakeReleaseFactor={settings.BrakeReleaseFactor}" +
-                    $", MinBrake={settings.MinBrake}" +
-                    $", HillClimbAccel={settings.HillClimbAccel}" +
-                    $", CruiseAccel={settings.CruiseAccel}" +
-                    $", MaxAccel={settings.MaxAccel}"
-                        );
-                if (settings != null)
+
+                if (config.LocoSettings.TryGetValue(locoEntity.Type, out LocoSettings? settings))
                 {
+                    log.Debug(
+                        $"MinTorque={settings.MinTorque}" +
+                        $", MaxAmps={settings.MaxAmps}" +
+                        $", OperatingTemp={settings.OperatingTemp}" +
+                        $", HillClimbTemp={settings.HillClimbTemp}" +
+                        $", BrakingTime={settings.BrakingTime}" +
+                        $", BrakeReleaseFactor={settings.BrakeReleaseFactor}" +
+                        $", MinBrake={settings.MinBrake}" +
+                        $", HillClimbAccel={settings.HillClimbAccel}" +
+                        $", CruiseAccel={settings.CruiseAccel}" +
+                        $", MaxAccel={settings.MaxAccel}"
+                    );
                     log.Debug("Assigned settings to locoEntity");
                     locoEntity.Components.LocoSettings = settings;
                 }
