@@ -193,6 +193,7 @@ namespace DriverAssist.Implementation
         public void OnFixedUpdate()
         {
             if (!loaded) return;
+            if (locoEntity?.Type == "LocoDM1U") return;
 
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
